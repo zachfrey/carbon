@@ -9,7 +9,7 @@ import { requirePermissions } from "@carbon/auth/auth.server";
 import { flash } from "@carbon/auth/session.server";
 import { InviteEmail } from "@carbon/documents/email";
 import { validationError, validator } from "@carbon/form";
-import { resend } from "@carbon/lib/resend.server";
+import { sendEmail } from "@carbon/lib/resend.server";
 import { render } from "@react-email/components";
 import { tasks } from "@trigger.dev/sdk/v3";
 import type { ActionFunctionArgs } from "@vercel/remix";
@@ -70,7 +70,7 @@ export async function action({ request }: ActionFunctionArgs) {
       );
     }
 
-    const invitationEmail = await resend.emails.send({
+    const invitationEmail = await sendEmail({
       from: `Carbon <no-reply@${RESEND_DOMAIN}>`,
       to: user.data.email,
       subject: `You have been invited to join ${company.data?.name} on Carbon`,

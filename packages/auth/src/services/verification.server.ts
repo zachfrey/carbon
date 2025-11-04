@@ -1,6 +1,6 @@
 import { VerificationEmail } from "@carbon/documents/email";
 import { redis } from "@carbon/kv";
-import { resend } from "@carbon/lib/resend.server";
+import { sendEmail } from "@carbon/lib/resend.server";
 import { render } from "@react-email/components";
 import { RESEND_DOMAIN } from "../config/env";
 
@@ -24,12 +24,13 @@ export async function sendVerificationCode(email: string) {
       })
     );
 
-    const result = await resend.emails.send({
+    const result = await sendEmail({
       from: `Carbon <no-reply@${RESEND_DOMAIN}>`,
       to: email,
       subject: "Verify your email address",
       html,
     });
+    console.log(result);
 
     return !result.error;
   } catch (error) {

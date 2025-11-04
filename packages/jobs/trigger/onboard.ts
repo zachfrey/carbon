@@ -2,7 +2,7 @@ import { openai } from "@ai-sdk/openai";
 import { getCarbonServiceRole, RESEND_DOMAIN } from "@carbon/auth";
 import type { Database } from "@carbon/database";
 import { GetStartedEmail, WelcomeEmail } from "@carbon/documents/email";
-import { resend } from "@carbon/lib/resend.server";
+import { resend, sendEmail } from "@carbon/lib/resend.server";
 import { getSlackClient } from "@carbon/lib/slack.server";
 import { getTwentyClient } from "@carbon/lib/twenty.server";
 import { render } from "@react-email/components";
@@ -253,7 +253,7 @@ export const onboardTask = task({
         );
 
         if (sendOnboardingEmail) {
-          await resend.emails.send({
+          await sendEmail({
             from,
             to: user.data.email,
             subject: `Welcome to Carbon`,
@@ -268,7 +268,7 @@ export const onboardTask = task({
         await wait.for({ days: 3 });
 
         if (sendOnboardingEmail) {
-          await resend.emails.send({
+          await sendEmail({
             from,
             to: user.data.email,
             subject: `Get the most out of Carbon`,

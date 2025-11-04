@@ -5,6 +5,7 @@ import {
   CONTROLLED_ENVIRONMENT,
   error,
   magicLinkValidator,
+  RATE_LIMIT,
 } from "@carbon/auth";
 import { sendMagicLink, verifyAuthSession } from "@carbon/auth/auth.server";
 import { flash, getAuthSession } from "@carbon/auth/session.server";
@@ -54,7 +55,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 const ratelimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(5, "1 h"), // 5 submissions per hour
+  limiter: Ratelimit.slidingWindow(RATE_LIMIT, "1 h"),
   analytics: true,
 });
 

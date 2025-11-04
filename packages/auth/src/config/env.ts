@@ -192,6 +192,10 @@ export const CLOUDFLARE_TURNSTILE_SECRET_KEY = getEnv(
   "CLOUDFLARE_TURNSTILE_SECRET_KEY",
   { isRequired: false }
 );
+export const RATE_LIMIT = parseInt(
+  getEnv("RATE_LIMIT", { isRequired: false, isSecret: false }) || "5",
+  10
+);
 
 export function getAppUrl() {
   if (VERCEL_ENV === "production" || NODE_ENV === "production") {

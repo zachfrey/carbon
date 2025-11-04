@@ -10,7 +10,7 @@ import {
 } from "@carbon/auth";
 import { deactivateUser } from "@carbon/auth/users.server";
 import { InviteEmail } from "@carbon/documents/email";
-import { resend } from "@carbon/lib/resend.server";
+import { sendEmail } from "@carbon/lib/resend.server";
 import { updateSubscriptionQuantityForCompany } from "@carbon/stripe/stripe.server";
 import { Edition } from "@carbon/utils";
 import { render } from "@react-email/components";
@@ -86,7 +86,7 @@ export const userAdminTask = task({
           };
         }
 
-        const invitationEmail = await resend.emails.send({
+        const invitationEmail = await sendEmail({
           from: `Carbon <no-reply@${RESEND_DOMAIN}>`,
           to: user.data.email,
           subject: `You have been invited to join ${company.data?.name} on Carbon`,
