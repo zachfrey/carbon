@@ -5,7 +5,7 @@ import { orchestrationAgent } from "./agents/orchestration-agent";
 import { createChatContext } from "./agents/shared/context";
 
 export const config = {
-  runtime: "edge",
+  runtime: "node",
 };
 
 export async function action({ request }: ActionFunctionArgs) {
