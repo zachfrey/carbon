@@ -5,9 +5,8 @@ import { validationError, validator } from "@carbon/form";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@vercel/remix";
 import { json, redirect } from "@vercel/remix";
-import type z from "zod";
-import type {
-  calibrationAttempt} from "~/modules/quality";
+import type z from "zod/v3";
+import type { calibrationAttempt } from "~/modules/quality";
 import {
   gaugeCalibrationRecordValidator,
   getGaugeCalibrationRecord,

@@ -22,17 +22,20 @@ export default defineConfig({
   define: {
     global: "globalThis",
   },
+  optimizeDeps: {
+    extensions: [".css", ".scss", ".sass"], // explicitly include CSS extensions if needed
+  },
   ssr: {
     noExternal: [
       "katex",
-      "react-tweet",
+      "novel",
       "react-dropzone",
+      "react-tweet",
       "react-icons",
       "react-json-view-lite",
       "react-phone-number-input",
       "tailwind-merge",
     ],
-    external: ["@xyflow/react/dist/style.css"],
   },
 
   server: {

@@ -15,8 +15,8 @@ import {
   TiptapImage,
   TiptapLink,
   UpdatedImage,
-} from "novel/extensions";
-import { UploadImagesPlugin } from "novel/plugins";
+  UploadImagesPlugin,
+} from "novel";
 
 // Video regex patterns
 const LOOM_REGEX = /https:\/\/www\.loom\.com\/share\/([a-zA-Z0-9]+)/;

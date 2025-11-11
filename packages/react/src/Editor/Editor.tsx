@@ -3,6 +3,7 @@
 import TextStyle from "@tiptap/extension-text-style";
 import type { JSONContent } from "novel";
 import {
+  Command,
   EditorBubble,
   EditorCommand,
   EditorCommandEmpty,
@@ -10,18 +11,13 @@ import {
   EditorCommandList,
   EditorContent,
   EditorRoot,
-} from "novel";
-import {
-  Command,
   ImageResizer,
-  handleCommandNavigation,
-  renderItems,
-} from "novel/extensions";
-import {
   createImageUpload,
+  handleCommandNavigation,
   handleImageDrop,
   handleImagePaste,
-} from "novel/plugins";
+  renderItems,
+} from "novel";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Separator } from "../Separator";

@@ -1,5 +1,5 @@
 import { tool } from "ai";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { getCurrencyByCode } from "~/modules/accounting/accounting.service";
 import {
   deletePurchaseOrder,

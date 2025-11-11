@@ -21,6 +21,9 @@ export default defineConfig({
   define: {
     global: "globalThis",
   },
+  optimizeDeps: {
+    extensions: [".css", ".scss", ".sass"], // explicitly include CSS extensions if needed
+  },
   ssr: {
     noExternal: [
       "react-tweet",
