@@ -26,7 +26,7 @@ import { Form, Link, useMatches } from "@remix-run/react";
 import { BsFillHexagonFill } from "react-icons/bs";
 import { IoMdAdd } from "react-icons/io";
 import { LuChevronsUpDown } from "react-icons/lu";
-import { z } from 'zod/v3';
+import { z } from "zod/v3";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -34,8 +34,12 @@ import {
 } from "~/components";
 
 import { useMode } from "@carbon/remix";
-import { Currency, Input, Submit } from "~/components/Form";
-import Country from "~/components/Form/Country";
+import {
+  AddressAutocomplete,
+  Currency,
+  Input,
+  Submit,
+} from "~/components/Form";
 import { useRouteData, useUser } from "~/hooks";
 import type { Company } from "~/modules/settings";
 import { companyValidator } from "~/modules/settings/settings.models";
@@ -207,11 +211,7 @@ function CompanyBreadcrumb() {
                 <ModalBody>
                   <VStack spacing={4}>
                     <Input autoFocus name="name" label="Company Name" />
-                    <Input name="addressLine1" label="Address" />
-                    <Input name="city" label="City" />
-                    <Input name="stateProvince" label="State / Province" />
-                    <Input name="postalCode" label="Postal Code" />
-                    <Country name="countryCode" />
+                    <AddressAutocomplete variant="grid" />
                     <Currency name="baseCurrencyCode" label="Base Currency" />
                   </VStack>
                 </ModalBody>

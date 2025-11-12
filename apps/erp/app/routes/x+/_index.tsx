@@ -5,6 +5,7 @@ import { useLocale } from "@react-aria/i18n";
 import { Link } from "@remix-run/react";
 import { useMemo, type ComponentProps } from "react";
 import { ChatInterface } from "~/components/Chat";
+// import { DevTools } from "~/components/Chat/DevTools.client";
 import { useChatInterface } from "~/components/Chat/hooks/useChatInterface";
 import { Greeting } from "~/components/Greeting";
 import { useModules } from "~/hooks";
@@ -23,6 +24,7 @@ const ChatPage = () => {
   return (
     <ChatProvider initialMessages={[]} key={currentChatId || "home"}>
       <ChatInterface />
+      {/* {getAppUrl().includes("localhost") && <DevTools />} */}
     </ChatProvider>
   );
 };

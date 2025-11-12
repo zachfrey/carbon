@@ -4,6 +4,7 @@
   "dependencies": {
     "@ai-sdk-tools/agents": "1.0.8",
     "@ai-sdk-tools/artifacts": "1.0.8",
+    "@ai-sdk-tools/devtools": "1.0.8",
     "@ai-sdk-tools/cache": "1.0.8",
     "@ai-sdk-tools/memory": "1.0.8",
     "@ai-sdk-tools/store": "1.0.8",

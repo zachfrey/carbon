@@ -1,7 +1,7 @@
 import { useArtifacts } from "@ai-sdk-tools/artifacts/client";
 import { useChatActions, useChatId, useChatStatus } from "@ai-sdk-tools/store";
 import { cn } from "@carbon/react";
-import { forwardRef, useRef } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { CommandMenu } from "./CommandMenu";
 import { useChatStore } from "./lib/store";
 import {
@@ -32,9 +32,22 @@ interface ChatInputProps {
   hasMessages: boolean;
 }
 
+const placeholderTexts = [
+  "Create a purchase order for 5 boxes of rubber gloves",
+  "Get the status of the SpaceX order",
+  'Create a quality issue for 1/4" steel from Alro',
+  "Generate a quote for 1000 widgets",
+  "What is John Doe working on today?",
+  "How much money are we owed right now?",
+];
+
 export const ChatInput = forwardRef<RecordButtonRef, ChatInputProps>(
   function ChatInput({ hasMessages }, ref) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const [currentPlaceholder, setCurrentPlaceholder] = useState("");
+    const [currentTextIndex, setCurrentTextIndex] = useState(0);
+    const [currentCharIndex, setCurrentCharIndex] = useState(0);
+    const [isTyping, setIsTyping] = useState(true);
 
     const status = useChatStatus();
     const { sendMessage, stop } = useChatActions();
@@ -59,6 +72,43 @@ export const ChatInput = forwardRef<RecordButtonRef, ChatInputProps>(
       handleKeyDown,
       resetCommandState,
     } = useChatStore();
+
+    // Animated placeholder effect
+    useEffect(() => {
+      if (isWebSearch || isRecording) return;
+
+      const currentText = placeholderTexts[currentTextIndex];
+
+      const typeText = () => {
+        if (isTyping) {
+          if (currentCharIndex < currentText.length) {
+            setCurrentPlaceholder(currentText.slice(0, currentCharIndex + 1));
+            setCurrentCharIndex((prev) => prev + 1);
+          } else {
+            // Finished typing, wait then start erasing
+            setTimeout(() => setIsTyping(false), 1000);
+          }
+        } else {
+          if (currentCharIndex > 0) {
+            setCurrentPlaceholder(currentText.slice(0, currentCharIndex - 1));
+            setCurrentCharIndex((prev) => prev - 1);
+          } else {
+            // Finished erasing, move to next text
+            setCurrentTextIndex((prev) => (prev + 1) % placeholderTexts.length);
+            setIsTyping(true);
+          }
+        }
+      };
+
+      const timeout = setTimeout(typeText, isTyping ? 50 : 25);
+      return () => clearTimeout(timeout);
+    }, [
+      currentCharIndex,
+      currentTextIndex,
+      isTyping,
+      isWebSearch,
+      isRecording,
+    ]);
 
     const handleSubmit = (message: ChatInputMessage) => {
       // If currently streaming or submitted, stop instead of submitting
@@ -160,7 +210,7 @@ export const ChatInput = forwardRef<RecordButtonRef, ChatInputProps>(
                   }}
                   value={input}
                   placeholder={
-                    isWebSearch ? "Search the web" : "You can just do things"
+                    isWebSearch ? "Search the web" : currentPlaceholder
                   }
                 />
               </PromptInputBody>
