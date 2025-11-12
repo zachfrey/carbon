@@ -19,8 +19,9 @@ import {
   toast,
   useDebounce,
   useDisclosure,
+  generateHTML,
 } from "@carbon/react";
-import { Editor, generateHTML } from "@carbon/react/Editor.client";
+import { Editor } from "@carbon/react/Editor.client";
 import { formatDate } from "@carbon/utils";
 import { parseDate } from "@internationalized/date";
 import { useFetchers, useParams, useSubmit } from "@remix-run/react";

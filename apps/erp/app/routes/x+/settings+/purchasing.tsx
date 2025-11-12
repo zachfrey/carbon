@@ -13,8 +13,9 @@ import {
   ScrollArea,
   useDebounce,
   VStack,
+  generateHTML,
 } from "@carbon/react";
-import { Editor, generateHTML } from "@carbon/react/Editor.client";
+import { Editor } from "@carbon/react/Editor.client";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { json, redirect, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@vercel/remix";

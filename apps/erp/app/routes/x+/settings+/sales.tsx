@@ -14,7 +14,7 @@ import {
   toast,
   useDebounce,
   VStack,
-} from "@carbon/react";
+ generateHTML } from "@carbon/react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@vercel/remix";
 import { json, redirect } from "@vercel/remix";
 
@@ -37,7 +37,7 @@ import type { Handle } from "~/utils/handle";
 import { path } from "~/utils/path";
 
 import type { JSONContent } from "@carbon/react";
-import { Editor, generateHTML } from "@carbon/react/Editor.client";
+import { Editor } from "@carbon/react/Editor.client";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { LuCircleCheck } from "react-icons/lu";
 import { usePermissions, useUser } from "~/hooks";

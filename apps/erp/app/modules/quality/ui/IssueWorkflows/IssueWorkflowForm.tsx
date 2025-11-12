@@ -9,8 +9,9 @@ import {
   HStack,
   toast,
   VStack,
+  generateHTML,
 } from "@carbon/react";
-import { Editor, generateHTML } from "@carbon/react/Editor.client";
+import { Editor } from "@carbon/react/Editor.client";
 import { nanoid } from "nanoid";
 import { useState } from "react";
 import type { z } from "zod/v3";

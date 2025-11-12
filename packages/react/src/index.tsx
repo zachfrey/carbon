@@ -124,7 +124,7 @@ import {
   FormLabel,
 } from "./Form";
 import { HStack } from "./HStack";
-import { HTML } from "./HTML";
+import { HTML, generateHTML } from "./HTML";
 import { Heading } from "./Heading";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./HoverCard";
 import { IconButton } from "./IconButton";
@@ -547,7 +547,10 @@ export {
   TabsList,
   TabsTrigger,
   Tbody,
-  Td, TextShimmer, Textarea, Tfoot,
+  Td,
+  TextShimmer,
+  Textarea,
+  Tfoot,
   Th,
   Thead,
   TimePicker,
@@ -564,6 +567,7 @@ export {
   buttonVariants,
   cn,
   copyToClipboard,
+  generateHTML,
   getValidChildren,
   multiSelectTriggerVariants,
   reactNodeToString,
@@ -572,7 +576,7 @@ export {
   useModalCardType,
   useModalDrawerType,
   useOperatingSystem,
-  useSidebar
+  useSidebar,
 };
 export type {
   AvatarProps,
@@ -589,6 +593,5 @@ export type {
   OperatingSystemPlatform,
   Shortcut,
   ShortcutDefinition,
-  TextareaProps
+  TextareaProps,
 };
-

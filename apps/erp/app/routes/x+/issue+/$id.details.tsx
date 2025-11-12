@@ -13,8 +13,9 @@ import {
   useDebounce,
   VStack,
   type JSONContent,
+  generateHTML,
 } from "@carbon/react";
-import { Editor, generateHTML } from "@carbon/react/Editor.client";
+import { Editor } from "@carbon/react/Editor.client";
 import { Await, useLoaderData, useParams } from "@remix-run/react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@vercel/remix";
 import { json, redirect } from "@vercel/remix";

@@ -22,6 +22,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  generateHTML,
   HStack,
   IconButton,
   Input as InputField,
@@ -45,7 +46,7 @@ import {
   useMount,
   VStack,
 } from "@carbon/react";
-import { Editor, generateHTML } from "@carbon/react/Editor.client";
+import { Editor } from "@carbon/react/Editor.client";
 import {
   formatDateTime,
   formatDurationMilliseconds,

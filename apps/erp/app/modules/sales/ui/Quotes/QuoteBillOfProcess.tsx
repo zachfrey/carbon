@@ -32,8 +32,9 @@ import {
   useDebounce,
   useDisclosure,
   VStack,
+  generateHTML,
 } from "@carbon/react";
-import { Editor, generateHTML } from "@carbon/react/Editor.client";
+import { Editor } from "@carbon/react/Editor.client";
 import { formatRelativeTime } from "@carbon/utils";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { useFetcher, useFetchers, useParams } from "@remix-run/react";
