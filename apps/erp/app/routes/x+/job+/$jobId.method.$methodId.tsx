@@ -18,6 +18,7 @@ import { usePanels } from "~/components/Layout";
 import { usePermissions, useRouteData } from "~/hooks";
 import type { Job } from "~/modules/production";
 import {
+  getJob,
   getJobMakeMethodById,
   getJobMaterialsByMethodId,
   getJobOperationsByMethodId,
@@ -42,12 +43,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (!jobId) throw new Error("Could not find jobId");
   if (!methodId) throw new Error("Could not find methodId");
 
-  const [materials, operations, tags, makeMethod] = await Promise.all([
+  const [job, materials, operations, tags, makeMethod] = await Promise.all([
+    getJob(client, jobId),
     getJobMaterialsByMethodId(client, methodId),
     getJobOperationsByMethodId(client, methodId),
     getTagsList(client, companyId, "operation"),
     getJobMakeMethodById(client, methodId, companyId),
   ]);
+
+  if (job.error) {
+    throw redirect(
+      path.to.jobs,
+      await flash(request, error(materials.error, "Failed to load job"))
+    );
+  }
 
   if (materials.error) {
     throw redirect(
@@ -80,6 +89,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   return defer({
+    job: job.data,
     materials:
       materials?.data.map((m) => ({
         ...m,
@@ -116,7 +126,7 @@ export default function JobMakeMethodRoute() {
   const routeData = useRouteData<{ job: Job }>(path.to.job(jobId));
 
   const loaderData = useLoaderData<typeof loader>();
-  const { materials, operations, productionData, tags } = loaderData;
+  const { job, materials, operations, productionData, tags } = loaderData;
 
   const { setIsExplorerCollapsed, isExplorerCollapsed } = usePanels();
 
@@ -138,6 +148,8 @@ export default function JobMakeMethodRoute() {
           locationId={routeData?.job?.locationId ?? ""}
           tags={tags}
           itemId={makeMethod.itemId}
+          salesOrderLineId={job.salesOrderLineId ?? ""}
+          customerId={job.customerId ?? ""}
         />
         <JobBillOfMaterial
           key={`bom:${methodId}`}

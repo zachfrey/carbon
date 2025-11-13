@@ -150,8 +150,10 @@ export const issueValidator = z.object({
   closeDate: zfd.text(z.string().optional()),
   quantity: zfd.numeric(z.number().optional()),
   items: z.array(z.string()).optional(),
-  jobId: z.string().optional(),
   jobOperationId: z.string().optional(),
+  customerId: z.string().optional(),
+  salesOrderLineId: z.string().optional(),
+  operationSupplierProcessId: z.string().optional(),
 });
 
 export const nonConformanceReviewerValidator = z.object({

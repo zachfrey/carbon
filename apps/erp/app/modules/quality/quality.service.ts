@@ -1191,7 +1191,14 @@ export async function upsertIssue(
       })
 ) {
   if ("createdBy" in nonConformance) {
-    const { items, jobId, jobOperationId, ...data } = nonConformance;
+    const {
+      items,
+      jobOperationId,
+      customerId,
+      salesOrderLineId,
+      operationSupplierProcessId,
+      ...data
+    } = nonConformance;
     const result = await client
       .from("nonConformance")
       .insert([data])
@@ -1212,30 +1219,98 @@ export async function upsertIssue(
           console.error(itemInsert);
         }
       }
-      if (jobId && jobOperationId) {
-        const [job, jobOperation] = await Promise.all([
-          client.from("job").select("*").eq("id", jobId).single(),
-          client
-            .from("jobOperation")
+      if (jobOperationId) {
+        const jobOperation = await client
+          .from("jobOperation")
+          .select("*")
+          .eq("id", jobOperationId)
+          .single();
+        if (jobOperation?.data) {
+          const job = await client
+            .from("job")
             .select("*")
-            .eq("id", jobOperationId)
-            .single(),
-        ]);
-        if (job?.data && jobOperation?.data) {
-          const jobOperationInsert = await client
-            .from("nonConformanceJobOperation")
+            .eq("id", jobOperation.data.jobId)
+            .single();
+          if (job.data) {
+            const jobOperationInsert = await client
+              .from("nonConformanceJobOperation")
+              .insert([
+                {
+                  jobId: jobOperation.data.jobId,
+                  jobOperationId,
+                  nonConformanceId: result.data.id,
+                  jobReadableId: job.data?.jobId,
+                  companyId: nonConformance.companyId,
+                  createdBy: nonConformance.createdBy,
+                },
+              ]);
+            if (jobOperationInsert.error) {
+              console.error(jobOperationInsert);
+            }
+          }
+        }
+      }
+      if (customerId) {
+        const customerInsert = await client
+          .from("nonConformanceCustomer")
+          .insert([
+            {
+              companyId: nonConformance.companyId,
+              createdBy: nonConformance.createdBy,
+              customerId: customerId,
+              nonConformanceId: result.data.id,
+            },
+          ]);
+
+        if (customerInsert.error) {
+          console.error(customerInsert);
+        }
+      }
+      if (salesOrderLineId) {
+        const salesOrderLine = await client
+          .from("salesOrderLine")
+          .select("*")
+          .eq("id", salesOrderLineId)
+          .single();
+        if (salesOrderLine.data) {
+          const salesOrderLineInsert = await client
+            .from("nonConformanceSalesOrderLine")
             .insert([
               {
-                jobId,
-                jobOperationId,
-                nonConformanceId: result.data.id,
-                jobReadableId: job.data?.jobId,
                 companyId: nonConformance.companyId,
                 createdBy: nonConformance.createdBy,
+                salesOrderLineId: salesOrderLineId,
+                salesOrderId: salesOrderLine.data.salesOrderId,
+                nonConformanceId: result.data.id,
               },
             ]);
-          if (jobOperationInsert.error) {
-            console.error(jobOperationInsert);
+
+          if (salesOrderLineInsert.error) {
+            console.error(salesOrderLineInsert);
+          }
+        }
+      }
+      if (operationSupplierProcessId) {
+        const operationSupplierProcess = await client
+          .from("supplierProcess")
+          .select("*")
+          .eq("id", operationSupplierProcessId)
+          .single();
+
+        if (operationSupplierProcess.data) {
+          const nonConformanceSupplierInsert = await client
+            .from("nonConformanceSupplier")
+            .insert([
+              {
+                companyId: nonConformance.companyId,
+                createdBy: nonConformance.createdBy,
+                supplierId: operationSupplierProcess.data.supplierId,
+                nonConformanceId: result.data.id,
+              },
+            ]);
+
+          if (nonConformanceSupplierInsert.error) {
+            console.error(nonConformanceSupplierInsert);
           }
         }
       }

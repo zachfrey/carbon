@@ -163,6 +163,7 @@ export default function IssueNewRoute() {
   const purchaseOrderLineId = params.get("purchaseOrderLineId");
   const salesOrderLineId = params.get("salesOrderLineId");
   const shipmentLineId = params.get("shipmentLineId");
+  const operationSupplierProcessId = params.get("operationSupplierProcessId");
 
   const initialValues = {
     id: undefined,
@@ -170,7 +171,7 @@ export default function IssueNewRoute() {
     approvalRequirements: [],
     customerId: customerId ?? "",
     investigationTypeIds: [],
-    items: [itemId],
+    items: itemId ? [itemId] : [],
     jobId: jobId ?? "",
     jobOperationId: jobOperationId ?? "",
     itemId: itemId ?? "",
@@ -191,6 +192,7 @@ export default function IssueNewRoute() {
     source: "Internal" as const,
     supplierId: supplierId ?? "",
     trackedEntityId: "",
+    operationSupplierProcessId: operationSupplierProcessId ?? "",
   };
 
   return (

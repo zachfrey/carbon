@@ -175,26 +175,26 @@ type JobBillOfProcessProps = {
   })[];
   tags: { name: string }[];
   itemId: string;
+  salesOrderLineId: string;
+  customerId: string;
 };
 
 function makeItems(
-  jobId: string,
-  itemId: string,
   operations: Operation[],
   tags: { name: string }[],
-  temporaryItems: TemporaryItems
+  temporaryItems: TemporaryItems,
+  urlParams: { [key: string]: string }
 ): ItemWithData[] {
   return operations.map((operation) =>
-    makeItem(jobId, itemId, operation, tags, temporaryItems)
+    makeItem(operation, tags, temporaryItems, urlParams)
   );
 }
 
 function makeItem(
-  jobId: string,
-  itemId: string,
   operation: Operation,
   tags: { name: string }[],
-  temporaryItems: TemporaryItems
+  temporaryItems: TemporaryItems,
+  urlParams: { [key: string]: string }
 ): ItemWithData {
   return {
     id: operation.id!,
@@ -255,17 +255,29 @@ function makeItem(
         </HStack>
         <HStack>
           <JobOperationTags operation={operation} availableTags={tags} />
-          <Link
-            to={`${path.to.newIssue}?jobId=${jobId}&jobOperationId=${operation.id}&itemId=${itemId}`}
-            title="Create Issue"
-          >
-            <IconButton
-              icon={<LuShieldX />}
-              variant="secondary"
-              aria-label="Create Issue"
-              size="sm"
-            ></IconButton>
-          </Link>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                to={`${path.to.newIssue}?${new URLSearchParams({
+                  jobOperationId: operation.id,
+                  operationSupplierProcessId:
+                    operation.operationSupplierProcessId ?? "",
+                  ...urlParams,
+                }).toString()}`}
+                title="Create Issue"
+              >
+                <IconButton
+                  icon={<LuShieldX />}
+                  variant="secondary"
+                  aria-label="Create Issue"
+                  size="sm"
+                ></IconButton>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>
+              <span>Create Issue</span>
+            </TooltipContent>
+          </Tooltip>
         </HStack>
       </HStack>
     ),
@@ -350,6 +362,8 @@ const JobBillOfProcess = ({
   operations: initialOperations,
   tags,
   itemId,
+  salesOrderLineId,
+  customerId,
 }: JobBillOfProcessProps) => {
   const { carbon, accessToken } = useCarbon();
   const sortOrderFetcher = useFetcher<{}>();
@@ -432,12 +446,14 @@ const JobBillOfProcess = ({
     (a, b) => (orderState[a.id!] ?? a.order) - (orderState[b.id!] ?? b.order)
   );
 
-  const items = makeItems(jobId, itemId, operations, tags, temporaryItems).map(
-    (item) => ({
-      ...item,
-      checked: checkedState[item.id] ?? false,
-    })
-  );
+  const items = makeItems(operations, tags, temporaryItems, {
+    itemId,
+    salesOrderLineId,
+    customerId,
+  }).map((item) => ({
+    ...item,
+    checked: checkedState[item.id] ?? false,
+  }));
 
   const isDisabled = ["Completed", "Cancelled"].includes(
     jobData?.job?.status ?? ""

@@ -16,7 +16,7 @@ import {
   VStack,
 } from "@carbon/react";
 import { useState } from "react";
-import type { z } from 'zod/v3';
+import type { z } from "zod/v3";
 import {
   CustomFormFields,
   Hidden,
@@ -119,6 +119,7 @@ const IssueForm = ({
           <Hidden name="salesOrderLineId" />
           <Hidden name="shipmentId" />
           <Hidden name="shipmentLineId" />
+          <Hidden name="operationSupplierProcessId" />
 
           <VStack spacing={4}>
             <div className="grid w-full gap-4 grid-cols-1 md:grid-cols-2">
