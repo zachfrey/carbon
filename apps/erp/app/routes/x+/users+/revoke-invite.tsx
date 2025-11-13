@@ -15,8 +15,6 @@ import { tasks } from "@trigger.dev/sdk";
 import { json, type ActionFunctionArgs } from "@vercel/remix";
 import { revokeInviteValidator } from "~/modules/users";
 
-export const config = { runtime: "nodejs" };
-
 export async function action({ request }: ActionFunctionArgs) {
   const { companyId } = await requirePermissions(request, {
     create: "users",

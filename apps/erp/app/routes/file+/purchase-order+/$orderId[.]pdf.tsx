@@ -12,8 +12,6 @@ import {
 import { getCompany } from "~/modules/settings";
 import { getLocale } from "~/utils/request";
 
-export const config = { runtime: "nodejs" };
-
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {
     view: "purchasing",

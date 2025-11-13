@@ -23,8 +23,6 @@ import { getUser } from "~/modules/users/users.server";
 import { loader as pdfLoader } from "~/routes/file+/sales-order+/$id[.]pdf";
 import { stripSpecialCharacters } from "~/utils/string";
 
-export const config = { runtime: "nodejs" };
-
 export async function action(args: ActionFunctionArgs) {
   const { request, params } = args;
 

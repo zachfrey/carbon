@@ -5,11 +5,9 @@ import { renderToStream } from "@react-pdf/renderer";
 import { redirect, type LoaderFunctionArgs } from "@vercel/remix";
 
 import type { TrackedEntityAttributes } from "@carbon/utils";
-import { path } from "~/utils/path";
 import { getCompanySettings } from "~/services/inventory.service";
 import { getTrackedEntitiesByOperationId } from "~/services/operations.service";
-
-export const config = { runtime: "nodejs" };
+import { path } from "~/utils/path";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {});

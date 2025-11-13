@@ -11,8 +11,6 @@ import type { ActionFunctionArgs } from "@vercel/remix";
 import { redirect } from "@vercel/remix";
 import { deactivateUsersValidator } from "~/modules/users";
 
-export const config = { runtime: "nodejs" };
-
 export async function action({ request }: ActionFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {
     delete: "users",

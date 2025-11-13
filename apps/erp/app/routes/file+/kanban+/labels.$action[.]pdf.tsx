@@ -4,8 +4,6 @@ import { renderToStream } from "@react-pdf/renderer";
 import { type LoaderFunctionArgs } from "@vercel/remix";
 import { getBase64ImageFromSupabase } from "~/modules/shared";
 
-export const config = { runtime: "nodejs" };
-
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client } = await requirePermissions(request, {
     view: "inventory",

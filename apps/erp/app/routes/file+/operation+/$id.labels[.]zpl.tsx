@@ -1,14 +1,12 @@
 import { requirePermissions } from "@carbon/auth/auth.server";
 import { generateProductLabelZPL } from "@carbon/documents/zpl";
-import { labelSizes } from "@carbon/utils";
 import type { TrackedEntityAttributes } from "@carbon/utils";
+import { labelSizes } from "@carbon/utils";
 import { redirect, type LoaderFunctionArgs } from "@vercel/remix";
 import { getTrackedEntitiesByMakeMethodId } from "~/modules/inventory";
 import { getCompanySettings } from "~/modules/settings";
 
 import { path } from "~/utils/path";
-
-export const config = { runtime: "nodejs" };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {});

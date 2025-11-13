@@ -25,8 +25,6 @@ import { getNextSequence } from "~/modules/settings/settings.service";
 import { setCustomFields } from "~/utils/form";
 import { path } from "~/utils/path";
 
-export const config = { runtime: "nodejs" };
-
 export async function action({ request }: ActionFunctionArgs) {
   assertIsPost(request);
   const { companyId, userId } = await requirePermissions(request, {

@@ -9,8 +9,6 @@ import { salesRfqDragValidator, upsertSalesRFQLine } from "~/modules/sales";
 import { setCustomFields } from "~/utils/form";
 import { path } from "~/utils/path";
 
-export const config = { runtime: "nodejs" };
-
 export async function action({ request, params }: ActionFunctionArgs) {
   assertIsPost(request);
   const { client, companyId, userId } = await requirePermissions(request, {

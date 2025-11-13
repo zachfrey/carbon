@@ -4,8 +4,6 @@ import { json, type LoaderFunctionArgs } from "@vercel/remix";
 import { getKanban } from "~/modules/inventory/inventory.service";
 import { path } from "~/utils/path";
 
-export const config = { runtime: "nodejs" };
-
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client } = await requirePermissions(request, {
     view: "inventory",

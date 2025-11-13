@@ -12,7 +12,6 @@ export const shouldRevalidate: ShouldRevalidateFunction = () => {
 
 export const config = {
   maxDuration: 300,
-  runtime: "nodejs",
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {

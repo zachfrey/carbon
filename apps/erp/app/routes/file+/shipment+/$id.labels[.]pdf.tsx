@@ -1,14 +1,12 @@
 import { requirePermissions } from "@carbon/auth/auth.server";
 import { ProductLabelPDF } from "@carbon/documents/pdf";
+import type { TrackedEntityAttributes } from "@carbon/utils";
 import { labelSizes } from "@carbon/utils";
 import { renderToStream } from "@react-pdf/renderer";
 import { redirect, type LoaderFunctionArgs } from "@vercel/remix";
 import { getShipmentTracking } from "~/modules/inventory";
 import { getCompanySettings } from "~/modules/settings/settings.service";
-import type { TrackedEntityAttributes } from "@carbon/utils";
 import { path } from "~/utils/path";
-
-export const config = { runtime: "nodejs" };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {

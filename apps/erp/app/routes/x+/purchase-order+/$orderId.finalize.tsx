@@ -30,8 +30,6 @@ import { loader as pdfLoader } from "~/routes/file+/purchase-order+/$orderId[.]p
 import { path, requestReferrer } from "~/utils/path";
 import { stripSpecialCharacters } from "~/utils/string";
 
-export const config = { runtime: "nodejs" };
-
 export async function action(args: ActionFunctionArgs) {
   const { request, params } = args;
   assertIsPost(request);

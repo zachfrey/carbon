@@ -11,11 +11,6 @@ import {
 } from "~/modules/sales";
 import { getCompanySettings } from "~/modules/settings";
 
-export const config = {
-  runtime: "nodejs",
-  maxDuration: 20,
-};
-
 export async function action({ request, params }: ActionFunctionArgs) {
   assertIsPost(request);
 

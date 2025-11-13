@@ -9,8 +9,6 @@ import { getCompanySettings } from "~/services/inventory.service";
 import { getTrackedEntity } from "~/services/operations.service";
 import { path } from "~/utils/path";
 
-export const config = { runtime: "nodejs" };
-
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {});
 

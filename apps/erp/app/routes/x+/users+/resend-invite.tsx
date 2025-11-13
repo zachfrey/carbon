@@ -17,8 +17,6 @@ import { json } from "@vercel/remix";
 import { nanoid } from "nanoid";
 import { resendInviteValidator } from "~/modules/users";
 
-export const config = { runtime: "nodejs" };
-
 export async function action({ request }: ActionFunctionArgs) {
   const { companyId } = await requirePermissions(request, {
     create: "users",

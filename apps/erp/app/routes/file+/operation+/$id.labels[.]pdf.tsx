@@ -7,10 +7,8 @@ import { redirect, type LoaderFunctionArgs } from "@vercel/remix";
 import type { TrackedEntityAttributes } from "@carbon/utils";
 import { path } from "~/utils/path";
 
-import { getCompanySettings } from "~/modules/settings/settings.service";
 import { getTrackedEntitiesByMakeMethodId } from "~/modules/inventory";
-
-export const config = { runtime: "nodejs" };
+import { getCompanySettings } from "~/modules/settings/settings.service";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {});

@@ -4,10 +4,6 @@ import { smoothStream } from "ai";
 import { orchestrationAgent } from "./agents/orchestration-agent";
 import { createChatContext } from "./agents/shared/context";
 
-export const config = {
-  runtime: "node",
-};
-
 export async function action({ request }: ActionFunctionArgs) {
   const { client, userId, companyId } = await requirePermissions(request, {});
 
