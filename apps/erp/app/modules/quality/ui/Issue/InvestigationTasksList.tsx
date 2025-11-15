@@ -26,9 +26,11 @@ import { TaskItem, TaskProgress } from "./IssueTask";
 
 export function InvestigationTasksList({
   tasks,
+  suppliers,
   isDisabled,
 }: {
   tasks: IssueInvestigationTask[];
+  suppliers: { supplierId: string }[];
   isDisabled: boolean;
 }) {
   if (tasks.length === 0) return <NewInvestigation isDisabled={isDisabled} />;
@@ -52,6 +54,7 @@ export function InvestigationTasksList({
                 key={task.id}
                 task={task}
                 type="investigation"
+                suppliers={suppliers}
                 isDisabled={isDisabled}
               />
             ))}

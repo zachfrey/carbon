@@ -68,6 +68,7 @@ export function ReviewersList({
               key={reviewer.id}
               task={reviewer}
               type="review"
+              suppliers={[]}
               isDisabled={isDisabled}
             />
           ))}

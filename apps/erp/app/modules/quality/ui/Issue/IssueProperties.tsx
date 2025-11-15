@@ -18,7 +18,7 @@ import {
 import { useFetcher, useParams } from "@remix-run/react";
 import { useCallback, useEffect } from "react";
 import { LuCopy, LuKeySquare, LuLink } from "react-icons/lu";
-import { z } from 'zod/v3';
+import { z } from "zod/v3";
 import {
   Assignee,
   EmployeeAvatar,
@@ -54,8 +54,6 @@ const IssueProperties = () => {
     files: Promise<StorageItem[]>;
     tags: { name: string }[];
   }>(path.to.issue(id));
-
-  console.log(routeData);
 
   const optimisticAssignment = useOptimisticAssignment({
     id: id,

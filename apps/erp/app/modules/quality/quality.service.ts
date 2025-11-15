@@ -667,6 +667,19 @@ export async function getIssueReviewers(
     .order("id", { ascending: true });
 }
 
+export async function getIssueSuppliers(
+  client: SupabaseClient<Database>,
+  id: string,
+  companyId: string
+) {
+  return client
+    .from("nonConformanceSupplier")
+    .select("supplierId")
+    .eq("nonConformanceId", id)
+    .eq("companyId", companyId)
+    .order("id", { ascending: true });
+}
+
 export async function getIssueTasks(
   client: SupabaseClient<Database>,
   id: string,

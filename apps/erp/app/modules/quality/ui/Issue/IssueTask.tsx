@@ -45,6 +45,7 @@ import { RxCheck } from "react-icons/rx";
 import { Assignee } from "~/components";
 import { useProcesses } from "~/components/Form/Process";
 import { IssueTaskStatusIcon } from "~/components/Icons";
+import SupplierAvatar from "~/components/SupplierAvatar";
 import { usePermissions, useRouteData, useUser } from "~/hooks";
 import type {
   Issue,
@@ -54,6 +55,7 @@ import type {
   IssueReviewer,
 } from "~/modules/quality";
 import { nonConformanceTaskStatus } from "~/modules/quality";
+import { useSuppliers } from "~/stores";
 import { getPrivateUrl, path } from "~/utils/path";
 
 export function TaskProgress({
@@ -115,13 +117,136 @@ const statusActions = {
   },
 } as const;
 
+function SupplierAssignment({
+  task,
+  type,
+  supplierIds,
+  isDisabled = false,
+}: {
+  task: IssueInvestigationTask | IssueActionTask;
+  type: "investigation" | "action";
+  supplierIds: string[];
+  isDisabled?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [suppliers] = useSuppliers();
+  const submit = useSubmit();
+  const permissions = usePermissions();
+  const fetchers = useFetchers();
+
+  const canEdit = permissions.can("update", "quality") && !isDisabled;
+
+  // Check for optimistic update
+  const pendingUpdate = fetchers.find(
+    (f) =>
+      f.formData?.get("id") === task.id &&
+      f.key === `supplierAssignment:${task.id}`
+  );
+
+  const currentSupplierId =
+    (pendingUpdate?.formData?.get("supplierId") as string | null) ??
+    task.supplierId;
+
+  const handleChange = (supplierId: string) => {
+    const table =
+      type === "investigation"
+        ? "nonConformanceInvestigationTask"
+        : "nonConformanceActionTask";
+
+    submit(
+      {
+        id: task.id!,
+        supplierId: supplierId || "",
+        table,
+      },
+      {
+        method: "post",
+        action: path.to.issueTaskSupplier,
+        navigate: false,
+        fetcherKey: `supplierAssignment:${task.id}`,
+      }
+    );
+    setOpen(false);
+  };
+
+  // Filter suppliers to only those passed in supplierIds
+  const options = useMemo(() => {
+    const filteredSuppliers = suppliers
+      .filter((supplier) => supplierIds.includes(supplier.id))
+      .map((supplier) => ({
+        value: supplier.id,
+        label: supplier.name,
+      }));
+
+    return [{ value: "", label: "Unassigned" }, ...filteredSuppliers];
+  }, [suppliers, supplierIds]);
+
+  const isPending = pendingUpdate && pendingUpdate?.state !== "idle";
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="secondary"
+          size="sm"
+          leftIcon={<LuContainer />}
+          isDisabled={isDisabled || !canEdit}
+          isLoading={isPending}
+        >
+          {currentSupplierId ? (
+            <SupplierAvatar
+              supplierId={currentSupplierId}
+              size="xxs"
+              className="text-sm"
+            />
+          ) : (
+            <span>Supplier</span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      {canEdit && (
+        <PopoverContent
+          align="start"
+          className="min-w-[--radix-popover-trigger-width] p-0"
+        >
+          <Command>
+            <CommandInput placeholder="Search suppliers..." className="h-9" />
+            <CommandEmpty>No supplier found.</CommandEmpty>
+            <CommandGroup className="max-h-[300px] overflow-y-auto">
+              {options.map((option) => (
+                <CommandItem
+                  value={option.label}
+                  key={option.value}
+                  onSelect={() => handleChange(option.value)}
+                >
+                  {option.label}
+                  <RxCheck
+                    className={cn(
+                      "ml-auto h-4 w-4",
+                      option.value === currentSupplierId
+                        ? "opacity-100"
+                        : "opacity-0"
+                    )}
+                  />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Command>
+        </PopoverContent>
+      )}
+    </Popover>
+  );
+}
+
 export function TaskItem({
   task,
   type,
+  suppliers,
   isDisabled = false,
 }: {
   task: IssueInvestigationTask | IssueActionTask | IssueReviewer;
   type: "investigation" | "action" | "review";
+  suppliers: { supplierId: string }[];
   isDisabled?: boolean;
 }) {
   const permissions = usePermissions();
@@ -234,14 +359,14 @@ export function TaskItem({
               />
             </>
           )}
-          <Button
-            variant="secondary"
-            size="sm"
-            leftIcon={<LuContainer />}
-            isDisabled
-          >
-            Supplier
-          </Button>
+          {(type === "investigation" || type === "action") && (
+            <SupplierAssignment
+              task={task as IssueInvestigationTask | IssueActionTask}
+              type={type}
+              supplierIds={suppliers.map((s) => s.supplierId)}
+              isDisabled={isDisabled}
+            />
+          )}
         </HStack>
         <HStack>
           <Button

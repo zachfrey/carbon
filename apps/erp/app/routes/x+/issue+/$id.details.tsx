@@ -109,6 +109,7 @@ export default function IssueDetailsRoute() {
 
   const routeData = useRouteData<{
     files: Promise<StorageItem[]>;
+    suppliers: { supplierId: string }[];
     associations: Promise<{ items: IssueAssociationNode["children"] }>;
   }>(path.to.issue(id));
 
@@ -171,6 +172,7 @@ export default function IssueDetailsRoute() {
           {(resolvedTasks) => (
             <InvestigationTasksList
               tasks={resolvedTasks?.data ?? []}
+              suppliers={routeData?.suppliers ?? []}
               isDisabled={nonConformance?.status === "Closed"}
             />
           )}
@@ -188,6 +190,7 @@ export default function IssueDetailsRoute() {
           {(resolvedTasks) => (
             <ActionTasksList
               tasks={resolvedTasks?.data ?? []}
+              suppliers={routeData?.suppliers ?? []}
               isDisabled={nonConformance?.status === "Closed"}
             />
           )}

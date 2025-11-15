@@ -26,9 +26,11 @@ import { TaskItem, TaskProgress } from "./IssueTask";
 
 export function ActionTasksList({
   tasks,
+  suppliers,
   isDisabled,
 }: {
   tasks: IssueActionTask[];
+  suppliers: { supplierId: string }[];
   isDisabled: boolean;
 }) {
   if (tasks.length === 0) return <NewAction isDisabled={isDisabled} />;
@@ -50,6 +52,7 @@ export function ActionTasksList({
                 key={task.id}
                 task={task}
                 type="action"
+                suppliers={suppliers}
                 isDisabled={isDisabled}
               />
             ))}

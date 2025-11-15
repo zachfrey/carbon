@@ -12,6 +12,7 @@ import {
   getInvestigationTypesList,
   getIssue,
   getIssueAssociations,
+  getIssueSuppliers,
   getIssueTypesList,
   getRequiredActionsList,
 } from "~/modules/quality";
@@ -46,12 +47,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     nonConformanceTypes,
     investigationTypes,
     requiredActions,
+    suppliers,
     tags,
   ] = await Promise.all([
     getIssue(client, id),
     getIssueTypesList(client, companyId),
     getInvestigationTypesList(client, companyId),
     getRequiredActionsList(client, companyId),
+    getIssueSuppliers(client, id, companyId),
     getTagsList(client, companyId, "nonConformance"),
   ]);
 
@@ -63,12 +66,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   return defer({
+    associations: getIssueAssociations(client, id, companyId),
+    files: getItemFiles(client, id, companyId),
+    investigationTypes: investigationTypes.data ?? [],
     nonConformance: nonConformance.data,
     nonConformanceTypes: nonConformanceTypes.data ?? [],
-    investigationTypes: investigationTypes.data ?? [],
     requiredActions: requiredActions.data ?? [],
-    files: getItemFiles(client, id, companyId),
-    associations: getIssueAssociations(client, id, companyId),
+    suppliers: suppliers.data ?? [],
     tags: tags.data ?? [],
   });
 }

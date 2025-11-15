@@ -741,7 +741,6 @@ export const path = {
     issues: `${x}/quality/issues`,
     issue: (id: string) => generatePath(`${x}/issue/${id}`),
     issueDetails: (id: string) => generatePath(`${x}/issue/${id}/details`),
-    issueSupplier: (id: string) => generatePath(`${x}/issue/${id}/supplier`),
     issueStatus: (id: string) => generatePath(`${x}/issue/${id}/status`),
     issueInvestigations: (id: string) =>
       generatePath(`${x}/issue/${id}/investigations`),
@@ -750,6 +749,7 @@ export const path = {
       generatePath(`${x}/issue/${id}/dispositions`),
     issueTaskStatus: (id: string) =>
       generatePath(`${x}/issue/task/${id}/status`),
+    issueTaskSupplier: `${x}/issue/task/supplier`,
     issueActionDueDate: (id: string) =>
       generatePath(`${x}/issue/action/${id}/due-date`),
     issueActionProcesses: (id: string) =>
