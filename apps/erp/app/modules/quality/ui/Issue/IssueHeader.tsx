@@ -7,15 +7,12 @@ import {
   LuFile,
   LuLoaderCircle,
 } from "react-icons/lu";
-import { DetailsTopbar } from "~/components/Layout";
 import { usePermissions, useRouteData } from "~/hooks";
 import { path } from "~/utils/path";
 import type { Issue } from "../../types";
 import IssueStatus from "./IssueStatus";
-import { useIssueNavigation } from "./useIssueNavigation";
 
 const IssueHeader = () => {
-  const links = useIssueNavigation();
   const { id } = useParams();
   if (!id) throw new Error("id not found");
 
@@ -41,7 +38,6 @@ const IssueHeader = () => {
       </VStack>
 
       <HStack>
-        <DetailsTopbar links={links} />
         <Button
           variant="secondary"
           leftIcon={<LuFile />}

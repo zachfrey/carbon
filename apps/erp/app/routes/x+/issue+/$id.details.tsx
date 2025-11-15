@@ -1,36 +1,33 @@
-import { assertIsPost, error, success, useCarbon } from "@carbon/auth";
+import { assertIsPost, error, success } from "@carbon/auth";
 import { requirePermissions } from "@carbon/auth/auth.server";
 import { flash } from "@carbon/auth/session.server";
 import { validationError, validator } from "@carbon/form";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  generateHTML,
-  Spinner,
-  toast,
-  useDebounce,
-  VStack,
-  type JSONContent,
-} from "@carbon/react";
-import { Editor } from "@carbon/react/Editor";
+import { Spinner, VStack, type JSONContent } from "@carbon/react";
 import { Await, useLoaderData, useParams } from "@remix-run/react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@vercel/remix";
-import { json, redirect } from "@vercel/remix";
-import { Suspense, useState } from "react";
-import { usePermissions, useRouteData, useUser } from "~/hooks";
-import { issueValidator, upsertIssue } from "~/modules/quality";
-import type { StorageItem } from "~/types";
-
-import { nanoid } from "nanoid";
+import { defer, redirect } from "@vercel/remix";
+import { Suspense } from "react";
 import { Documents } from "~/components";
+import { usePermissions, useRouteData } from "~/hooks";
+import {
+  getIssueActionTasks,
+  getIssueInvestigationTasks,
+  getIssueReviewers,
+  issueValidator,
+  upsertIssue,
+} from "~/modules/quality";
+import {
+  ActionTasksList,
+  InvestigationTasksList,
+  IssueContent,
+  ReviewersList,
+} from "~/modules/quality/ui/Issue";
+import type { StorageItem } from "~/types";
 import { setCustomFields } from "~/utils/form";
-import { getPrivateUrl, path } from "~/utils/path";
+import { path } from "~/utils/path";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { client } = await requirePermissions(request, {
+  const { client, companyId } = await requirePermissions(request, {
     view: "quality",
     bypassRls: true,
   });
@@ -48,7 +45,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     throw new Error(nonConformance.error.message);
   }
 
-  return json({ nonConformance: nonConformance.data });
+  return defer({
+    nonConformance: nonConformance.data,
+    investigationTasks: getIssueInvestigationTasks(client, id, companyId),
+    actionTasks: getIssueActionTasks(client, id, companyId),
+    reviewers: getIssueReviewers(client, id, companyId),
+  });
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -100,7 +102,8 @@ export default function IssueDetailsRoute() {
   const { id } = useParams();
   if (!id) throw new Error("Could not find id");
 
-  const { nonConformance } = useLoaderData<typeof loader>();
+  const { nonConformance, investigationTasks, actionTasks, reviewers } =
+    useLoaderData<typeof loader>();
 
   const routeData = useRouteData<{
     files: Promise<StorageItem[]>;
@@ -120,116 +123,77 @@ export default function IssueDetailsRoute() {
       />
 
       {permissions.is("employee") && (
-        <>
-          <Suspense
-            fallback={
-              <div className="flex w-full h-full rounded bg-gradient-to-tr from-background to-card items-center justify-center">
-                <Spinner className="h-10 w-10" />
-              </div>
-            }
-          >
-            <Await resolve={routeData?.files}>
-              {(resolvedFiles) => (
-                <Documents
-                  files={resolvedFiles}
-                  sourceDocument="Issue"
-                  sourceDocumentId={id}
-                  writeBucket="parts"
-                  writeBucketPermission="parts"
-                />
-              )}
-            </Await>
-          </Suspense>
-        </>
+        <Suspense
+          fallback={
+            <div className="flex min-h-[420px] w-full h-full rounded bg-gradient-to-tr from-background to-card items-center justify-center">
+              <Spinner className="size-10" />
+            </div>
+          }
+        >
+          <Await resolve={routeData?.files}>
+            {(resolvedFiles) => (
+              <Documents
+                files={resolvedFiles}
+                sourceDocument="Issue"
+                sourceDocumentId={id}
+                writeBucket="parts"
+                writeBucketPermission="parts"
+              />
+            )}
+          </Await>
+        </Suspense>
       )}
-    </VStack>
-  );
-}
 
-function IssueContent({
-  id,
-  title,
-  subTitle,
-  content: initialContent,
-  isDisabled,
-}: {
-  id: string;
-  title: string;
-  subTitle: string;
-  content: JSONContent;
-  isDisabled: boolean;
-}) {
-  const {
-    id: userId,
-    company: { id: companyId },
-  } = useUser();
-  const { carbon } = useCarbon();
-  const permissions = usePermissions();
-
-  const [content, setContent] = useState(initialContent ?? {});
-
-  const onUploadImage = async (file: File) => {
-    const fileType = file.name.split(".").pop();
-    const fileName = `${companyId}/parts/${nanoid()}.${fileType}`;
-
-    const result = await carbon?.storage.from("private").upload(fileName, file);
-
-    if (result?.error) {
-      toast.error("Failed to upload image");
-      throw new Error(result.error.message);
-    }
-
-    if (!result?.data) {
-      throw new Error("Failed to upload image");
-    }
-
-    return getPrivateUrl(result.data.path);
-  };
-
-  const onUpdateContent = useDebounce(
-    async (content: JSONContent) => {
-      await carbon
-        ?.from("nonConformance")
-        .update({
-          content: content,
-          updatedBy: userId,
-        })
-        .eq("id", id!);
-    },
-    2500,
-    true
-  );
-
-  if (!id) return null;
-
-  return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{subTitle}</CardDescription>
-        </CardHeader>
-
-        <CardContent>
-          {permissions.can("update", "quality") && !isDisabled ? (
-            <Editor
-              initialValue={(content ?? {}) as JSONContent}
-              onUpload={onUploadImage}
-              onChange={(value) => {
-                setContent(value);
-                onUpdateContent(value);
-              }}
-            />
-          ) : (
-            <div
-              className="prose dark:prose-invert"
-              dangerouslySetInnerHTML={{
-                __html: generateHTML(content as JSONContent),
-              }}
+      <Suspense
+        fallback={
+          <div className="flex min-h-[420px] w-full h-full rounded bg-gradient-to-tr from-background to-card items-center justify-center">
+            <Spinner className="size-10" />
+          </div>
+        }
+      >
+        <Await resolve={investigationTasks}>
+          {(resolvedTasks) => (
+            <InvestigationTasksList
+              tasks={resolvedTasks?.data ?? []}
+              isDisabled={nonConformance?.status === "Closed"}
             />
           )}
-        </CardContent>
-      </Card>
-    </>
+        </Await>
+      </Suspense>
+
+      <Suspense
+        fallback={
+          <div className="flex min-h-[420px] w-full h-full rounded bg-gradient-to-tr from-background to-card items-center justify-center">
+            <Spinner className="size-10" />
+          </div>
+        }
+      >
+        <Await resolve={actionTasks}>
+          {(resolvedTasks) => (
+            <ActionTasksList
+              tasks={resolvedTasks?.data ?? []}
+              isDisabled={nonConformance?.status === "Closed"}
+            />
+          )}
+        </Await>
+      </Suspense>
+
+      <Suspense
+        fallback={
+          <div className="flex min-h-[420px] w-full h-full rounded bg-gradient-to-tr from-background to-card items-center justify-center">
+            <Spinner className="size-10" />
+          </div>
+        }
+      >
+        <Await resolve={reviewers}>
+          {(resolvedReviewers) => (
+            <ReviewersList
+              reviewers={resolvedReviewers?.data ?? []}
+              isDisabled={nonConformance?.status === "Closed"}
+            />
+          )}
+        </Await>
+      </Suspense>
+    </VStack>
   );
 }

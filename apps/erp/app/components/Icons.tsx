@@ -204,7 +204,7 @@ export const IssueTaskStatusIcon = ({
     case "Skipped":
       return <LuCircleX className={cn("text-muted-foreground", className)} />;
     case "Completed":
-      return <LuCircleCheck className={cn("text-blue-600", className)} />;
+      return <LuCircleCheck className={cn("text-emerald-600", className)} />;
     case "In Progress":
       return <AlmostDoneIcon className={className} />;
     default:

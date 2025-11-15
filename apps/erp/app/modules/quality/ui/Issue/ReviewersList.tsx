@@ -1,0 +1,226 @@
+import { Input, Submit, ValidatedForm } from "@carbon/form";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Checkbox,
+  HStack,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  ModalTitle,
+  useDisclosure,
+  VStack,
+} from "@carbon/react";
+import { useFetcher, useParams } from "@remix-run/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { LuCirclePlus } from "react-icons/lu";
+import { useRouteData } from "~/hooks";
+import type { IssueReviewer } from "~/modules/quality";
+import { nonConformanceReviewerValidator } from "~/modules/quality";
+import type { Issue } from "~/modules/quality/types";
+import type { action as reviewAction } from "~/routes/x+/issue+/$id.review";
+import { path } from "~/utils/path";
+import { TaskItem, TaskProgress } from "./IssueTask";
+
+export function ReviewersList({
+  reviewers,
+  isDisabled,
+}: {
+  reviewers: IssueReviewer[];
+  isDisabled: boolean;
+}) {
+  const disclosure = useDisclosure();
+
+  const fetcher = useFetcher<typeof reviewAction>();
+  const submitted = useRef(false);
+  useEffect(() => {
+    if (fetcher.data?.success && submitted.current) {
+      disclosure.onClose();
+      submitted.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetcher.data?.success]);
+
+  if (reviewers.length === 0) {
+    return <NewApprovalRequirement isDisabled={isDisabled} />;
+  }
+
+  return (
+    <Card className="w-full" isCollapsible>
+      <HStack className="justify-between w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            Approval Requirements
+          </CardTitle>
+        </CardHeader>
+        <TaskProgress tasks={reviewers} />
+      </HStack>
+      <CardContent>
+        <VStack spacing={3}>
+          {reviewers.map((reviewer) => (
+            <TaskItem
+              key={reviewer.id}
+              task={reviewer}
+              type="review"
+              isDisabled={isDisabled}
+            />
+          ))}
+          {disclosure.isOpen && (
+            <Modal
+              open
+              onOpenChange={(open) => {
+                if (!open) disclosure.onClose();
+              }}
+            >
+              <ModalContent>
+                <ValidatedForm
+                  method="post"
+                  validator={nonConformanceReviewerValidator}
+                  fetcher={fetcher}
+                  onSubmit={() => {
+                    submitted.current = true;
+                  }}
+                >
+                  <ModalHeader>
+                    <ModalTitle>Add Approval Requirement</ModalTitle>
+                  </ModalHeader>
+                  <ModalBody>
+                    <Input name="title" label="Title" />
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button
+                      isDisabled={fetcher.state === "submitting"}
+                      variant="secondary"
+                      onClick={disclosure.onClose}
+                    >
+                      Cancel
+                    </Button>
+                    <Submit
+                      isLoading={fetcher.state === "submitting"}
+                      isDisabled={fetcher.state === "submitting"}
+                    >
+                      Submit
+                    </Submit>
+                  </ModalFooter>
+                </ValidatedForm>
+              </ModalContent>
+            </Modal>
+          )}
+          <HStack>
+            {disclosure.isOpen ? (
+              <Button variant="secondary" onClick={disclosure.onClose}>
+                Cancel
+              </Button>
+            ) : (
+              <Button leftIcon={<LuCirclePlus />} onClick={disclosure.onOpen}>
+                Add Requirement
+              </Button>
+            )}
+          </HStack>
+        </VStack>
+      </CardContent>
+    </Card>
+  );
+}
+
+function NewApprovalRequirement({ isDisabled }: { isDisabled: boolean }) {
+  const { id } = useParams();
+  if (!id) throw new Error("id not found");
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMRBChecked, setIsMRBChecked] = useState(false);
+
+  const routeData = useRouteData<{
+    nonConformance: Issue;
+  }>(path.to.issue(id));
+
+  const fetcher = useFetcher();
+
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data) {
+      setIsOpen(false);
+      setIsMRBChecked(false);
+    }
+  }, [fetcher.state, fetcher.data]);
+
+  const handleSubmit = useCallback(() => {
+    const formData = new FormData();
+    formData.append("ids", id);
+    formData.append("field", "approvalRequirements");
+
+    // Get existing approval requirements and add MRB
+    const existingApprovals =
+      routeData?.nonConformance?.approvalRequirements ?? [];
+    const newApprovals = [...existingApprovals, "MRB"];
+    formData.append("value", newApprovals.join(","));
+
+    fetcher.submit(formData, {
+      method: "post",
+      action: path.to.bulkUpdateIssue,
+    });
+  }, [id, routeData?.nonConformance?.approvalRequirements, fetcher]);
+
+  return (
+    <>
+      <button
+        className="flex items-center justify-start bg-card border-2 border-dashed border-background w-full hover:bg-background/80 rounded-lg p-4 gap-2 transition-colors duration-200 text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        onClick={() => setIsOpen(true)}
+        disabled={isDisabled}
+      >
+        <LuCirclePlus size={16} /> <span>Add Approval Requirement</span>
+      </button>
+
+      <Modal
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsOpen(false);
+            setIsMRBChecked(false);
+          }
+        }}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>Add Approval Requirement</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            <VStack spacing={3}>
+              <HStack>
+                <Checkbox
+                  isChecked={isMRBChecked}
+                  onCheckedChange={(checked) => setIsMRBChecked(!!checked)}
+                />
+                <span>MRB</span>
+              </HStack>
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setIsOpen(false);
+                setIsMRBChecked(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              isLoading={fetcher.state === "submitting"}
+              disabled={!isMRBChecked || fetcher.state !== "idle"}
+            >
+              {fetcher.state !== "idle" ? "Adding..." : "Add Requirement"}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
