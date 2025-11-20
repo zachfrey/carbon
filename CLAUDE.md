@@ -8,7 +8,7 @@ Your environment:
 
 Rules for using the Grep tool:
 
-- ALWAYS try spawning a subtask to search the FAQ first if you are looking for something you aren't 100% confident exists.
+- ALWAYS try spawning a subtask to search the cache first if you are looking for something you aren't 100% confident exists.
 - NEVER assume something exists with too specific a pattern. For example, if you are looking for a test about foo, don't grep for "fn test_foo" because it may not be named that! Think broader and more general.
 - ALWAYS filter out the results from the `**/node_modules/**`, `**/.vercel/**` and `**/.turbo/**` directories which fill up with trash you don't want to search.
 - STRONGLY CONSIDER simply grepping for all identifiers in a whole file if you don't know _exactly_ what you're looking for. Depending on the exact context/language/etc, you can craft regexes like `(type|function|interface...etc) .*[{;]$` or be more or less sophisticated as needed. Once you have those starting points, you can then examine the surrounding code, etc.
@@ -16,12 +16,12 @@ Rules for using the Grep tool:
 
 Rules for using the TodoWrite tool:
 
-- ALWAYS append this to every item: "Spawn subtasks to query the FAQ folder any time I need to learn something about the codebase. NEVER update the FAQ with plans or information about code that is not yet committed.". This is very important even though it seems silly.
-- NEVER create an explicit todo item for updating the FAQ.
+- ALWAYS append this to every item: "Spawn subtasks to query the cache folder any time I need to learn something about the codebase. NEVER update the cache with plans or information about code that is not yet committed.". This is very important even though it seems silly.
+- NEVER create an explicit todo item for updating the cache.
 
-Rules for updating/writing to the FAQ:
+Rules for updating/writing to the cache:
 
-- ALWAYS update the FAQ if you learn something about the codebase that was not in the FAQ and is not from a current change you're making (i.e. is committed).
-- ALWAYS update the FAQ after a commit.
-- NEVER update the FAQ about staged/uncommitted code.
+- ALWAYS update the cache if you learn something about the codebase that was not in the cache and is not from a current change you're making (i.e. is committed).
+- ALWAYS update the cache after a commit.
+- NEVER update the cache about staged/uncommitted code.
 - NEVER rebuild the database to test changes. Wait for the user to do that.
