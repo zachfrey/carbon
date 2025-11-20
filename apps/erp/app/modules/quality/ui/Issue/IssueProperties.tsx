@@ -374,35 +374,6 @@ const IssueProperties = () => {
 
       <ValidatedForm
         defaultValues={{
-          investigationTypeIds:
-            routeData?.nonConformance?.investigationTypeIds ?? [],
-        }}
-        validator={z.object({
-          investigationTypeIds: z.array(z.string()).optional(),
-        })}
-        className="w-full"
-      >
-        <MultiSelect
-          options={(routeData?.investigationTypes ?? []).map((type) => ({
-            value: type.id,
-            label: type.name,
-          }))}
-          isReadOnly={disableStructureUpdate}
-          label="Investigation Types"
-          name="investigationTypeIds"
-          inline
-          value={routeData?.nonConformance?.investigationTypeIds ?? []}
-          onChange={(value) => {
-            onUpdate(
-              "investigationTypeIds",
-              value.map((v) => v.value).join(",")
-            );
-          }}
-        />
-      </ValidatedForm>
-
-      <ValidatedForm
-        defaultValues={{
           requiredActionIds: routeData?.nonConformance?.requiredActionIds ?? [],
         }}
         validator={z.object({

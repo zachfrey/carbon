@@ -9,7 +9,6 @@ import { Suspense } from "react";
 import { PanelProvider, ResizablePanels } from "~/components/Layout/Panels";
 import { getItemFiles } from "~/modules/items";
 import {
-  getInvestigationTypesList,
   getIssue,
   getIssueAssociations,
   getIssueSuppliers,
@@ -45,14 +44,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const [
     nonConformance,
     nonConformanceTypes,
-    investigationTypes,
     requiredActions,
     suppliers,
     tags,
   ] = await Promise.all([
     getIssue(client, id),
     getIssueTypesList(client, companyId),
-    getInvestigationTypesList(client, companyId),
     getRequiredActionsList(client, companyId),
     getIssueSuppliers(client, id, companyId),
     getTagsList(client, companyId, "nonConformance"),
@@ -68,7 +65,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return defer({
     associations: getIssueAssociations(client, id, companyId),
     files: getItemFiles(client, id, companyId),
-    investigationTypes: investigationTypes.data ?? [],
     nonConformance: nonConformance.data,
     nonConformanceTypes: nonConformanceTypes.data ?? [],
     requiredActions: requiredActions.data ?? [],

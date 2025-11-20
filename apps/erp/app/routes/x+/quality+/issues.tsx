@@ -1,8 +1,10 @@
+import { error } from "@carbon/auth";
 import { requirePermissions } from "@carbon/auth/auth.server";
+import { flash } from "@carbon/auth/session.server";
 import { VStack } from "@carbon/react";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@vercel/remix";
-import { json } from "@vercel/remix";
+import { redirect } from "@vercel/remix";
 import { getIssues, getIssueTypesList } from "~/modules/quality";
 import IssuesTable from "~/modules/quality/ui/Issue/IssuesTable";
 import type { Handle } from "~/utils/handle";
@@ -37,11 +39,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
     getIssueTypesList(client, companyId),
   ]);
 
-  return json({
+  if (issues.error) {
+    console.error(issues.error);
+    throw redirect(
+      path.to.authenticatedRoot,
+      await flash(request, error(issues.error, "Error loading issues"))
+    );
+  }
+
+  return {
     issues: issues.data ?? [],
     count: issues.count ?? 0,
     types: nonConformanceTypes.data ?? [],
-  });
+  };
 }
 
 export default function IssuesRoute() {

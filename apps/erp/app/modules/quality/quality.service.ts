@@ -130,16 +130,6 @@ export async function deleteIssueAssociation(
   }
 }
 
-export async function deleteInvestigationType(
-  client: SupabaseClient<Database>,
-  investigationTypeId: string
-) {
-  return client
-    .from("nonConformanceInvestigationType")
-    .delete()
-    .eq("id", investigationTypeId);
-}
-
 export async function deleteIssueType(
   client: SupabaseClient<Database>,
   nonConformanceTypeId: string
@@ -380,24 +370,6 @@ export async function getIssueWorkflow(
     .select("*")
     .eq("id", nonConformanceWorkflowId)
     .single();
-}
-
-export async function getIssueInvestigationTasks(
-  client: SupabaseClient<Database>,
-  id: string,
-  companyId: string,
-  supplierId?: string
-) {
-  let query = client
-    .from("nonConformanceInvestigationTask")
-    .select("*, ...nonConformanceInvestigationType(name), supplier(name)")
-    .eq("nonConformanceId", id)
-    .eq("companyId", companyId);
-
-  if (supplierId) {
-    query = query.eq("supplierId", supplierId);
-  }
-  return query;
 }
 
 export async function getIssueActionTasks(
@@ -714,17 +686,11 @@ export async function getIssueTasks(
 ) {
   return Promise.all([
     client
-      .from("nonConformanceInvestigationTask")
-      .select("*")
-      .eq("nonConformanceId", id)
-      .eq("companyId", companyId)
-      .order("investigationType", { ascending: true }),
-    client
       .from("nonConformanceActionTask")
       .select("*")
       .eq("nonConformanceId", id)
       .eq("companyId", companyId)
-      .order("actionType", { ascending: true }),
+      .order("createdAt", { ascending: true }),
     client
       .from("nonConformanceApprovalTask")
       .select("*")
@@ -812,55 +778,6 @@ export async function getIssueTypesList(
     .from("nonConformanceType")
     .select("id, name")
     .eq("companyId", companyId)
-    .order("name");
-}
-
-export async function getInvestigationTypes(
-  client: SupabaseClient<Database>,
-  companyId: string,
-  args?: GenericQueryFilters & { search: string | null }
-) {
-  let query = client
-    .from("nonConformanceInvestigationType")
-    .select("*", { count: "exact" })
-    .eq("companyId", companyId);
-
-  if (args?.search) {
-    query = query.ilike("name", `%${args.search}%`);
-  }
-
-  if (args) {
-    query = setGenericQueryFilters(query, args, [
-      { column: "name", ascending: true },
-    ]);
-  } else {
-    query = query.order("name");
-  }
-
-  const result = await query;
-  return result;
-}
-
-export async function getInvestigationType(
-  client: SupabaseClient<Database>,
-  investigationTypeId: string
-) {
-  return client
-    .from("nonConformanceInvestigationType")
-    .select("*")
-    .eq("id", investigationTypeId)
-    .single();
-}
-
-export async function getInvestigationTypesList(
-  client: SupabaseClient<Database>,
-  companyId: string
-) {
-  return client
-    .from("nonConformanceInvestigationType")
-    .select("id, name")
-    .eq("companyId", companyId)
-    .eq("active", true)
     .order("name");
 }
 
@@ -1092,16 +1009,14 @@ export async function updateIssueTaskStatus(
   args: {
     id: string;
     status: "Pending" | "Completed" | "Skipped" | "In Progress";
-    type: "investigation" | "action" | "approval" | "review";
+    type: "action" | "approval" | "review";
     userId?: string;
     assignee?: string | null;
   }
 ) {
   const { id, status, type, userId, assignee } = args;
   const table =
-    type === "investigation"
-      ? "nonConformanceInvestigationTask"
-      : type === "action"
+    type === "action"
       ? "nonConformanceActionTask"
       : type === "review"
       ? "nonConformanceReviewer"
@@ -1121,15 +1036,13 @@ export async function updateIssueTaskContent(
   client: SupabaseClient<Database>,
   args: {
     id: string;
-    type: "investigation" | "action" | "approval" | "review";
+    type: "action" | "approval" | "review";
     content: JSONContent;
   }
 ) {
   const { id, content, type } = args;
   const table =
-    type === "investigation"
-      ? "nonConformanceInvestigationTask"
-      : type === "action"
+    type === "action"
       ? "nonConformanceActionTask"
       : type === "review"
       ? "nonConformanceReviewer"
@@ -1497,33 +1410,6 @@ export async function upsertIssueType(
       .from("nonConformanceType")
       .update(sanitize(nonConformanceType))
       .eq("id", nonConformanceType.id);
-  }
-}
-
-export async function upsertInvestigationType(
-  client: SupabaseClient<Database>,
-  investigationType:
-    | (Omit<z.infer<typeof investigationTypeValidator>, "id"> & {
-        companyId: string;
-        active?: boolean;
-        createdBy: string;
-      })
-    | (Omit<z.infer<typeof investigationTypeValidator>, "id"> & {
-        id: string;
-        active?: boolean;
-        updatedBy: string;
-      })
-) {
-  if ("createdBy" in investigationType) {
-    return client
-      .from("nonConformanceInvestigationType")
-      .insert([investigationType])
-      .select("id");
-  } else {
-    return client
-      .from("nonConformanceInvestigationType")
-      .update(sanitize(investigationType))
-      .eq("id", investigationType.id);
   }
 }
 

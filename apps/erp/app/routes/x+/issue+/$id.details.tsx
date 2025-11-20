@@ -12,7 +12,6 @@ import { useRouteData } from "~/hooks";
 import type { IssueAssociationNode } from "~/modules/quality";
 import {
   getIssueActionTasks,
-  getIssueInvestigationTasks,
   getIssueReviewers,
   issueValidator,
   upsertIssue,
@@ -20,7 +19,6 @@ import {
 import {
   ActionTasksList,
   AssociatedItemsList,
-  InvestigationTasksList,
   IssueContent,
   ReviewersList,
 } from "~/modules/quality/ui/Issue";
@@ -49,7 +47,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   return defer({
     nonConformance: nonConformance.data,
-    investigationTasks: getIssueInvestigationTasks(client, id, companyId),
     actionTasks: getIssueActionTasks(client, id, companyId),
     reviewers: getIssueReviewers(client, id, companyId),
   });
@@ -104,7 +101,7 @@ export default function IssueDetailsRoute() {
   const { id } = useParams();
   if (!id) throw new Error("Could not find id");
 
-  const { nonConformance, investigationTasks, actionTasks, reviewers } =
+  const { nonConformance, actionTasks, reviewers } =
     useLoaderData<typeof loader>();
 
   const routeData = useRouteData<{
@@ -156,24 +153,6 @@ export default function IssueDetailsRoute() {
               sourceDocumentId={id}
               writeBucket="parts"
               writeBucketPermission="parts"
-            />
-          )}
-        </Await>
-      </Suspense>
-
-      <Suspense
-        fallback={
-          <div className="flex min-h-[420px] w-full h-full rounded bg-gradient-to-tr from-background to-card items-center justify-center">
-            <Spinner className="size-10" />
-          </div>
-        }
-      >
-        <Await resolve={investigationTasks}>
-          {(resolvedTasks) => (
-            <InvestigationTasksList
-              tasks={resolvedTasks?.data ?? []}
-              suppliers={routeData?.suppliers ?? []}
-              isDisabled={nonConformance?.status === "Closed"}
             />
           )}
         </Await>

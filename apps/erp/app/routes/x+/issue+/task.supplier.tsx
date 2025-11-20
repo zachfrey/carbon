@@ -27,10 +27,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     );
   }
 
-  if (
-    table !== "nonConformanceInvestigationTask" &&
-    table !== "nonConformanceActionTask"
-  ) {
+  if (table !== "nonConformanceActionTask") {
     return json(
       { success: false },
       await flash(request, error(null, "Invalid table"))

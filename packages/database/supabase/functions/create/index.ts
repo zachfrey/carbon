@@ -133,16 +133,11 @@ serve(async (req: Request) => {
 
         const [
           nonConformance,
-          investigationTasks,
           actionTasks,
           approvalTasks,
           existingReviewers,
         ] = await Promise.all([
           client.from("nonConformance").select("*").eq("id", id).single(),
-          client
-            .from("nonConformanceInvestigationTask")
-            .select("*")
-            .eq("nonConformanceId", id),
           client
             .from("nonConformanceActionTask")
             .select("*")
@@ -169,14 +164,6 @@ serve(async (req: Request) => {
 
         if (workflow?.error) throw new Error(workflow.error.message);
 
-        const currentInvestigationTasks =
-          investigationTasks.data?.reduce<Record<string, string>>((acc, d) => {
-            if (d.investigationTypeId && !acc[d.investigationTypeId]) {
-              acc[d.investigationTypeId] = d.id;
-            }
-            return acc;
-          }, {}) ?? {};
-
         const currentActionTasks =
           actionTasks.data?.reduce<Record<string, string>>((acc, d) => {
             if (d.actionTypeId && !acc[d.actionTypeId]) {
@@ -193,24 +180,9 @@ serve(async (req: Request) => {
             return acc;
           }, {}) ?? {};
 
-        const investigationTasksToDelete: string[] = [];
         const actionTasksToDelete: string[] = [];
         const approvalTasksToDelete: string[] = [];
         const reviewersToDelete: string[] = [];
-
-        Object.keys(currentInvestigationTasks).forEach(
-          (investigationTypeId) => {
-            if (
-              !(nonConformance.data?.investigationTypeIds ?? []).some(
-                (d) => d === investigationTypeId
-              )
-            ) {
-              investigationTasksToDelete.push(
-                currentInvestigationTasks[investigationTypeId]
-              );
-            }
-          }
-        );
 
         Object.keys(currentActionTasks).forEach((actionTypeId) => {
           if (
@@ -232,8 +204,6 @@ serve(async (req: Request) => {
           }
         });
 
-        const investigationTaskInserts: Database["public"]["Tables"]["nonConformanceInvestigationTask"]["Insert"][] =
-          [];
         const actionTaskInserts: Database["public"]["Tables"]["nonConformanceActionTask"]["Insert"][] =
           [];
         const approvalTaskInserts: Database["public"]["Tables"]["nonConformanceApprovalTask"]["Insert"][] =
@@ -241,19 +211,6 @@ serve(async (req: Request) => {
 
         const reviewerInserts: Database["public"]["Tables"]["nonConformanceReviewer"]["Insert"][] =
           [];
-
-        nonConformance.data?.investigationTypeIds?.forEach(
-          (investigationTypeId) => {
-            if (!currentInvestigationTasks[investigationTypeId]) {
-              investigationTaskInserts.push({
-                nonConformanceId: id,
-                investigationTypeId,
-                companyId,
-                createdBy: userId,
-              });
-            }
-          }
-        );
 
         nonConformance.data?.requiredActionIds?.forEach((actionTypeId) => {
           if (!currentActionTasks[actionTypeId]) {
@@ -352,12 +309,6 @@ serve(async (req: Request) => {
             }
           }
 
-          if (investigationTaskInserts.length > 0) {
-            await trx
-              .insertInto("nonConformanceInvestigationTask")
-              .values(investigationTaskInserts)
-              .execute();
-          }
           if (actionTaskInserts.length > 0) {
             await trx
               .insertInto("nonConformanceActionTask")
@@ -371,12 +322,6 @@ serve(async (req: Request) => {
               .execute();
           }
 
-          if (investigationTasksToDelete.length > 0) {
-            await trx
-              .deleteFrom("nonConformanceInvestigationTask")
-              .where("id", "=", investigationTasksToDelete)
-              .execute();
-          }
           if (actionTasksToDelete.length > 0) {
             await trx
               .deleteFrom("nonConformanceActionTask")

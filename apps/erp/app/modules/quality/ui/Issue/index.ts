@@ -1,6 +1,5 @@
 export * from "./ActionTasksList";
 export * from "./AssociatedItemsList";
-export * from "./InvestigationTasksList";
 export * from "./IssueAssociations";
 export * from "./IssueContent";
 export * from "./IssueForm";
