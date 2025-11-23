@@ -9532,6 +9532,7 @@ export type Database = {
           locationId: string
           modelUploadId: string | null
           notes: Json | null
+          priority: number
           productionQuantity: number | null
           quantity: number
           quantityComplete: number
@@ -9571,6 +9572,7 @@ export type Database = {
           locationId: string
           modelUploadId?: string | null
           notes?: Json | null
+          priority?: number
           productionQuantity?: number | null
           quantity?: number
           quantityComplete?: number
@@ -9610,6 +9612,7 @@ export type Database = {
           locationId?: string
           modelUploadId?: string | null
           notes?: Json | null
+          priority?: number
           productionQuantity?: number | null
           quantity?: number
           quantityComplete?: number
@@ -49257,6 +49260,34 @@ export type Database = {
           thumbnailPath: string
           type: Database["public"]["Enums"]["itemType"]
           unitOfMeasureCode: string
+        }[]
+      }
+      get_jobs_by_date_range: {
+        Args: { end_date: string; location_id: string; start_date: string }
+        Returns: {
+          assignee: string
+          completedDate: string
+          completedOperationCount: number
+          customerId: string
+          customerName: string
+          deadlineType: Database["public"]["Enums"]["deadlineType"]
+          dueDate: string
+          id: string
+          itemDescription: string
+          itemId: string
+          itemReadableId: string
+          jobId: string
+          operationCount: number
+          priority: number
+          quantity: number
+          quantityComplete: number
+          quantityShipped: number
+          salesOrderId: string
+          salesOrderLineId: string
+          salesOrderReadableId: string
+          status: Database["public"]["Enums"]["jobStatus"]
+          tags: string[]
+          thumbnailPath: string
         }[]
       }
       get_material_details: {

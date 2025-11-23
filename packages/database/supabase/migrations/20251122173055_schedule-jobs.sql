@@ -1,0 +1,119 @@
+ALTER TABLE "job"
+  ADD COLUMN "priority" DOUBLE PRECISION NOT NULL DEFAULT 1;
+
+
+-- Get jobs by location and date range for scheduling
+DROP FUNCTION IF EXISTS get_jobs_by_date_range;
+CREATE OR REPLACE FUNCTION get_jobs_by_date_range(
+  location_id TEXT,
+  start_date DATE,
+  end_date DATE
+)
+RETURNS TABLE (
+  "id" TEXT,
+  "jobId" TEXT,
+  "status" "jobStatus",
+  "dueDate" DATE,
+  "completedDate" TIMESTAMP WITH TIME ZONE,
+  "deadlineType" "deadlineType",
+  "customerId" TEXT,
+  "customerName" TEXT,
+  "salesOrderReadableId" TEXT,
+  "salesOrderId" TEXT,
+  "salesOrderLineId" TEXT,
+  "itemId" TEXT,
+  "itemReadableId" TEXT,
+  "itemDescription" TEXT,
+  "quantity" NUMERIC,
+  "quantityComplete" NUMERIC,
+  "quantityShipped" NUMERIC,
+  "priority" DOUBLE PRECISION,
+  "assignee" TEXT,
+  "tags" TEXT[],
+  "thumbnailPath" TEXT,
+  "operationCount" INTEGER,
+  "completedOperationCount" INTEGER
+)
+SECURITY INVOKER
+AS $$
+BEGIN
+  RETURN QUERY
+  WITH relevant_jobs AS (
+    SELECT
+      j."id",
+      j."jobId",
+      j."status",
+      j."dueDate",
+      j."completedDate",
+      j."deadlineType",
+      j."customerId",
+      j."salesOrderLineId",
+      j."quantity",
+      j."quantityComplete",
+      j."quantityShipped",
+      j."priority",
+      j."assignee",
+      j."tags",
+      mu."thumbnailPath"
+    FROM "job" j
+    LEFT JOIN "modelUpload" mu ON mu.id = j."modelUploadId"
+    WHERE j."locationId" = location_id
+    AND j."dueDate" IS NOT NULL
+    AND j."dueDate" >= start_date
+    AND j."dueDate" <= end_date
+  ),
+  job_items AS (
+    SELECT DISTINCT ON (jmm."jobId")
+      jmm."jobId",
+      jmm."itemId",
+      i."readableId" AS "itemReadableId",
+      i."name" AS "itemDescription",
+      i."thumbnailPath" AS "itemThumbnailPath",
+      imu."thumbnailPath" AS "itemModelThumbnailPath"
+    FROM "jobMakeMethod" jmm
+    LEFT JOIN "item" i ON i.id = jmm."itemId"
+    LEFT JOIN "modelUpload" imu ON imu.id = i."modelUploadId"
+    WHERE jmm."parentMaterialId" IS NULL
+    ORDER BY jmm."jobId", jmm."createdAt"
+  ),
+  operation_stats AS (
+    SELECT
+      jo."jobId",
+      COUNT(*)::INTEGER AS "operationCount",
+      COUNT(*) FILTER (WHERE jo."status" = 'Done')::INTEGER AS "completedOperationCount"
+    FROM "jobOperation" jo
+    GROUP BY jo."jobId"
+  )
+  SELECT
+    rj."id",
+    rj."jobId",
+    rj."status",
+    rj."dueDate",
+    rj."completedDate",
+    rj."deadlineType",
+    rj."customerId",
+    c."name" AS "customerName",
+    so."salesOrderId" AS "salesOrderReadableId",
+    so."id" AS "salesOrderId",
+    rj."salesOrderLineId",
+    ji."itemId",
+    ji."itemReadableId",
+    ji."itemDescription",
+    rj."quantity",
+    rj."quantityComplete",
+    rj."quantityShipped",
+    rj."priority",
+    rj."assignee",
+    rj."tags",
+    COALESCE(ji."itemThumbnailPath", ji."itemModelThumbnailPath", rj."thumbnailPath") AS "thumbnailPath",
+    COALESCE(os."operationCount", 0) AS "operationCount",
+    COALESCE(os."completedOperationCount", 0) AS "completedOperationCount"
+  FROM relevant_jobs rj
+  LEFT JOIN "salesOrderLine" sol ON sol."id" = rj."salesOrderLineId"
+  LEFT JOIN "salesOrder" so ON so."id" = sol."salesOrderId"
+  LEFT JOIN "customer" c ON c."id" = rj."customerId"
+  LEFT JOIN job_items ji ON ji."jobId" = rj."id"
+  LEFT JOIN operation_stats os ON os."jobId" = rj."id"
+  ORDER BY rj."dueDate";
+END;
+$$ LANGUAGE plpgsql;

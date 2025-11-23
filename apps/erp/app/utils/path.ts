@@ -743,7 +743,6 @@ export const path = {
     issue: (id: string) => generatePath(`${x}/issue/${id}`),
     issueDetails: (id: string) => generatePath(`${x}/issue/${id}/details`),
     issueStatus: (id: string) => generatePath(`${x}/issue/${id}/status`),
-
     issueActions: (id: string) => generatePath(`${x}/issue/${id}`),
     issueDispositions: (id: string) =>
       generatePath(`${x}/issue/${id}/dispositions`),
@@ -812,7 +811,6 @@ export const path = {
     jobStatus: (id: string) => generatePath(`${x}/job/${id}/status`),
     kanban: (id: string) => generatePath(`${x}/inventory/kanbans/${id}`),
     kanbans: `${x}/inventory/kanbans`,
-
     labelsSettings: `${x}/settings/labels`,
     location: (id: string) => generatePath(`${x}/resources/locations/${id}`),
     locations: `${x}/resources/locations`,
@@ -1035,7 +1033,6 @@ export const path = {
       generatePath(`${x}/warehouse-transfer/${transferId}/details/new`),
     newWorkCenter: `${x}/resources/work-centers/new`,
     newWebhook: `${x}/settings/webhooks/new`,
-
     noQuoteReasons: `${x}/sales/no-quote-reasons`,
     noQuoteReason: (id: string) =>
       generatePath(`${x}/sales/no-quote-reasons/${id}`),
@@ -1296,8 +1293,10 @@ export const path = {
     salesSettings: `${x}/settings/sales`,
     saveViews: `${x}/shared/views`,
     saveViewOrder: `${x}/shared/view/order`,
-    schedule: `${x}/schedule`,
-    scheduleOperationUpdate: `${x}/schedule/operation/update`,
+    scheduleOperation: `${x}/schedule/operations`,
+    scheduleOperationUpdate: `${x}/schedule/operations/update`,
+    scheduleDates: `${x}/schedule/dates`,
+    scheduleDatesUpdate: `${x}/schedule/dates/update`,
     scrapReason: (id: string) =>
       generatePath(`${x}/production/scrap-reasons/${id}`),
     scrapReasons: `${x}/production/scrap-reasons`,

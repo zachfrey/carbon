@@ -40,7 +40,7 @@ const productionRoutes: AuthenticatedRouteGroup[] = [
       },
       {
         name: "Schedule",
-        to: path.to.schedule,
+        to: path.to.scheduleDates,
         icon: <LuSquareKanban />,
       },
     ],

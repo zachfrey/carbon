@@ -4,6 +4,7 @@ import type { recalculateTask } from "@carbon/jobs/trigger/recalculate";
 import { tasks } from "@trigger.dev/sdk";
 import { json, type ActionFunctionArgs } from "@vercel/remix";
 import {
+  calculateJobPriority,
   recalculateJobRequirements,
   upsertJobMethod,
 } from "~/modules/production";
@@ -121,9 +122,58 @@ export async function action({ request }: ActionFunctionArgs) {
       }
 
       return json(itemUpdate);
-    case "customerId":
     case "deadlineType":
     case "dueDate":
+      // When dueDate or deadlineType changes, recalculate priority
+      for await (const id of ids) {
+        // Get the current job to access its data
+        const currentJob = await client
+          .from("job")
+          .select("dueDate, deadlineType, locationId")
+          .eq("id", id as string)
+          .eq("companyId", companyId)
+          .single();
+
+        if (currentJob.error || !currentJob.data) {
+          return json(currentJob);
+        }
+
+        // Determine the new dueDate and deadlineType after this update
+        const newDueDate = field === "dueDate" ? (value ?? null) : currentJob.data.dueDate;
+        const newDeadlineType = field === "deadlineType" ? value : currentJob.data.deadlineType;
+
+        if (!newDeadlineType) {
+          return json({ error: { message: "Invalid deadline type" }, data: null });
+        }
+
+        // Calculate new priority
+        const priority = await calculateJobPriority(client, {
+          jobId: id as string,
+          dueDate: newDueDate,
+          deadlineType: newDeadlineType as "ASAP" | "Hard Deadline" | "Soft Deadline" | "No Deadline",
+          companyId,
+          locationId: currentJob.data.locationId,
+        });
+
+        // Update the job with new field value and priority
+        const updateResult = await client
+          .from("job")
+          .update({
+            [field]: value ? value : null,
+            priority,
+            updatedBy: userId,
+            updatedAt: new Date().toISOString(),
+          })
+          .eq("id", id as string)
+          .eq("companyId", companyId);
+
+        if (updateResult.error) {
+          return json(updateResult);
+        }
+      }
+
+      return json({ error: null, data: null });
+    case "customerId":
     case "jobId":
     case "locationId":
     case "shelfId":

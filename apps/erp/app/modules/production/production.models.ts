@@ -837,6 +837,12 @@ export const scheduleOperationUpdateValidator = z.object({
   priority: zfd.numeric(z.number().min(0).optional()),
 });
 
+export const scheduleJobUpdateValidator = z.object({
+  id: z.string().min(1, { message: "ID is required" }),
+  columnId: z.string().min(1, { message: "Column is required" }),
+  priority: zfd.numeric(z.number().min(0).optional()),
+});
+
 export const scrapReasonValidator = z.object({
   id: zfd.text(z.string().optional()),
   name: z.string().min(1, { message: "Name is required" }),

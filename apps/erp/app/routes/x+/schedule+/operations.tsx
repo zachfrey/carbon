@@ -39,7 +39,7 @@ import type { ColumnFilter } from "~/components/Table/components/Filter/types";
 import { useFilters } from "~/components/Table/components/Filter/useFilters";
 import { useUrlParams, useUser } from "~/hooks";
 import { getActiveJobOperationsByLocation } from "~/modules/production";
-import type { Column, Item } from "~/modules/production/ui/Schedule";
+import type { Column, OperationItem } from "~/modules/production/ui/Schedule";
 
 import type {
   DisplaySettings,
@@ -47,6 +47,7 @@ import type {
   Progress,
 } from "~/modules/production/ui/Schedule/Kanban";
 import { Kanban } from "~/modules/production/ui/Schedule/Kanban";
+import { ScheduleNavigation } from "~/modules/production/ui/Schedule/Kanban/ScheuleNavigation";
 import {
   getLocationsList,
   getProcessesList,
@@ -59,7 +60,7 @@ import { makeDurations } from "~/utils/duration";
 
 export const handle: Handle = {
   breadcrumb: "Schedule",
-  to: path.to.schedule,
+  to: path.to.scheduleOperation,
   module: "schedule",
 };
 
@@ -266,7 +267,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         machineDuration: operation.machineDuration,
         thumbnailPath: op.thumbnailPath,
       };
-    }) ?? []) satisfies Item[],
+    }) ?? []) satisfies OperationItem[],
     processes: processes.data ?? [],
     salesOrders: Object.entries(
       filteredOperations?.reduce((acc, op) => {
@@ -316,7 +317,7 @@ function KanbanSchedule() {
 
   const locations = useLocations();
 
-  const [items, setItems] = useState<Item[]>(initialItems);
+  const [items, setItems] = useState<OperationItem[]>(initialItems);
   const [displaySettings, setDisplaySettings] = useLocalStorage(
     DISPLAY_SETTINGS_KEY,
     defaultDisplaySettings
@@ -326,7 +327,7 @@ function KanbanSchedule() {
     setItems(initialItems);
   }, [initialItems]);
 
-  const sortItems = useCallback((items: Item[]) => {
+  const sortItems = useCallback((items: OperationItem[]) => {
     return [...items].sort((a, b) => a.priority - b.priority);
   }, []);
 
@@ -410,6 +411,7 @@ function KanbanSchedule() {
     <div className="flex flex-col h-full max-h-full  overflow-auto relative">
       <HStack className="px-4 py-2 justify-between bg-card border-b border-border">
         <HStack>
+          <ScheduleNavigation />
           <SearchFilter param="search" size="sm" placeholder="Search" />
           <Filter filters={filters} />
         </HStack>
@@ -538,9 +540,9 @@ export default function ScheduleRoute() {
 }
 
 function useProgressByOperation(
-  items: Item[],
-  setItems: React.Dispatch<React.SetStateAction<Item[]>>,
-  sortItems: (items: Item[]) => Item[]
+  items: OperationItem[],
+  setItems: React.Dispatch<React.SetStateAction<OperationItem[]>>,
+  sortItems: (items: OperationItem[]) => OperationItem[]
 ) {
   const {
     company: { id: companyId },
@@ -670,9 +672,9 @@ function useProgressByOperation(
             switch (payload.eventType) {
               case "UPDATE": {
                 const { new: updated } = payload;
-                setItems((prevItems: Item[]) =>
+                setItems((prevItems: OperationItem[]) =>
                   sortItems(
-                    prevItems.map((item: Item) => {
+                    prevItems.map((item: OperationItem) => {
                       if (item.id === updated.id) {
                         return {
                           ...item,
@@ -688,9 +690,9 @@ function useProgressByOperation(
               }
               case "DELETE": {
                 const { old: deleted } = payload;
-                setItems((prevItems: Item[]) =>
+                setItems((prevItems: OperationItem[]) =>
                   sortItems(
-                    prevItems.filter((item: Item) => item.id !== deleted.id)
+                    prevItems.filter((item: OperationItem) => item.id !== deleted.id)
                   )
                 );
                 break;
@@ -763,5 +765,5 @@ function useProgressByOperation(
 }
 
 function getLocationPath(locationId: string) {
-  return `${path.to.schedule}?location=${locationId}`;
+  return `${path.to.scheduleOperation}?location=${locationId}`;
 }

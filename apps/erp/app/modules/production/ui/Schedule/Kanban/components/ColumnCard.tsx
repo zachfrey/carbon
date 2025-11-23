@@ -11,6 +11,7 @@ import { useDndContext } from "@dnd-kit/core";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cva } from "class-variance-authority";
+import type { ComponentType } from "react";
 import { useMemo } from "react";
 import { LuGripVertical } from "react-icons/lu";
 import type { Column, Item, Progress } from "../types";
@@ -21,6 +22,13 @@ type ColumnCardProps = {
   items: Item[];
   isOverlay?: boolean;
   progressByItemId: Record<string, Progress>;
+  hideInactiveIndicator?: boolean;
+  disableColumnDrag?: boolean;
+  CardComponent?: ComponentType<{
+    item: Item;
+    isOverlay?: boolean;
+    progressByItemId: Record<string, Progress>;
+  }>;
 };
 
 export function ColumnCard({
@@ -28,6 +36,9 @@ export function ColumnCard({
   items,
   isOverlay,
   progressByItemId,
+  hideInactiveIndicator = false,
+  disableColumnDrag = false,
+  CardComponent = ItemCard,
 }: ColumnCardProps) {
   const [params] = useUrlParams();
   const currentFilters = params.getAll("filter").filter(Boolean);
@@ -90,7 +101,9 @@ export function ColumnCard({
     >
       <div className="p-4 w-full font-semibold text-left flex flex-row space-between items-center sticky top-0 bg-card z-1 border-b">
         <div className="flex flex-grow items-start space-x-2">
-          <PulsingDot inactive={!column.active} className="mt-2" />
+          {column.active || !hideInactiveIndicator ? (
+            <PulsingDot inactive={!column.active} className="mt-2" />
+          ) : null}
           <div className="flex flex-col flex-grow">
             <span className="mr-auto truncate"> {column.title}</span>
             {totalDuration > 0 ? (
@@ -104,20 +117,22 @@ export function ColumnCard({
             )}
           </div>
         </div>
-        <IconButton
-          aria-label={`Move column: ${column.title}`}
-          icon={<LuGripVertical />}
-          variant={"ghost"}
-          {...attributes}
-          {...listeners}
-          className="cursor-grab relative"
-        />
+        {!disableColumnDrag && (
+          <IconButton
+            aria-label={`Move column: ${column.title}`}
+            icon={<LuGripVertical />}
+            variant={"ghost"}
+            {...attributes}
+            {...listeners}
+            className="cursor-grab relative"
+          />
+        )}
       </div>
       <ScrollArea className="flex-grow">
         <div className="flex flex-col gap-2 p-2">
           <SortableContext items={itemsIds}>
             {items.map((item) => (
-              <ItemCard
+              <CardComponent
                 key={item.id!}
                 item={item}
                 progressByItemId={progressByItemId}

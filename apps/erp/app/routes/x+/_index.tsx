@@ -48,15 +48,6 @@ const AppsPage = () => {
       <Subheading>{formatter.format(date)}</Subheading>
       <Hr />
       <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-6 mb-8">
-        {/* {permissions.can("view", "production") && (
-          <ModuleCard
-            module={{
-              name: "Schedule",
-              to: path.to.schedule,
-              icon: LuCalendarClock,
-            }}
-          />
-        )} */}
         {modules
           .filter((mod) => mod.name !== "Settings")
           .map((module) => (

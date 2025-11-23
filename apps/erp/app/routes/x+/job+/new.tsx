@@ -10,7 +10,12 @@ import { redirect } from "@vercel/remix";
 import { useUrlParams, useUser } from "~/hooks";
 import { getDefaultShelfForJob } from "~/modules/inventory";
 import { getItemReplenishment } from "~/modules/items";
-import { jobValidator, upsertJob, upsertJobMethod } from "~/modules/production";
+import {
+  calculateJobPriority,
+  jobValidator,
+  upsertJob,
+  upsertJobMethod,
+} from "~/modules/production";
 import { JobForm } from "~/modules/production/ui/Jobs";
 import { getNextSequence } from "~/modules/settings";
 import type { MethodItemType } from "~/modules/shared";
@@ -86,10 +91,19 @@ export async function action({ request }: ActionFunctionArgs) {
     companyId
   );
 
+  // Calculate priority based on due date and deadline type
+  const priority = await calculateJobPriority(client, {
+    dueDate: data.dueDate ?? null,
+    deadlineType: data.deadlineType,
+    companyId,
+    locationId: validation.data.locationId,
+  });
+
   const createJob = await upsertJob(client, {
     ...data,
     jobId,
     configuration,
+    priority,
     shelfId: shelfId ?? undefined,
     startDate: data.dueDate
       ? parseDate(data.dueDate).subtract({ days: leadTime }).toString()

@@ -1,0 +1,614 @@
+import type { Handle } from "~/utils/handle";
+import { path } from "~/utils/path";
+
+import { error } from "@carbon/auth";
+import { requirePermissions } from "@carbon/auth/auth.server";
+import { flash } from "@carbon/auth/session.server";
+import {
+  Button,
+  ClientOnly,
+  Combobox,
+  HStack,
+  IconButton,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Spinner,
+  Switch,
+  useLocalStorage,
+  VStack,
+} from "@carbon/react";
+import {
+  endOfMonth,
+  endOfWeek,
+  getLocalTimeZone,
+  now,
+  parseDate,
+  startOfMonth,
+  startOfWeek,
+  toCalendarDate,
+} from "@internationalized/date";
+import { useLoaderData, useNavigate, useSearchParams } from "@remix-run/react";
+import { json, redirect, type LoaderFunctionArgs } from "@vercel/remix";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { LuChevronLeft, LuChevronRight, LuSettings2 } from "react-icons/lu";
+import { SearchFilter } from "~/components";
+import { useLocations } from "~/components/Form/Location";
+import { ActiveFilters, Filter } from "~/components/Table/components/Filter";
+import type { ColumnFilter } from "~/components/Table/components/Filter/types";
+import { useUrlParams } from "~/hooks";
+import { getJobsByDateRange } from "~/modules/production";
+import type { Column, JobItem } from "~/modules/production/ui/Schedule";
+
+import type { DisplaySettings } from "~/modules/production/ui/Schedule/Kanban";
+import { DateKanban } from "~/modules/production/ui/Schedule/Kanban/DateKanban";
+import { ScheduleNavigation } from "~/modules/production/ui/Schedule/Kanban/ScheuleNavigation";
+import { getTagsList } from "~/modules/shared";
+import { getUserDefaults } from "~/modules/users/users.server";
+import { usePeople } from "~/stores";
+
+export const handle: Handle = {
+  breadcrumb: "Schedule",
+  to: path.to.scheduleDates,
+  module: "production",
+};
+
+type ViewType = "week" | "month";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { client, companyId, userId } = await requirePermissions(request, {
+    view: "production",
+    bypassRls: true,
+  });
+
+  const url = new URL(request.url);
+  const searchParams = new URLSearchParams(url.search);
+  const search = searchParams.get("search");
+  const filterParam = searchParams.getAll("filter");
+  const view = (searchParams.get("view") as ViewType) ?? "week";
+  const dateParam = searchParams.get("date");
+
+  const timezone = getLocalTimeZone();
+  const currentDate = dateParam
+    ? parseDate(dateParam)
+    : toCalendarDate(now(timezone));
+
+  let selectedSalesOrderIds: string[] = [];
+  let selectedTags: string[] = [];
+  let selectedAssignee: string[] = [];
+
+  if (filterParam) {
+    for (const filter of filterParam) {
+      const [key, operator, value] = filter.split(":");
+      if (key === "salesOrderId") {
+        if (operator === "in") {
+          selectedSalesOrderIds = value.split(",");
+        } else if (operator === "eq") {
+          selectedSalesOrderIds = [value];
+        }
+      } else if (key === "tag") {
+        if (operator === "in") {
+          selectedTags = value.split(",");
+        } else if (operator === "eq") {
+          selectedTags = [value];
+        }
+      } else if (key === "assignee") {
+        if (operator === "in") {
+          selectedAssignee = value.split(",");
+        } else if (operator === "eq") {
+          selectedAssignee = [value];
+        }
+      }
+    }
+  }
+
+  let locationId = searchParams.get("location");
+
+  if (!locationId) {
+    const userDefaults = await getUserDefaults(client, userId, companyId);
+    if (userDefaults.error) {
+      throw redirect(
+        path.to.inventory,
+        await flash(
+          request,
+          error(userDefaults.error, "Failed to load default location")
+        )
+      );
+    }
+
+    locationId = userDefaults.data?.locationId ?? null;
+  }
+
+  // Calculate date range based on view
+  let startDate: string;
+  let endDate: string;
+
+  if (view === "week") {
+    const weekStart = startOfWeek(currentDate, "en-GB"); // en-GB uses Monday as first day
+    const weekEnd = endOfWeek(currentDate, "en-GB");
+    startDate = weekStart.toString();
+    endDate = weekEnd.toString();
+  } else {
+    // Month view - start from first of month, include full weeks (may extend into next month)
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+
+    // Calculate the last week's end date
+    let lastWeekStart = monthStart;
+    while (lastWeekStart.compare(monthEnd) <= 0) {
+      lastWeekStart = lastWeekStart.add({ weeks: 1 });
+    }
+    // Go back one week to get the last week that starts within the month
+    lastWeekStart = lastWeekStart.add({ weeks: -1 });
+    const lastWeekEnd = lastWeekStart.add({ days: 6 });
+
+    startDate = monthStart.toString();
+    endDate = lastWeekEnd.toString();
+  }
+
+  const [jobs, tags] = await Promise.all([
+    getJobsByDateRange(client, locationId ?? "", startDate, endDate),
+    getTagsList(client, companyId, "job"),
+  ]);
+
+  console.log(jobs);
+
+  // Filter jobs
+  let filteredJobs = jobs.data ?? [];
+
+  if (selectedSalesOrderIds.length) {
+    filteredJobs = filteredJobs.filter((job) =>
+      selectedSalesOrderIds.includes(job.salesOrderId)
+    );
+  }
+
+  if (selectedTags.length) {
+    filteredJobs = filteredJobs.filter((job) => {
+      if (job.tags) {
+        return selectedTags.some((tag) => job.tags.includes(tag));
+      }
+      return false;
+    });
+  }
+
+  if (selectedAssignee.length) {
+    filteredJobs = filteredJobs.filter((job) =>
+      selectedAssignee.includes(job.assignee)
+    );
+  }
+
+  if (search) {
+    filteredJobs = filteredJobs.filter(
+      (job) =>
+        job.jobId.toLowerCase().includes(search.toLowerCase()) ||
+        job.itemReadableId?.toLowerCase().includes(search.toLowerCase()) ||
+        job.itemDescription?.toLowerCase().includes(search.toLowerCase())
+    );
+  }
+
+  // Jobs are already sorted by due date and priority from the SQL function
+
+  // Create columns based on view type
+  let columns: Column[] = [];
+  const todayDate = toCalendarDate(now(timezone));
+
+  if (view === "week") {
+    const weekStart = startOfWeek(currentDate, "en-GB"); // en-GB uses Monday as first day
+
+    // Create 7 columns for days of the week (Mon-Sun) + 1 for "Next Week"
+    for (let i = 0; i < 7; i++) {
+      const day = weekStart.add({ days: i });
+      const isToday = day.compare(todayDate) === 0;
+
+      columns.push({
+        id: day.toString(),
+        title: day.toDate(timezone).toLocaleDateString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        }),
+        type: [],
+        active: isToday,
+      });
+    }
+
+    // Add "Next Week" column
+    columns.push({
+      id: "next-week",
+      title: "Next Week",
+      type: [],
+      active: false,
+    });
+  } else {
+    // Month view - create full 7-day week columns starting from the 1st of the month
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+
+    // Start from the first day of the month
+    let currentWeekStart = monthStart;
+
+    // Continue while we're still in the month
+    while (currentWeekStart.compare(monthEnd) <= 0) {
+      // Each week is exactly 7 days
+      const currentWeekEnd = currentWeekStart.add({ days: 6 });
+
+      // Check if this week contains today
+      const isTodayInWeek =
+        todayDate.compare(currentWeekStart) >= 0 &&
+        todayDate.compare(currentWeekEnd) <= 0;
+
+      const weekStartDate = currentWeekStart.toDate(timezone);
+      const weekEndDate = currentWeekEnd.toDate(timezone);
+
+      columns.push({
+        id: currentWeekStart.toString(),
+        title: `${weekStartDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        })} - ${weekEndDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        })}`,
+        type: [],
+        active: isTodayInWeek,
+      });
+
+      // Move to the next week (7 days later)
+      currentWeekStart = currentWeekStart.add({ weeks: 1 });
+    }
+
+    // Add next month column with the month name
+    const nextMonth = monthEnd.add({ days: 1 });
+    const nextMonthName = nextMonth
+      .toDate(timezone)
+      .toLocaleDateString("en-US", {
+        month: "long",
+      });
+    columns.push({
+      id: "next-month",
+      title: nextMonthName,
+      type: [],
+      active: false,
+    });
+  }
+
+  return json({
+    columns,
+    items: (filteredJobs.map((job) => {
+      // Determine which column this item belongs to
+      let columnId = view === "week" ? "next-week" : "next-month";
+
+      if (job.dueDate) {
+        const dueDate = parseDate(job.dueDate.split("T")[0]);
+
+        if (view === "week") {
+          const weekStart = startOfWeek(currentDate, "en-GB"); // en-GB uses Monday as first day
+          const weekEnd = endOfWeek(currentDate, "en-GB");
+
+          if (
+            dueDate.compare(weekStart) >= 0 &&
+            dueDate.compare(weekEnd) <= 0
+          ) {
+            columnId = dueDate.toString();
+          }
+        } else {
+          const monthStart = startOfMonth(currentDate);
+          const monthEnd = endOfMonth(currentDate);
+
+          if (
+            dueDate.compare(monthStart) >= 0 &&
+            dueDate.compare(monthEnd) <= 0
+          ) {
+            // Find which week column this date belongs to
+            // Weeks start on the 1st, 8th, 15th, 22nd, etc.
+            let weekStart = monthStart;
+            while (weekStart.compare(monthEnd) <= 0) {
+              const weekEnd = weekStart.add({ days: 6 });
+              if (
+                dueDate.compare(weekStart) >= 0 &&
+                dueDate.compare(weekEnd) <= 0
+              ) {
+                columnId = weekStart.toString();
+                break;
+              }
+              weekStart = weekStart.add({ weeks: 1 });
+            }
+          }
+        }
+      }
+
+      return {
+        id: job.id,
+        columnId,
+        columnType: "", // Jobs don't have a specific process type
+        priority: job.priority ?? 0,
+        title: job.jobId,
+        link: path.to.job(job.id),
+        subtitle: job.itemReadableId ?? "",
+        assignee: job.assignee,
+        tags: job.tags,
+        description: job.itemDescription,
+        dueDate: job.dueDate,
+        completedDate: job.completedDate,
+        duration: 0, // Jobs don't have duration, only operations do
+        jobId: job.id,
+        jobReadableId: job.jobId,
+        itemReadableId: job.itemReadableId ?? "",
+        itemDescription: job.itemDescription,
+        progress: job.completedOperationCount / Math.max(job.operationCount, 1),
+        deadlineType: job.deadlineType,
+        customerId: job.customerId,
+        quantity: job.quantity,
+        quantityCompleted: job.quantityComplete,
+        quantityScrapped: 0,
+        salesOrderReadableId: job.salesOrderReadableId,
+        salesOrderId: job.salesOrderId,
+        salesOrderLineId: job.salesOrderLineId,
+        status: job.status,
+        setupDuration: 0,
+        laborDuration: 0,
+        machineDuration: 0,
+        thumbnailPath: job.thumbnailPath,
+      };
+    }) ?? []) satisfies JobItem[],
+    salesOrders: Object.entries(
+      filteredJobs?.reduce((acc, job) => {
+        if (job.salesOrderId) {
+          acc[job.salesOrderId] = job.salesOrderReadableId;
+        }
+        return acc;
+      }, {} as Record<string, string>) ?? {}
+    ).map(([id, readableId]) => ({ id, readableId })),
+    availableTags: Object.entries(
+      filteredJobs.reduce((acc, job) => {
+        if (job.tags) {
+          job.tags.forEach((tag: string) => (acc[tag] = true));
+        }
+        return acc;
+      }, {} as Record<string, boolean>)
+    ).map(([tag]) => tag),
+    tags: tags.data ?? [],
+    locationId,
+    view,
+    currentDate: currentDate.toString(),
+  });
+}
+
+const defaultDisplaySettings: DisplaySettings = {
+  showDuration: true,
+  showCustomer: true,
+  showDescription: true,
+  showDueDate: true,
+  showEmployee: true,
+  showProgress: true,
+  showQuantity: true,
+  showStatus: true,
+  showSalesOrder: true,
+  showThumbnail: true,
+};
+
+const DISPLAY_SETTINGS_KEY = "kanban-schedule-dates-display-settings";
+
+function DateKanbanSchedule() {
+  const {
+    columns,
+    items: initialItems,
+    salesOrders,
+    availableTags,
+    tags,
+    locationId,
+    view,
+    currentDate,
+  } = useLoaderData<typeof loader>();
+
+  const locations = useLocations();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const [items, setItems] = useState<JobItem[]>(initialItems);
+  const [displaySettings, setDisplaySettings] = useLocalStorage(
+    DISPLAY_SETTINGS_KEY,
+    defaultDisplaySettings
+  );
+
+  useEffect(() => {
+    setItems(initialItems);
+  }, [initialItems]);
+
+  const sortItems = useCallback((items: JobItem[]) => {
+    return [...items].sort((a, b) => a.priority - b.priority);
+  }, []);
+
+  useEffect(() => {
+    setItems((prevItems) => sortItems(prevItems));
+  }, [sortItems]);
+
+  const [people] = usePeople();
+  const [params] = useUrlParams();
+
+  const currentFilters = params.getAll("filter").filter(Boolean);
+
+  const filters = useMemo<ColumnFilter[]>(() => {
+    return [
+      {
+        accessorKey: "salesOrderId",
+        header: "Sales Order",
+        filter: {
+          type: "static",
+          options: salesOrders.map((so) => ({
+            label: so.readableId,
+            value: so.id,
+          })),
+        },
+      },
+      {
+        accessorKey: "assignee",
+        header: "Assignee",
+        filter: {
+          type: "static",
+          options: people.map((p) => ({
+            label: p.name,
+            value: p.id,
+          })),
+        },
+      },
+      {
+        accessorKey: "tag",
+        header: "Tag",
+        filter: {
+          type: "static",
+          options: availableTags.map((tag) => ({
+            label: tag,
+            value: tag,
+          })),
+        },
+      },
+    ];
+  }, [salesOrders, people, availableTags]);
+
+  const parsedDate = parseDate(currentDate);
+
+  const navigateDate = (direction: "prev" | "next") => {
+    const newDate =
+      view === "week"
+        ? parsedDate.add({ weeks: direction === "next" ? 1 : -1 })
+        : parsedDate.add({ months: direction === "next" ? 1 : -1 });
+
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("date", newDate.toString());
+    navigate(`?${newParams.toString()}`);
+  };
+
+  const goToToday = () => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("date"); // Removing date param will default to today
+    navigate(`?${newParams.toString()}`);
+  };
+
+  return (
+    <div className="flex flex-col h-full max-h-full overflow-auto relative">
+      <HStack className="px-4 py-2 flex justify-between bg-card border-b border-border">
+        <HStack>
+          <ScheduleNavigation />
+          <SearchFilter param="search" size="sm" placeholder="Search" />
+          <Filter filters={filters} />
+        </HStack>
+
+        <HStack>
+          <HStack>
+            <Button variant="secondary" onClick={goToToday}>
+              Today
+            </Button>
+            <IconButton
+              variant="secondary"
+              onClick={() => navigateDate("prev")}
+              icon={<LuChevronLeft />}
+              aria-label="Previous Date"
+            />
+
+            <IconButton
+              variant="secondary"
+              onClick={() => navigateDate("next")}
+              icon={<LuChevronRight />}
+              aria-label="Next Date"
+            />
+          </HStack>
+          <Combobox
+            asButton
+            size="sm"
+            value={locationId ?? undefined}
+            options={locations}
+            onChange={(selected) => {
+              const newParams = new URLSearchParams(searchParams);
+              newParams.set("location", selected);
+              window.location.href = `${
+                path.to.scheduleDates
+              }?${newParams.toString()}`;
+            }}
+          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                leftIcon={<LuSettings2 />}
+                variant="secondary"
+                className="border-dashed border-border"
+              >
+                Display
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48">
+              <VStack>
+                {[
+                  { key: "showCustomer", label: "Customer" },
+                  { key: "showDueDate", label: "Due Date" },
+                  { key: "showDuration", label: "Duration" },
+                  { key: "showProgress", label: "Progress" },
+                  { key: "showQuantity", label: "Quantity" },
+                  { key: "showStatus", label: "Status" },
+                  { key: "showSalesOrder", label: "Sales Order" },
+                  { key: "showThumbnail", label: "Thumbnail" },
+                ].map(({ key, label }) => (
+                  <Switch
+                    key={key}
+                    variant="small"
+                    label={label}
+                    checked={
+                      displaySettings[key as keyof typeof displaySettings]
+                    }
+                    onCheckedChange={(checked) =>
+                      setDisplaySettings((prev) => ({
+                        ...prev,
+                        [key]: checked,
+                      }))
+                    }
+                  />
+                ))}
+              </VStack>
+            </PopoverContent>
+          </Popover>
+        </HStack>
+      </HStack>
+      {currentFilters.length > 0 && (
+        <HStack className="px-4 py-1.5 justify-between bg-card border-b border-border w-full">
+          <HStack>
+            <ActiveFilters filters={filters} />
+          </HStack>
+        </HStack>
+      )}
+      <div className="flex flex-grow h-full items-stretch overflow-hidden relative">
+        <div className="flex flex-1 min-h-0 w-full relative">
+          <DateKanban
+            columns={columns}
+            items={items}
+            progressByItemId={{}}
+            tags={tags}
+            showCustomer={displaySettings.showCustomer}
+            showDescription={displaySettings.showDescription}
+            showDueDate={displaySettings.showDueDate}
+            showDuration={displaySettings.showDuration}
+            showEmployee={displaySettings.showEmployee}
+            showProgress={displaySettings.showProgress}
+            showQuantity={displaySettings.showQuantity}
+            showStatus={displaySettings.showStatus}
+            showSalesOrder={displaySettings.showSalesOrder}
+            showThumbnail={displaySettings.showThumbnail}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ScheduleRoute() {
+  return (
+    <ClientOnly
+      fallback={
+        <div className="flex h-full w-full items-center justify-center">
+          <Spinner className="h-8 w-8" />
+        </div>
+      }
+    >
+      {() => <DateKanbanSchedule />}
+    </ClientOnly>
+  );
+}

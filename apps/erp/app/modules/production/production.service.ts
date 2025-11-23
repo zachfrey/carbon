@@ -20,6 +20,7 @@ import type {
   operationToolValidator,
 } from "../shared";
 import type {
+  deadlineTypes,
   jobMaterialValidator,
   jobOperationStatus,
   jobOperationValidator,
@@ -176,11 +177,20 @@ export async function convertSalesOrderLinesToJobs(
           unitOfMeasureCode: line.unitOfMeasureCode ?? "EA",
         };
 
+        // Calculate priority based on due date and deadline type
+        const priority = await calculateJobPriority(serviceRole, {
+          dueDate: data.dueDate ?? null,
+          deadlineType: data.deadlineType,
+          companyId,
+          locationId: locationId!,
+        });
+
         const createJob = await serviceRole
           .from("job")
           .insert({
             ...data,
             jobId: nextSequence.data,
+            priority,
             companyId,
             createdBy: userId,
             updatedBy: userId,
@@ -286,6 +296,97 @@ export async function convertSalesOrderLinesToJobs(
   }
 
   return salesOrder;
+}
+
+/**
+ * Calculate the priority for a job based on its dueDate and deadlineType.
+ * Priority ordering: ASAP > Hard Deadline > Soft Deadline > No Deadline
+ *
+ * @param client - Supabase client
+ * @param params - Job details
+ * @returns The calculated priority number
+ */
+export async function calculateJobPriority(
+  client: SupabaseClient<Database>,
+  params: {
+    jobId?: string; // Optional - if updating an existing job
+    dueDate: string | null;
+    deadlineType: (typeof deadlineTypes)[number];
+    companyId: string;
+    locationId: string;
+  }
+): Promise<number> {
+  const { jobId, dueDate, deadlineType, companyId, locationId } = params;
+
+  // Define deadline type priority order (lower number = higher priority)
+  const deadlineTypePriority: Record<string, number> = {
+    "ASAP": 0,
+    "Hard Deadline": 1,
+    "Soft Deadline": 2,
+    "No Deadline": 3,
+  };
+
+  const currentJobPriority = deadlineTypePriority[deadlineType];
+
+  // Query all jobs with the same dueDate (or null if dueDate is null)
+  let query = client
+    .from("job")
+    .select("id, priority, deadlineType")
+    .eq("companyId", companyId)
+    .eq("locationId", locationId)
+    .order("priority", { ascending: true });
+
+  if (dueDate) {
+    query = query.eq("dueDate", dueDate);
+  } else {
+    query = query.is("dueDate", null);
+  }
+
+  // Exclude the current job if we're updating
+  if (jobId) {
+    query = query.neq("id", jobId);
+  }
+
+  const { data: existingJobs } = await query;
+
+  if (!existingJobs || existingJobs.length === 0) {
+    // No existing jobs with this due date, start at priority 0
+    return 0;
+  }
+
+  // Find the position where this job should be inserted based on deadlineType
+  let insertBeforeIndex = existingJobs.length; // Default to end of list
+
+  for (let i = 0; i < existingJobs.length; i++) {
+    const existingJobPriority = deadlineTypePriority[existingJobs[i].deadlineType];
+
+    // If the current job has higher priority (lower number) than this existing job,
+    // we should insert before this job
+    if (currentJobPriority < existingJobPriority) {
+      insertBeforeIndex = i;
+      break;
+    }
+  }
+
+  // Calculate the priority value using fractional indexing
+  let newPriority: number;
+
+  if (insertBeforeIndex === 0) {
+    // Insert at the beginning - use half of the first job's priority
+    const firstPriority = existingJobs[0].priority ?? 0;
+    newPriority = firstPriority > 0 ? firstPriority / 2 : -1;
+  } else if (insertBeforeIndex === existingJobs.length) {
+    // Insert at the end - add 1 to the last job's priority
+    const lastPriority = existingJobs[existingJobs.length - 1].priority ?? 0;
+    newPriority = lastPriority + 1;
+  } else {
+    // Insert between two jobs - average their priorities
+    const beforePriority = existingJobs[insertBeforeIndex - 1].priority ?? 0;
+    const afterPriority = existingJobs[insertBeforeIndex].priority ?? 0;
+    newPriority = (beforePriority + afterPriority) / 2;
+  }
+
+  return newPriority;
 }
 
 export async function deleteDemandForecasts(
@@ -474,6 +575,19 @@ export async function getActiveJobOperationsByLocation(
   return client.rpc("get_active_job_operations_by_location", {
     location_id: locationId,
     work_center_ids: workCenterIds,
+  });
+}
+
+export async function getJobsByDateRange(
+  client: SupabaseClient<Database>,
+  locationId: string,
+  startDate: string,
+  endDate: string
+) {
+  return client.rpc("get_jobs_by_date_range", {
+    location_id: locationId,
+    start_date: startDate,
+    end_date: endDate,
   });
 }
 

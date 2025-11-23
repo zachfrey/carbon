@@ -1,5 +1,9 @@
-import { z } from 'zod/v3';
-import { deadlineTypes, jobOperationStatus } from "../../../production.models";
+import { z } from "zod/v3";
+import {
+  deadlineTypes,
+  jobOperationStatus,
+  jobStatus,
+} from "../../../production.models";
 import type { ProductionEvent } from "../../../types";
 
 export const columnValidator = z.object({
@@ -36,7 +40,8 @@ export type Event = Pick<
   "id" | "jobOperationId" | "duration" | "startTime" | "endTime" | "employeeId"
 >;
 
-const itemValidator = z.object({
+// Base item fields shared by both job and operation items
+const baseItemValidator = z.object({
   id: z.string(),
   assignee: z.string().optional(),
   columnId: z.string(),
@@ -45,15 +50,12 @@ const itemValidator = z.object({
   deadlineType: z.enum(deadlineTypes).optional(),
   description: z.string().optional(),
   dueDate: z.string().optional(), // 2024-05-28
-  duration: z.number().optional(), // miliseconds
   employeeIds: z.array(z.string()).optional(),
   itemDescription: z.string().optional(),
   itemReadableId: z.string(),
   jobId: z.string(),
   jobReadableId: z.string(),
-  laborDuration: z.number().optional(),
   link: z.string().optional(),
-  machineDuration: z.number().optional(),
   priority: z.number(),
   progress: z.number().optional(), // miliseconds
   quantity: z.number().optional(),
@@ -62,15 +64,30 @@ const itemValidator = z.object({
   salesOrderId: z.string().optional(),
   salesOrderLineId: z.string().optional(),
   salesOrderReadableId: z.string().optional(),
-  setupDuration: z.number().optional(),
-  status: z.enum(jobOperationStatus).optional(),
   subtitle: z.string().optional(),
   tags: z.array(z.string()).optional(),
   thumbnailPath: z.string().optional(),
   title: z.string(),
 });
 
-export type Item = z.infer<typeof itemValidator>;
+// Operation item with operation-level status
+const operationItemValidator = baseItemValidator.extend({
+  duration: z.number().optional(), // miliseconds
+  laborDuration: z.number().optional(),
+  machineDuration: z.number().optional(),
+  setupDuration: z.number().optional(),
+  status: z.enum(jobOperationStatus).optional(),
+});
+
+// Job item with job-level status
+const jobItemValidator = baseItemValidator.extend({
+  status: z.enum(jobStatus).optional(),
+  completedDate: z.string().optional(),
+});
+
+export type OperationItem = z.infer<typeof operationItemValidator>;
+export type JobItem = z.infer<typeof jobItemValidator>;
+export type Item = OperationItem | JobItem;
 
 export interface ItemDragData {
   type: "item";
