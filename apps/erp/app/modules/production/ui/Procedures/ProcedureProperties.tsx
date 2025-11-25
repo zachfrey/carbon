@@ -21,6 +21,7 @@ import type { Procedure } from "../../types";
 import ProcedureStatus from "./ProcedureStatus";
 import { procedureStatus } from "../../production.models";
 import Assignee, { useOptimisticAssignment } from "~/components/Assignee";
+import { useTags } from "~/hooks/useTags";
 
 const ProcedureProperties = () => {
   const { id } = useParams();
@@ -66,24 +67,7 @@ const ProcedureProperties = () => {
 
   const permissions = usePermissions();
 
-  const onUpdateTags = useCallback(
-    (value: string[]) => {
-      const formData = new FormData();
-
-      formData.append("ids", id);
-      formData.append("table", "procedure");
-      value.forEach((v) => {
-        formData.append("value", v);
-      });
-
-      fetcher.submit(formData, {
-        method: "post",
-        action: path.to.tags,
-      });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [id]
-  );
+  const { onUpdateTags } = useTags({ id, table: "procedure" });
 
   return (
     <VStack
