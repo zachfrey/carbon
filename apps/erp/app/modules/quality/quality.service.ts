@@ -1503,6 +1503,7 @@ export async function upsertQualityDocument(
         .from("qualityDocument")
         .update({
           content: workInstruction,
+          tags: qualityDocument.data.tags,
         })
         .eq("id", insert.data.id),
       steps.length > 0
