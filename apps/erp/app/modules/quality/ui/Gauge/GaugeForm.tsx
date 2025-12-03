@@ -26,16 +26,17 @@ import {
 import { formatRelativeTime } from "@carbon/utils";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { Await, Link, useFetcher } from "@remix-run/react";
+import type { FileObject } from "@supabase/storage-js";
 import type { PostgrestResponse } from "@supabase/supabase-js";
 import { nanoid } from "nanoid";
-import { Suspense, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import {
   LuCalendar,
   LuCircleGauge,
   LuCirclePlus,
   LuEllipsisVertical,
 } from "react-icons/lu";
-import type { z } from 'zod/v3';
+import type { z } from "zod/v3";
 import { EmployeeAvatar, Empty } from "~/components";
 import { Enumerable } from "~/components/Enumerable";
 import {
@@ -66,6 +67,7 @@ type GaugeFormProps = {
   type?: "modal" | "drawer";
   open?: boolean;
   onClose?: () => void;
+  files?: FileObject[];
 };
 
 const GaugeForm = ({
@@ -75,10 +77,16 @@ const GaugeForm = ({
   open = true,
   type = "drawer",
   onClose,
+  files = [],
 }: GaugeFormProps) => {
   const permissions = usePermissions();
   const fetcher = useFetcher<{}>();
   const isEditing = initialValues.id !== undefined;
+
+  const id = useMemo(() => {
+    return initialValues.id ?? nanoid();
+  }, [initialValues.id]);
+
   const isDisabled = isEditing
     ? !permissions.can("update", "quality")
     : !permissions.can("create", "quality");
@@ -319,9 +327,9 @@ const GaugeForm = ({
       </ModalDrawerProvider>
       {newRecordDisclosure.isOpen && (
         <GaugeCalibrationRecordForm
-          files={[]}
+          files={files}
           initialValues={{
-            id: nanoid(),
+            id,
             gaugeId: initialValues.id!,
             dateCalibrated: today(getLocalTimeZone()).toString(),
             requiresAction: false,
