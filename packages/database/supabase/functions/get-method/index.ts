@@ -2765,7 +2765,7 @@ serve(async (req: Request) => {
                     await trx
                       .insertInto("methodOperationStep")
                       .values(
-                        jobOperationStep.map(({ id: _id, ...attribute }) => ({
+                        jobOperationStep.map(({ id: _id, nonConformanceActionId : _nonConformanceActionId, ...attribute }) => ({
                           ...attribute,
                           operationId,
                           companyId,
