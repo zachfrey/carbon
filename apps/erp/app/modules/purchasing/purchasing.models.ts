@@ -96,12 +96,12 @@ export const purchaseOrderValidator = z.object({
 });
 
 export const externalSupplierQuoteValidator = z.object({
-  digitalSupplierQuoteSubmittedBy: z
-    .string()
-    .min(1, { message: "Name is required" }),
-  digitalSupplierQuoteSubmittedByEmail: z
-    .string()
-    .email({ message: "Email is invalid" }),
+  digitalSupplierQuoteSubmittedBy: zfd.text(
+    z.string().min(1, { message: "Name is required" })
+  ),
+  digitalSupplierQuoteSubmittedByEmail: zfd.text(
+    z.string().email({ message: "Email is invalid" })
+  ),
   note: zfd.text(z.string().optional()),
 });
 

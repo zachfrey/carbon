@@ -37,6 +37,8 @@ import {
   LuCheckCheck,
   LuCircleStop,
   LuLoaderCircle,
+  LuCircleCheck,
+  LuCircleX,
 } from "react-icons/lu";
 import { usePanels } from "~/components/Layout";
 import ConfirmDelete from "~/components/Modals/ConfirmDelete";
@@ -202,18 +204,53 @@ const SupplierQuoteHeader = () => {
                   statusFetcher.state !== "idle" &&
                   statusFetcher.formData?.get("status") === "Submitted"
                 }
-                leftIcon={<LuCheckCheck />}
+                variant={
+                  routeData?.quote?.status === "Sent" ? "primary" : "secondary"
+                }
+                leftIcon={<LuCircleCheck />}
                 type="submit"
               >
                 Submit
               </Button>
             </statusFetcher.Form>
 
+            <statusFetcher.Form
+              id="decline-form"
+              method="post"
+              action={path.to.supplierQuoteStatus(id)}
+            >
+              <input type="hidden" name="status" value="Declined" />
+              <Button
+                isDisabled={
+                  routeData?.quote?.status !== "Sent" ||
+                  statusFetcher.state !== "idle" ||
+                  !permissions.can("update", "purchasing")
+                }
+                isLoading={
+                  statusFetcher.state !== "idle" &&
+                  statusFetcher.formData?.get("status") === "Declined"
+                }
+                variant={
+                  routeData?.quote?.status === "Sent"
+                    ? "destructive"
+                    : "secondary"
+                }
+                leftIcon={<LuCircleX />}
+                type="submit"
+              >
+                Decline
+              </Button>
+            </statusFetcher.Form>
+
             <Button
               isDisabled={
-                (routeData?.quote?.status !== "Sent" &&
-                  routeData?.quote?.status !== "Submitted") ||
+                routeData?.quote?.status !== "Submitted" ||
                 !permissions.can("update", "purchasing")
+              }
+              variant={
+                routeData?.quote?.status === "Submitted"
+                  ? "primary"
+                  : "secondary"
               }
               leftIcon={<LuShoppingCart />}
               onClick={convertToOrderModal.onOpen}
@@ -221,9 +258,7 @@ const SupplierQuoteHeader = () => {
               Order
             </Button>
 
-            {routeData?.quote?.status === "Active" ||
-            routeData?.quote?.status === "Sent" ||
-            routeData?.quote?.status === "Submitted" ? (
+            {routeData?.quote?.status === "Active" ? (
               <statusFetcher.Form
                 method="post"
                 action={path.to.supplierQuoteStatus(id)}
@@ -245,7 +280,7 @@ const SupplierQuoteHeader = () => {
                   Cancel
                 </Button>
               </statusFetcher.Form>
-            ) : routeData?.quote?.status !== "Ordered" ? (
+            ) : (
               <statusFetcher.Form
                 method="post"
                 action={path.to.supplierQuoteStatus(id)}
@@ -255,10 +290,7 @@ const SupplierQuoteHeader = () => {
                   isDisabled={
                     statusFetcher.state !== "idle" ||
                     !permissions.can("update", "purchasing") ||
-                    routeData?.quote?.status === "Ordered" ||
-                    routeData?.quote?.status === "Partial" ||
-                    routeData?.quote?.status === "Sent" ||
-                    routeData?.quote?.status === "Submitted"
+                    routeData?.quote?.status === "Ordered"
                   }
                   isLoading={
                     statusFetcher.state !== "idle" &&
@@ -271,7 +303,7 @@ const SupplierQuoteHeader = () => {
                   Reopen
                 </Button>
               </statusFetcher.Form>
-            ) : null}
+            )}
 
             <IconButton
               aria-label="Toggle Properties"

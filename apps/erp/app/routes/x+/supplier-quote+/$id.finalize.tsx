@@ -1,13 +1,9 @@
-import {
-  assertIsPost,
-  error,
-  getCarbonServiceRole,
-  success,
-} from "@carbon/auth";
+import { assertIsPost, error, success } from "@carbon/auth";
 import { requirePermissions } from "@carbon/auth/auth.server";
 import { flash } from "@carbon/auth/session.server";
 import { validationError, validator } from "@carbon/form";
 import type { sendEmailResendTask } from "@carbon/jobs/trigger/send-email-resend";
+import { getLocalTimeZone, now } from "@internationalized/date";
 import { tasks } from "@trigger.dev/sdk";
 import { redirect, type ActionFunctionArgs } from "@vercel/remix";
 import {
@@ -58,18 +54,29 @@ export async function action(args: ActionFunctionArgs) {
       .from("supplierQuote")
       .update({
         externalLinkId: externalLink.data.id,
+        completedDate: now(getLocalTimeZone()).toAbsoluteString(),
       })
       .eq("id", id);
   }
 
-  const finalize = await finalizeSupplierQuote(client, id, userId);
-  if (finalize.error) {
+  // TODO: Add PDF generation for supplier quotes when available
+  // TODO: Add document creation for supplier quotes when PDF is available
+
+  try {
+    const finalize = await finalizeSupplierQuote(client, id, userId);
+    if (finalize.error) {
+      throw redirect(
+        path.to.supplierQuote(id),
+        await flash(
+          request,
+          error(finalize.error, "Failed to finalize supplier quote")
+        )
+      );
+    }
+  } catch (err) {
     throw redirect(
       path.to.supplierQuote(id),
-      await flash(
-        request,
-        error(finalize.error, "Failed to finalize supplier quote")
-      )
+      await flash(request, error(err, "Failed to finalize supplier quote"))
     );
   }
 
@@ -83,8 +90,6 @@ export async function action(args: ActionFunctionArgs) {
 
   const { notification, supplierContact: supplierContactId } = validation.data;
 
-  const serviceRole = getCarbonServiceRole();
-
   switch (notification) {
     case "Email":
       try {
@@ -92,11 +97,11 @@ export async function action(args: ActionFunctionArgs) {
 
         const [company, companySettings, supplierContact, supplierQuote, user] =
           await Promise.all([
-            getCompany(serviceRole, companyId),
-            getCompanySettings(serviceRole, companyId),
-            getSupplierContact(serviceRole, supplierContactId),
-            getSupplierQuote(serviceRole, id),
-            getUser(serviceRole, userId),
+            getCompany(client, companyId),
+            getCompanySettings(client, companyId),
+            getSupplierContact(client, supplierContactId),
+            getSupplierQuote(client, id),
+            getUser(client, userId),
           ]);
 
         if (!company.data) throw new Error("Failed to get company");

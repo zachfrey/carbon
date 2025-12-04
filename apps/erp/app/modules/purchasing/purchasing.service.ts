@@ -1548,7 +1548,7 @@ export async function upsertSupplierQuote(
           supplierQuote.expirationDate &&
           today(getLocalTimeZone()).toString() > supplierQuote.expirationDate
             ? "Expired"
-            : supplierQuote.status ?? existingStatus ?? "Draft",
+            : supplierQuote.status ?? existingStatus ?? "Active",
         updatedAt: today(getLocalTimeZone()).toString(),
       })
       .eq("id", supplierQuote.id);
