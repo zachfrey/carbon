@@ -2,7 +2,9 @@ import type { Database } from "@carbon/database";
 import { isBrowser } from "@carbon/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
+import type { StoreApi } from "zustand";
 
+import type { MutableRefObject } from "react";
 import {
   SUPABASE_ANON_KEY,
   SUPABASE_SERVICE_ROLE_KEY,
@@ -48,6 +50,21 @@ export const getCarbonAPIKeyClient = (apiKey: string) => {
   );
 
   return client;
+};
+
+export const createCarbonWithAuthGetter = (
+  store: MutableRefObject<StoreApi<{ accessToken: string }>>
+) => {
+  return createClient<Database, "public">(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+    async accessToken() {
+      const state = store.current.getState();
+      return state.accessToken;
+    },
+  });
 };
 
 export const getCarbon = (accessToken?: string) => {
