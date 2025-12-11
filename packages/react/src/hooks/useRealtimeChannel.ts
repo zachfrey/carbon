@@ -26,6 +26,7 @@ export const useRealtimeChannel = <TDeps extends any[]>(
   const memoSetup = useCallback(setup, [topic, ...dependencies]);
 
   const teardown = useCallback(async () => {
+    console.log(`🌀 Tearing down realtime channel ${topic}...`);
     const channel = channelRef.current;
 
     if (!channel || !carbon) return;
@@ -67,6 +68,7 @@ export const useRealtimeChannel = <TDeps extends any[]>(
         channelRef.current = configuredChannel;
 
         configuredChannel.subscribe(async (status, err) => {
+          console.log(`🌀 Realtime channel ${topic} status:`, status);
           if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
             return;
           }

@@ -11,6 +11,7 @@ import { getTagsList } from "~/modules/shared";
 import type { Handle } from "~/utils/handle";
 import { path } from "~/utils/path";
 import { getGenericQueryFilters } from "~/utils/query";
+import { useRealtime } from "../../../hooks";
 
 export const handle: Handle = {
   breadcrumb: "Parts",
@@ -59,6 +60,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function PartsSearchRoute() {
   const { count, parts, tags } = useLoaderData<typeof loader>();
+
+  useRealtime("part");
 
   return (
     <VStack spacing={0} className="h-full">

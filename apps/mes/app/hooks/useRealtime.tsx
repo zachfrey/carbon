@@ -7,7 +7,7 @@ export function useRealtime(table: string, filter?: string) {
   const revalidator = useRevalidator();
 
   const channel = useRealtimeChannel({
-    topic: `postgres_changes:${table}}`,
+    topic: `postgres_changes:${table}`,
     dependencies: [company.id, filter],
     setup(channel) {
       return channel.on(
