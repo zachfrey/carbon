@@ -86,7 +86,7 @@ export default function RiskRegisterCard({
         </CardAction>
       </HStack>
 
-      <CardContent className="p-0">
+      <CardContent className="p-0 h-full">
         {loading ? (
           <div className="p-4">
             <Loading isLoading={true} />
@@ -96,7 +96,7 @@ export default function RiskRegisterCard({
             No risks registered
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 p-4">
             {risks.map((risk) => (
               <div
                 key={risk.id}
