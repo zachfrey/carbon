@@ -256,16 +256,6 @@ export async function convertSalesOrderLinesToJobs(
           }
         });
 
-        await serviceRole.functions.invoke("schedule", {
-          body: {
-            jobId: createJob.data.id,
-            companyId,
-            userId,
-            mode: "initial",
-            direction: "backward"
-          }
-        });
-
         jobsCreated++;
       }
     }
