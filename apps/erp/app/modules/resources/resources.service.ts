@@ -76,6 +76,13 @@ export async function deleteShift(
   return client.from("shift").update({ active: false }).eq("id", shiftId);
 }
 
+export async function deleteSuggestion(
+  client: SupabaseClient<Database>,
+  suggestionId: string
+) {
+  return client.from("suggestion").delete().eq("id", suggestionId);
+}
+
 export async function deleteTraining(
   client: SupabaseClient<Database>,
   trainingId: string
@@ -366,6 +373,36 @@ export async function getProcessesList(
     .select(`id, name`)
     .eq("companyId", companyId)
     .order("name");
+}
+
+export async function getSuggestion(
+  client: SupabaseClient<Database>,
+  suggestionId: string
+) {
+  return client.from("suggestions").select("*").eq("id", suggestionId).single();
+}
+
+export async function getSuggestions(
+  client: SupabaseClient<Database>,
+  companyId: string,
+  args?: GenericQueryFilters & { search: string | null }
+) {
+  let query = client
+    .from("suggestions")
+    .select("*", { count: "exact" })
+    .eq("companyId", companyId);
+
+  if (args?.search) {
+    query = query.ilike("suggestion", `%${args.search}%`);
+  }
+
+  if (args) {
+    query = setGenericQueryFilters(query, args, [
+      { column: "createdAt", ascending: false }
+    ]);
+  }
+
+  return query;
 }
 
 export async function getTraining(
@@ -676,6 +713,22 @@ export async function updateAbility(
   }>
 ) {
   return client.from("ability").update(sanitize(ability)).eq("id", id);
+}
+
+export async function updateSuggestionEmoji(
+  client: SupabaseClient<Database>,
+  suggestionId: string,
+  emoji: string
+) {
+  return client.from("suggestion").update({ emoji }).eq("id", suggestionId);
+}
+
+export async function updateSuggestionTags(
+  client: SupabaseClient<Database>,
+  suggestionId: string,
+  tags: string[]
+) {
+  return client.from("suggestion").update({ tags }).eq("id", suggestionId);
 }
 
 export async function updateTrainingQuestionOrder(

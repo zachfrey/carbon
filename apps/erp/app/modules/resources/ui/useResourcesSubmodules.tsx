@@ -2,6 +2,7 @@ import {
   LuClipboardCheck,
   LuCog,
   LuGraduationCap,
+  LuMailbox,
   LuMapPin,
   LuWrench
 } from "react-icons/lu";
@@ -11,7 +12,7 @@ import { path } from "~/utils/path";
 
 const resourcesRoutes: RouteGroup[] = [
   {
-    name: "Manage",
+    name: "Infrastructure",
     routes: [
       {
         name: "Locations",
@@ -34,7 +35,7 @@ const resourcesRoutes: RouteGroup[] = [
     ]
   },
   {
-    name: "Training",
+    name: "People",
     routes: [
       {
         name: "Training",
@@ -46,6 +47,12 @@ const resourcesRoutes: RouteGroup[] = [
         name: "Assignments",
         to: path.to.trainingAssignments,
         icon: <LuClipboardCheck />
+      },
+      {
+        name: "Suggestions",
+        to: path.to.suggestions,
+        icon: <LuMailbox />,
+        table: "suggestion"
       }
     ]
   }

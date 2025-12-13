@@ -114,6 +114,12 @@ export const rfqReadyValidator = z.object({
     .optional()
 });
 
+export const suggestionNotificationValidator = z.object({
+  suggestionNotificationGroup: z
+    .array(z.string().min(1, { message: "Invalid selection" }))
+    .optional()
+});
+
 export const sequenceValidator = z.object({
   table: z.string().min(1, { message: "Table is required" }),
   prefix: zfd.text(z.string().optional()),

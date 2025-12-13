@@ -54,7 +54,7 @@ export async function flash(request: Request, result: Result) {
 **How it works:**
 
 1. Retrieves the current session from the request
-2. Uses Remix's `session.flash()` to store temporary data that will be cleared after being read once
+2. Uses React Router's `session.flash()` to store temporary data that will be cleared after being read once
 3. Stores three pieces of data: `success` (boolean), `message` (string), and optionally `flash` (visual effect type)
 4. Returns headers to commit the session cookie
 

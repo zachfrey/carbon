@@ -577,6 +577,17 @@ export async function updateRfqReadySetting(
     .eq("id", companyId);
 }
 
+export async function updateSuggestionNotificationSetting(
+  client: SupabaseClient<Database>,
+  companyId: string,
+  suggestionNotificationGroup: string[]
+) {
+  return client
+    .from("company")
+    .update(sanitize({ suggestionNotificationGroup }))
+    .eq("id", companyId);
+}
+
 export async function updatePurchasePriceUpdateTimingSetting(
   client: SupabaseClient<Database>,
   companyId: string,

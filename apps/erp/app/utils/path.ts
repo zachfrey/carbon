@@ -687,7 +687,13 @@ export const path = {
       generatePath(`${x}/purchasing/supplier-statuses/delete/${id}`),
     deleteSupplierType: (id: string) =>
       generatePath(`${x}/purchasing/supplier-types/delete/${id}`),
+    deleteSuggestion: (id: string) =>
+      generatePath(`${x}/resources/suggestions/delete/${id}`),
     deleteTraining: (id: string) => generatePath(`${x}/training/delete/${id}`),
+    deleteTrainingAssignment: (assignmentId: string) =>
+      generatePath(
+        `${x}/resources/assignments/assignment/${assignmentId}/delete`
+      ),
     deleteTrainingQuestion: (id: string, questionId: string) =>
       generatePath(`${x}/training/${id}/questions/delete/${questionId}`),
     deleteUom: (id: string) => generatePath(`${x}/items/uom/delete/${id}`),
@@ -729,6 +735,7 @@ export const path = {
     externalTraining: (assignmentId: string) =>
       generatePath(`/share/training/${assignmentId}`),
     feedback: `${x}/feedback`,
+    resourcesSettings: `${x}/settings/resources`,
     fiscalYears: `${x}/accounting/years`,
     gauge: (id: string) => generatePath(`${x}/quality/gauges/${id}`),
     gauges: `${x}/quality/gauges`,
@@ -978,6 +985,7 @@ export const path = {
     newStockTransfer: `${x}/stock-transfer/new`,
     newStockTransferLine: (id: string) =>
       generatePath(`${x}/stock-transfer/${id}/line/new`),
+    newSuggestion: `${x}/resources/suggestions/new`,
     newProcedure: `${x}/production/procedures/new`,
     newProcedureStep: (id: string) =>
       generatePath(`${x}/procedure/${id}/steps/new`),
@@ -1116,6 +1124,9 @@ export const path = {
     stockTransferStatus: (id: string) =>
       generatePath(`${x}/stock-transfer/${id}/status`),
     stockTransfers: `${x}/inventory/stock-transfers`,
+    suggestion: (id: string) =>
+      generatePath(`${x}/resources/suggestions/${id}`),
+    suggestions: `${x}/resources/suggestions`,
     procedure: (id: string) => generatePath(`${x}/procedure/${id}`),
     procedureStep: (id: string, attributeId: string) =>
       generatePath(`${x}/procedure/${id}/steps/${attributeId}`),
@@ -1133,7 +1144,6 @@ export const path = {
       generatePath(`${x}/production/planning/${itemId}`),
     productionSettings: `${x}/settings/production`,
     profile: `${x}/account/profile`,
-    qualitySettings: `${x}/settings/quality`,
     purchaseInvoice: (id: string) =>
       generatePath(`${x}/purchase-invoice/${id}`),
     purchaseInvoiceDelivery: (id: string) =>
@@ -1195,10 +1205,8 @@ export const path = {
     newTrainingAssignment: `${x}/resources/assignments/new`,
     trainingAssignment: (assignmentId: string) =>
       generatePath(`${x}/resources/assignments/assignment/${assignmentId}`),
-    deleteTrainingAssignment: (assignmentId: string) =>
-      generatePath(
-        `${x}/resources/assignments/assignment/${assignmentId}/delete`
-      ),
+
+    qualitySettings: `${x}/settings/quality`,
 
     quote: (id: string) => generatePath(`${x}/quote/${id}`),
     quoteAssembly: (quoteId: string, lineId: string, assemblyId: string) =>

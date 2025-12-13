@@ -12,7 +12,7 @@ import type {
   FormMethod,
   SubmitOptions
 } from "react-router";
-import { Form as RemixForm, useSubmit } from "react-router";
+import { Form as ReactRouterForm, useSubmit } from "react-router";
 import * as R from "remeda";
 import type { z } from "zod/v3";
 import { useIsSubmitting, useIsValid } from "./hooks";
@@ -82,7 +82,7 @@ export type FormProps<DataType, Subaction extends string | undefined> = {
    */
   onAfterSubmit?: () => void | Promise<void>;
   /**
-   * Allows you to provide a `fetcher` from Remix's `useFetcher` hook.
+   * Allows you to provide a `fetcher` from React Router's `useFetcher` hook.
    * The form will use the fetcher for loading states, action data, etc
    * instead of the default form action.
    */
@@ -113,7 +113,7 @@ export type FormProps<DataType, Subaction extends string | undefined> = {
    * Set this to `false` to disable this behavior.
    */
   disableFocusOnError?: boolean;
-} & Omit<ComponentProps<typeof RemixForm>, "onSubmit">;
+} & Omit<ComponentProps<typeof ReactRouterForm>, "onSubmit">;
 
 const getDataFromForm = (el: HTMLFormElement) => new FormData(el);
 
@@ -298,7 +298,7 @@ export function ValidatedForm<
   const backendDefaultValues = useDefaultValuesFromLoader(contextValue);
   const hasActiveSubmission = useHasActiveFormSubmit(contextValue);
   const formRef = useRef<HTMLFormElement>(null);
-  const Form = fetcher?.Form ?? RemixForm;
+  const Form = fetcher?.Form ?? ReactRouterForm;
 
   const submit = useSubmit();
   const setFieldErrors = useSetFieldErrors(formId);
@@ -426,8 +426,8 @@ export function ValidatedForm<
         encType: encType as FormEncType | undefined
       };
 
-      // We deviate from the Remix code here a bit because of our async submit.
-      // In Remix's `FormImpl`, they use `event.currentTarget` to get the form,
+      // We deviate from the React Routers code here a bit because of our async submit.
+      // In React Routers's `FormImpl`, they use `event.currentTarget` to get the form,
       // but we already have the form in `formRef.current` so we can just use that.
       // If we use `event.currentTarget` here, it will break because `currentTarget`
       // will have changed since the start of the submission.

@@ -72,6 +72,14 @@ export const feedbackValidator = z.object({
   location: z.string()
 });
 
+export const suggestionValidator = z.object({
+  suggestion: z.string().min(1, { message: "Suggestion is required" }),
+  emoji: z.string().default("💡"),
+  attachmentPath: z.string().optional(),
+  path: z.string(),
+  userId: zfd.text(z.string().optional())
+});
+
 export const productionEventType = ["Setup", "Labor", "Machine"] as const;
 
 export const productionEventAction = ["Start", "End"] as const;

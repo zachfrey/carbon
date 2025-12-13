@@ -31,6 +31,7 @@ export const tablesWithTags = [
   "job",
   "material",
   "part",
+  "suggestion",
   "tool"
 ];
 
@@ -94,6 +95,14 @@ export const feedbackValidator = z.object({
   feedback: z.string().min(1, { message: "" }),
   attachmentPath: z.string().optional(),
   location: z.string()
+});
+
+export const suggestionValidator = z.object({
+  suggestion: z.string().min(1, { message: "Suggestion is required" }),
+  emoji: z.string().default("💡"),
+  attachmentPath: z.string().optional(),
+  path: z.string(),
+  userId: zfd.text(z.string().optional())
 });
 
 export const operationStepValidator = z

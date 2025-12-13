@@ -12,7 +12,7 @@ Carbon is a manufacturing system built with modern web technologies. It consists
 
 ### Frontend
 
-- **Framework**: Remix (React-based)
+- **Framework**: React Router (React-based)
 - **UI Components**: Custom component library at `/packages/react/`
 - **Styling**: Tailwind CSS
 - **Forms**: Custom form library at `/packages/form/`
@@ -43,7 +43,7 @@ The monorepo uses NPM workspaces with packages located in `/packages/`:
 - `logger` - Logging utilities
 - `notifications` - Notification services
 - `react` - Shared React components
-- `remix` - Remix-specific utilities
+- `remix` - React Router-specific utilities
 - `utils` - Common utilities
 
 ## Common Patterns
@@ -54,7 +54,7 @@ Each app follows a consistent structure:
 
 - `components/` - React components
 - `hooks/` - Custom React hooks
-- `routes/` - Remix routes
+- `routes/` - React Router routes
 - `services/` - Business logic and API calls
 - `stores/` - State management (appears to use nanostores)
 - `styles/` - CSS files
@@ -77,7 +77,7 @@ The ERP app organizes business logic into modules:
 
 ### Routing
 
-- Uses Remix flat routes
+- Uses React Router flat routes
 - Protected routes under `x+/` prefix
 - Public routes under `_public+/` prefix
 - API routes under `api+/` prefix

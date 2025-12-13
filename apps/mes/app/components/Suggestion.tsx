@@ -9,39 +9,59 @@ import {
   Badge,
   BadgeCloseButton,
   Button,
+  Checkbox,
   File,
   HStack,
   Popover,
   PopoverContent,
   PopoverTrigger,
+  SidebarMenuButton,
   toast,
   VStack
 } from "@carbon/react";
-import { SUPPORT_EMAIL } from "@carbon/utils";
+import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
 import { nanoid } from "nanoid";
 import type { ChangeEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { LuImage, LuLightbulb } from "react-icons/lu";
 import { useFetcher, useLocation } from "react-router";
-import { feedbackValidator } from "~/modules/shared";
-import type { action } from "~/routes/x+/feedback";
+import { useUser } from "~/hooks";
+import type { action } from "~/routes/x+/suggestion";
+import { suggestionValidator } from "~/services/models";
 import { path } from "~/utils/path";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
-const Feedback = () => {
+
+type EmojiData = {
+  native: string;
+  id: string;
+  name: string;
+};
+
+const Suggestion = () => {
   const fetcher = useFetcher<typeof action>();
   const location = useLocation();
   const popoverTriggerRef = useRef<HTMLButtonElement>(null);
-  const [feedback, setFeedback] = useState("");
+  const [suggestion, setSuggestion] = useState("");
+  const [emoji, setEmoji] = useState("💡");
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
+  const [anonymous, setAnonymous] = useState(true);
   const [attachment, setAttachment] = useState<{
     name: string;
     path: string;
   } | null>(null);
   const { carbon } = useCarbon();
+  const user = useUser();
+  const companyId = user.company.id;
 
   useEffect(() => {
     if (fetcher.data?.success) {
       toast.success(fetcher.data.message);
+      setSuggestion("");
+      setEmoji("💡");
+      setAttachment(null);
+      setAnonymous(true);
       popoverTriggerRef.current?.click();
     } else if (fetcher.data?.message) {
       toast.error(fetcher.data.message);
@@ -51,7 +71,6 @@ const Feedback = () => {
   const uploadImage = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && carbon) {
       const file = e.target.files[0];
-      toast.info(`Uploading ${file.name}`);
       const fileExtension = file.name.substring(file.name.lastIndexOf(".") + 1);
 
       if (file.size > MAX_FILE_SIZE) {
@@ -59,9 +78,10 @@ const Feedback = () => {
         return;
       }
 
+      const fileName = `${companyId}/suggestions/${nanoid()}.${fileExtension}`;
       const imageUpload = await carbon.storage
-        .from("feedback")
-        .upload(`${nanoid()}.${fileExtension}`, file, {
+        .from("private")
+        .upload(fileName, file, {
           cacheControl: `${12 * 60 * 60}`,
           upsert: true
         });
@@ -80,39 +100,45 @@ const Feedback = () => {
     }
   };
 
+  const onEmojiSelect = (emojiData: EmojiData) => {
+    setEmoji(emojiData.native);
+    setEmojiPickerOpen(false);
+  };
+
   return (
     <Popover>
       <PopoverTrigger ref={popoverTriggerRef} asChild>
-        <Button variant="secondary">Feedback</Button>
+        <SidebarMenuButton>
+          <LuLightbulb />
+          <span>Suggestion</span>
+        </SidebarMenuButton>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-[380px] ">
+      <PopoverContent className="w-[380px] ">
         <ValidatedForm
           method="post"
-          action={path.to.feedback}
-          validator={feedbackValidator}
+          action={path.to.suggestion}
+          validator={suggestionValidator}
           fetcher={fetcher}
-          onSubmit={() => {
-            setFeedback("");
-            setAttachment(null);
-          }}
         >
-          <Hidden name="location" value={location.pathname} />
+          <Hidden name="path" value={location.pathname} />
+          <Hidden name="emoji" value={emoji} />
           <Hidden name="attachmentPath" value={attachment?.path ?? ""} />
-          <VStack spacing={4}>
-            <VStack spacing={2}>
+          <Hidden name="userId" value={anonymous ? "" : user.id} />
+          <VStack spacing={2}>
+            <VStack spacing={2} className="w-full">
               <TextAreaControlled
-                name="feedback"
+                name="suggestion"
                 label=""
-                value={feedback}
-                onChange={(value) => setFeedback(value)}
-                placeholder="Ideas, suggestions or problems with this page?"
+                value={suggestion}
+                onChange={(value) => setSuggestion(value)}
+                placeholder="Ideas, suggestions or problems?"
               />
               {attachment && (
                 <Badge className="-mt-2 truncate" variant="secondary">
                   {attachment.name}
                   <BadgeCloseButton
                     type="button"
-                    onClick={(e) => {
+                    onClick={() => {
                       setAttachment(null);
                     }}
                   />
@@ -120,10 +146,45 @@ const Feedback = () => {
               )}
             </VStack>
             <HStack className="w-full justify-between">
+              <HStack spacing={2}>
+                <Checkbox
+                  isChecked={anonymous}
+                  onCheckedChange={(checked) => setAnonymous(checked === true)}
+                />
+                <span className="text-sm">Submit anonymously</span>
+              </HStack>
+              <Popover open={emojiPickerOpen} onOpenChange={setEmojiPickerOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center rounded-md h-10 w-10 text-2xl hover:bg-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shrink-0"
+                  >
+                    {emoji}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto p-0 border-0 bg-white"
+                  align="end"
+                  sideOffset={8}
+                >
+                  <Picker
+                    data={data}
+                    onEmojiSelect={onEmojiSelect}
+                    theme="light"
+                    previewPosition="none"
+                    skinTonePosition="none"
+                    navPosition="bottom"
+                    perLine={8}
+                  />
+                </PopoverContent>
+              </Popover>
+            </HStack>
+            <HStack className="w-full justify-between">
               <Button
                 variant="secondary"
                 onClick={() => {
-                  setFeedback("");
+                  setSuggestion("");
+                  setEmoji("💡");
                   setAttachment(null);
                   popoverTriggerRef.current?.click();
                 }}
@@ -132,9 +193,9 @@ const Feedback = () => {
               </Button>
               <HStack spacing={1}>
                 <Button
-                  isDisabled={feedback.length === 0}
+                  isDisabled={suggestion.length === 0}
                   variant="secondary"
-                  onClick={() => setFeedback("")}
+                  onClick={() => setSuggestion("")}
                 >
                   Clear
                 </Button>
@@ -148,15 +209,9 @@ const Feedback = () => {
                 >
                   <LuImage />
                 </File>
-                <Submit isDisabled={feedback.length < 3}>Send</Submit>
+                <Submit isDisabled={suggestion.length < 3}>Send</Submit>
               </HStack>
             </HStack>
-            <p className="text-sm">
-              Have a technical issue? Contact{" "}
-              <a className="text-primary" href={`mailto:${SUPPORT_EMAIL}`}>
-                Carbon Support.
-              </a>
-            </p>
           </VStack>
         </ValidatedForm>
       </PopoverContent>
@@ -164,4 +219,4 @@ const Feedback = () => {
   );
 };
 
-export default Feedback;
+export default Suggestion;

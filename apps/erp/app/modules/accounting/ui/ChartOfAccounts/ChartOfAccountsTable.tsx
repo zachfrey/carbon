@@ -2,7 +2,7 @@ import { Button, Checkbox, cn, HStack } from "@carbon/react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { memo, useMemo } from "react";
 import { LuEllipsisVertical } from "react-icons/lu";
-import { Link as RemixLink } from "react-router";
+import { Link as ReactRouterLink } from "react-router";
 import { Hyperlink } from "~/components";
 import { Enumerable } from "~/components/Enumerable";
 import Grid from "~/components/Grid";
@@ -45,9 +45,9 @@ const ChartOfAccountsTable = memo(({ data }: ChartOfAccountsTableProps) => {
                   aria-label="Edit account"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <RemixLink to={`${row.original.id}`}>
+                  <ReactRouterLink to={`${row.original.id}`}>
                     <LuEllipsisVertical />
-                  </RemixLink>
+                  </ReactRouterLink>
                 </Button>
               </div>
             </HStack>

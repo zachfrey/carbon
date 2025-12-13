@@ -103,7 +103,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 - Uses nanostores for global state
 - React Query for server state
-- Remix's built-in data loading for route-specific data
+- React Router's built-in data loading for route-specific data
 
 ## Error Handling
 

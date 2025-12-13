@@ -2,7 +2,7 @@
 
 ## Overview
 
-ClientAction is a Remix feature used to handle client-side operations before calling the server action. In this codebase, it's primarily used for cache invalidation with React Query.
+ClientAction is a React Router feature used to handle client-side operations before calling the server action. In this codebase, it's primarily used for cache invalidation with React Query.
 
 ## Common Patterns
 

@@ -5,9 +5,9 @@ import AvatarMenu from "../../AvatarMenu";
 import Breadcrumbs from "./Breadcrumbs";
 import CompanySwitcher from "./CompanySwitcher";
 import CreateMenu from "./CreateMenu";
-import Feedback from "./Feedback";
 import Notifications from "./Notifications";
 import Search from "./Search";
+import Suggestion from "./Suggestion";
 
 const Topbar = () => {
   const permissions = usePermissions();
@@ -26,7 +26,7 @@ const Topbar = () => {
         {permissions.is("employee") ? <Search /> : <div />}
       </div>
       <HStack spacing={1} className="flex-1 justify-end py-2">
-        <Feedback />
+        <Suggestion />
         <CreateMenu
           trigger={
             <IconButton

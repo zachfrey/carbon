@@ -10,6 +10,8 @@ import type {
   getLocations,
   getPartners,
   getProcesses,
+  getSuggestion,
+  getSuggestions,
   getTraining,
   getTrainingAssignment,
   getTrainingQuestions,
@@ -125,3 +127,11 @@ export type TrainingAssignmentSummaryItem = {
 export type TrainingAssignment = NonNullable<
   Awaited<ReturnType<typeof getTrainingAssignment>>["data"]
 >;
+
+export type Suggestion = NonNullable<
+  Awaited<ReturnType<typeof getSuggestion>>["data"]
+>;
+
+export type SuggestionListItem = NonNullable<
+  Awaited<ReturnType<typeof getSuggestions>>["data"]
+>[number];

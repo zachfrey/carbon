@@ -80,6 +80,7 @@ const cardVariants = cva(
         Done: "",
         Paused: "",
         Canceled: "border-red-500/30",
+        Cancelled: "border-red-500/30",
         Waiting: "opacity-50",
         Todo: "border-border"
       }
@@ -101,6 +102,7 @@ const cardHeaderVariants = cva(
         Todo: "",
         Paused: "",
         Canceled: "",
+        Cancelled: "",
         Waiting: ""
       }
     },

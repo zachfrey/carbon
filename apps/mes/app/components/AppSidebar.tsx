@@ -55,7 +55,7 @@ import type { Location } from "~/services/types";
 import { ERP_URL, path } from "~/utils/path";
 import { AdjustInventory } from "./AdjustInventory";
 import { EndShift } from "./EndShift";
-import Feedback from "./Feedback";
+import Suggestion from "./Suggestion";
 
 export function AppSidebar({
   activeEvents,
@@ -220,7 +220,7 @@ export function ToolsNav() {
           </SidebarMenuItem>
 
           <SidebarMenuItem>
-            <Feedback />
+            <Suggestion />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>

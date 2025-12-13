@@ -190,7 +190,7 @@ To refactor warehouse transfers to match this pattern:
 ## Data Flow Patterns
 
 ### Optimistic Updates
-- Uses Remix fetchers for optimistic UI updates
+- Uses React Router fetchers for optimistic UI updates
 - Pending changes merged with server data
 - Real-time feedback without full page reloads
 

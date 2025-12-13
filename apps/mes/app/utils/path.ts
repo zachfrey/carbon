@@ -124,14 +124,15 @@ export const path = {
     root: "/",
     scrap: `${x}/scrap`,
     scrapReasons: `${api}/scrap-reasons`,
-    startOperation: (id: string) => generatePath(`${x}/start/${id}`),
-    switchCompany: (companyId: string) =>
-      generatePath(`${x}/company/switch/${companyId}`),
-    unconsume: `${x}/unconsume`,
     scrapEntity: (operationId: string, id: string, parentId?: string) => {
       const basePath = generatePath(`${x}/entity/${operationId}/${id}/scrap`);
       return parentId ? `${basePath}?parentId=${parentId}` : basePath;
     },
+    startOperation: (id: string) => generatePath(`${x}/start/${id}`),
+    switchCompany: (companyId: string) =>
+      generatePath(`${x}/company/switch/${companyId}`),
+    suggestion: `${x}/suggestion`,
+    unconsume: `${x}/unconsume`,
     workCenter: (workCenter: string) =>
       generatePath(`${x}/operations/${workCenter}`)
   }

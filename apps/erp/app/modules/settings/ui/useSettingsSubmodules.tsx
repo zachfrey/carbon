@@ -7,6 +7,7 @@ import {
   LuFactory,
   LuImage,
   LuLayoutDashboard,
+  LuLightbulb,
   LuSheet,
   LuShoppingCart,
   LuSquareStack,
@@ -91,6 +92,12 @@ const settingsRoutes: AuthenticatedRouteGroup<{
         to: path.to.salesSettings,
         role: "employee",
         icon: <LuCrown />
+      },
+      {
+        name: "Resources",
+        to: path.to.resourcesSettings,
+        role: "employee",
+        icon: <LuLightbulb />
       }
     ]
   },
