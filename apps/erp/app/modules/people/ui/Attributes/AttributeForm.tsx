@@ -37,6 +37,7 @@ type AttributeFormProps = {
     isList: boolean;
     isNumeric: boolean;
     isText: boolean;
+    isFile: boolean;
   }[];
   onClose: () => void;
 };

@@ -1,10 +1,21 @@
+import { useCarbon } from "@carbon/auth";
 import { ValidatedForm } from "@carbon/form";
-import { Button, HStack, Switch, VStack, useDisclosure } from "@carbon/react";
+import {
+  Button,
+  HStack,
+  Switch,
+  toast,
+  useDisclosure,
+  VStack
+} from "@carbon/react";
 import { parseDate } from "@internationalized/date";
 import { useLocale } from "@react-aria/i18n";
 import { useFetcher, useParams } from "@remix-run/react";
 import { useState } from "react";
+import { LuFile, LuPaperclip } from "react-icons/lu";
 import type { ZodSchema } from "zod/v3";
+import CustomerAvatar from "~/components/CustomerAvatar";
+import FileDropzone from "~/components/FileDropzone";
 import {
   Boolean as BooleanInput,
   Customer,
@@ -18,14 +29,14 @@ import {
   Supplier
 } from "~/components/Form";
 import { UserSelect } from "~/components/Selectors";
-import CustomerAvatar from "~/components/CustomerAvatar";
 import SupplierAvatar from "~/components/SupplierAvatar";
 import { usePermissions, useUser } from "~/hooks";
 import { DataType } from "~/modules/shared";
-import { path } from "~/utils/path";
+import { getPrivateUrl, path } from "~/utils/path";
 import {
   attributeBooleanValidator,
   attributeCustomerValidator,
+  attributeFileValidator,
   attributeNumericValidator,
   attributeSupplierValidator,
   attributeTextValidator,
@@ -423,6 +434,19 @@ function TypedForm(
           </div>
         </ValidatedForm>
       );
+    case DataType.File:
+      return (
+        <FileAttributeForm
+          attribute={attribute}
+          userAttributeId={userAttributeId}
+          userAttributeValueId={userAttributeValueId}
+          value={value}
+          updateFetcher={updateFetcher}
+          userId={userId}
+          onSubmit={onSubmit}
+          onClose={onClose}
+        />
+      );
     default:
       return (
         <div className="text-destructive bg-destructive-foreground p-4 w-full">
@@ -567,6 +591,36 @@ function TypedDisplay(
           />
         </div>
       );
+    case DataType.File:
+      return (
+        <div className="grid grid-cols-[1fr_2fr_1fr] border-t border-border gap-x-2 pt-3 w-full items-center">
+          <p className="text-muted-foreground self-center">{attribute.name}</p>
+          {value ? (
+            <a
+              href={getPrivateUrl(value.toString())}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm text-primary hover:underline"
+            >
+              <LuPaperclip className="size-4" />
+              <span className="truncate max-w-[200px]">
+                {value.toString().split("/").pop()}
+              </span>
+            </a>
+          ) : (
+            <p className="self-center">{displayValue}</p>
+          )}
+
+          <UpdateRemoveButtons
+            canRemove={
+              !isAuthorized || (attribute.canSelfManage === true && !!value)
+            }
+            canUpdate={!isAuthorized || (attribute.canSelfManage ?? false)}
+            {...props}
+            onSubmit={setOptimisticUpdate}
+          />
+        </div>
+      );
   }
 }
 
@@ -641,6 +695,11 @@ function getGenericProps(
         value = userAttributeValue.valueText;
         if (userAttributeValue.valueText)
           displayValue = userAttributeValue.valueText;
+        break;
+      case DataType.File:
+        value = userAttributeValue.valueFile;
+        if (userAttributeValue.valueFile)
+          displayValue = userAttributeValue.valueFile;
     }
   }
 
@@ -656,6 +715,117 @@ function getGenericProps(
     userAttributeValueId,
     value
   };
+}
+
+function FileAttributeForm({
+  attribute,
+  userAttributeId,
+  userAttributeValueId,
+  value,
+  updateFetcher,
+  userId,
+  onSubmit,
+  onClose
+}: {
+  attribute: {
+    id: string | null;
+    name: string | null;
+    canSelfManage: boolean | null;
+    listOptions: string[] | null;
+  };
+  userAttributeId: string;
+  userAttributeValueId?: string;
+  value: Date | string | number | boolean | null;
+  updateFetcher: ReturnType<typeof useFetcher>;
+  userId: string;
+  onSubmit: (value: string | boolean | number) => void;
+  onClose: () => void;
+}) {
+  const { carbon } = useCarbon();
+  const { company } = useUser();
+  const [file, setFile] = useState<File | null>(null);
+  const [filePath, setFilePath] = useState<string | null>(
+    value?.toString() ?? null
+  );
+
+  const onDrop = async (acceptedFiles: File[]) => {
+    if (!acceptedFiles[0] || !carbon) return;
+    const fileUpload = acceptedFiles[0];
+
+    setFile(fileUpload);
+    toast.info(`Uploading ${fileUpload.name}`);
+
+    const fileName = `${company.id}/person/${userId}/${fileUpload.name}`;
+
+    const upload = await carbon?.storage
+      .from("private")
+      .upload(fileName, fileUpload, {
+        cacheControl: `${12 * 60 * 60}`,
+        upsert: true
+      });
+
+    if (upload.error) {
+      toast.error(`Failed to upload file: ${fileUpload.name}`);
+    } else if (upload.data?.path) {
+      toast.success(`Uploaded: ${fileUpload.name}`);
+      setFilePath(upload.data.path);
+    }
+  };
+
+  return (
+    <ValidatedForm
+      method="post"
+      action={path.to.userAttribute(userId)}
+      validator={attributeFileValidator}
+      defaultValues={{
+        userAttributeId,
+        userAttributeValueId,
+        value: filePath ?? ""
+      }}
+      fetcher={updateFetcher}
+      onSubmit={() => {
+        if (filePath) onSubmit(filePath);
+      }}
+    >
+      <div className="grid grid-cols-[1fr_2fr_1fr] border-t border-border gap-x-2 pt-3 w-full items-center">
+        <p className="text-muted-foreground self-center">{attribute.name}</p>
+        <div>
+          <Hidden name="type" value="file" />
+          <Hidden name="userAttributeId" />
+          <Hidden name="userAttributeValueId" />
+          <Hidden name="value" value={filePath ?? ""} />
+          {file || filePath ? (
+            <div className="flex flex-col gap-2 items-center justify-center py-4 w-full">
+              <LuFile className="size-8 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground truncate max-w-[200px]">
+                {file?.name ?? filePath?.split("/").pop()}
+              </p>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setFile(null);
+                  setFilePath(null);
+                }}
+              >
+                Remove
+              </Button>
+            </div>
+          ) : (
+            <FileDropzone onDrop={onDrop} />
+          )}
+        </div>
+        <HStack className="justify-end w-full self-center">
+          <Submit type="submit" isDisabled={!filePath}>
+            Save
+          </Submit>
+          <Button variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+        </HStack>
+      </div>
+    </ValidatedForm>
+  );
 }
 
 function UpdateRemoveButtons({

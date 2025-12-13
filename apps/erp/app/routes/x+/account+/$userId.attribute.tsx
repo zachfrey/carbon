@@ -8,6 +8,7 @@ import type { ZodSchema } from "zod/v3";
 import {
   attributeBooleanValidator,
   attributeCustomerValidator,
+  attributeFileValidator,
   attributeNumericValidator,
   attributeSupplierValidator,
   attributeTextValidator,
@@ -117,6 +118,9 @@ function getValidatorByType(type: string) {
       return attributeSupplierValidator;
     case "customer":
       return attributeCustomerValidator;
+    case "file":
+      return attributeFileValidator;
+
     default:
       throw new Error("Invalid type provided");
   }

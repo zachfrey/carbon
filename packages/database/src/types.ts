@@ -1698,6 +1698,7 @@ export type Database = {
           isBoolean: boolean
           isCustomer: boolean
           isDate: boolean
+          isFile: boolean
           isList: boolean
           isNumeric: boolean
           isSupplier: boolean
@@ -1710,6 +1711,7 @@ export type Database = {
           isBoolean?: boolean
           isCustomer?: boolean
           isDate?: boolean
+          isFile?: boolean
           isList?: boolean
           isNumeric?: boolean
           isSupplier?: boolean
@@ -1722,6 +1724,7 @@ export type Database = {
           isBoolean?: boolean
           isCustomer?: boolean
           isDate?: boolean
+          isFile?: boolean
           isList?: boolean
           isNumeric?: boolean
           isSupplier?: boolean
@@ -36564,6 +36567,7 @@ export type Database = {
           userId: string
           valueBoolean: boolean | null
           valueDate: string | null
+          valueFile: string | null
           valueNumeric: number | null
           valueText: string | null
           valueUser: string | null
@@ -36578,6 +36582,7 @@ export type Database = {
           userId: string
           valueBoolean?: boolean | null
           valueDate?: string | null
+          valueFile?: string | null
           valueNumeric?: number | null
           valueText?: string | null
           valueUser?: string | null
@@ -36592,6 +36597,7 @@ export type Database = {
           userId?: string
           valueBoolean?: boolean | null
           valueDate?: string | null
+          valueFile?: string | null
           valueNumeric?: number | null
           valueText?: string | null
           valueUser?: string | null

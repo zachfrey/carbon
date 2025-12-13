@@ -33,9 +33,9 @@ export async function getAttributes(
     .select(
       `id, name, emoji, companyId,
       userAttribute(id, name, listOptions, canSelfManage,
-        attributeDataType(id, isBoolean, isDate, isNumeric, isText, isUser),
+        attributeDataType(id, isBoolean, isDate, isNumeric, isText, isUser, isFile),
         userAttributeValue(
-          id, valueBoolean, valueDate, valueNumeric, valueText, valueUser
+          id, valueBoolean, valueDate, valueNumeric, valueText, valueUser, valueFile
         )
       )`
     )
@@ -73,9 +73,9 @@ export async function getAllAttributeCategories(
     .select(
       `id, name, emoji, companyId,
       userAttribute(id, name, listOptions, canSelfManage,
-        attributeDataType(id, isBoolean, isDate, isNumeric, isText, isUser),
+        attributeDataType(id, isBoolean, isDate, isNumeric, isText, isUser, isFile),
         userAttributeValue(
-          id, valueBoolean, valueDate, valueNumeric, valueText, valueUser
+          id, valueBoolean, valueDate, valueNumeric, valueText, valueUser, valueFile
         )
       )`
     )
@@ -97,9 +97,9 @@ export async function getAttributeCategoryWithValues(
     .select(
       `id, name, emoji, companyId, public,
       userAttribute(id, name, listOptions, canSelfManage,
-        attributeDataType(id, isBoolean, isDate, isNumeric, isText, isUser),
+        attributeDataType(id, isBoolean, isDate, isNumeric, isText, isUser, isFile),
         userAttributeValue(
-          id, valueBoolean, valueDate, valueNumeric, valueText, valueUser
+          id, valueBoolean, valueDate, valueNumeric, valueText, valueUser, valueFile
         )
       )`
     )
@@ -191,6 +191,10 @@ export async function upsertUserAttributeValue(
 
   if (type === "supplier" && typeof value === "string") {
     valueUpdate = { valueText: value };
+  }
+
+  if (type === "file" && typeof value === "string") {
+    valueUpdate = { valueFile: value };
   }
 
   if (userAttributeValueId) {

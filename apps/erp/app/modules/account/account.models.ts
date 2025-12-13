@@ -1,5 +1,5 @@
-import { zfd } from "zod-form-data";
 import { z } from "zod/v3";
+import { zfd } from "zod-form-data";
 
 export const onboardingUserValidator = z.object({
   firstName: z.string().min(1, { message: "First name is required" }),
@@ -69,6 +69,11 @@ export const attributeCustomerValidator = z.object({
 export const attributeSupplierValidator = z.object({
   ...attributeDefaults,
   value: z.string().min(1, { message: "Supplier is required" })
+});
+
+export const attributeFileValidator = z.object({
+  ...attributeDefaults,
+  value: z.string().min(1, { message: "File is required" })
 });
 
 export const deleteUserAttributeValueValidator = z.object({

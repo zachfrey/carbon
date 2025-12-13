@@ -78,9 +78,9 @@ async function getAttributes(
     .select(
       `*,
       userAttribute(id, name, listOptions, canSelfManage,
-        attributeDataType(id, isBoolean, isDate, isNumeric, isText, isUser),
+        attributeDataType(id, isBoolean, isDate, isNumeric, isText, isUser, isFile),
         userAttributeValue(
-          id, userId, valueBoolean, valueDate, valueNumeric, valueText, valueUser, user!userAttributeValue_userId_fkey(id, fullName, avatarUrl)
+          id, userId, valueBoolean, valueDate, valueNumeric, valueText, valueUser, valueFile, user!userAttributeValue_userId_fkey(id, fullName, avatarUrl)
         )
       )`
     )
@@ -124,10 +124,10 @@ export async function getAttributeCategory(
   return client
     .from("userAttributeCategory")
     .select(
-      `*, 
+      `*,
       userAttribute(
-        id, name, sortOrder, 
-        attributeDataType(id, label,  isBoolean, isDate, isList, isNumeric, isText, isUser ))
+        id, name, sortOrder,
+        attributeDataType(id, label, isBoolean, isDate, isList, isNumeric, isText, isUser, isFile))
       `,
       {
         count: "exact"
@@ -316,7 +316,8 @@ export async function getPeople(
                   : userAttributeValue?.valueDate ||
                     userAttributeValue?.valueNumeric ||
                     userAttributeValue?.valueText ||
-                    userAttributeValue?.valueUser;
+                    userAttributeValue?.valueUser ||
+                    userAttributeValue?.valueFile;
 
               if (value && userAttributeValue?.id) {
                 acc[userAttributeId] = {
