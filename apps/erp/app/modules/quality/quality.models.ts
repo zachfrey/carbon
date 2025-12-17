@@ -61,16 +61,13 @@ export const nonConformanceAssociationType = [
 ] as const;
 
 export const riskSource = [
+  "Customer",
   "General",
   "Item",
-  "Item Master",
-  "Quote Line",
   "Job",
-  "Work Center",
+  "Quote Line",
   "Supplier",
-  "Supplier Master",
-  "Customer",
-  "Customer Master",
+  "Work Center"
 ] as const;
 
 export const riskStatus = [
@@ -78,7 +75,7 @@ export const riskStatus = [
   "In Review",
   "Mitigating",
   "Closed",
-  "Accepted",
+  "Accepted"
 ] as const;
 
 export const qualityDocumentStatus = ["Draft", "Active", "Archived"] as const;
@@ -312,12 +309,13 @@ export const requiredActionValidator = z.object({
 
 export const riskRegisterValidator = z.object({
   id: zfd.text(z.string().optional()),
-  title: z.string().min(1, { message: "Title is required" }),
+  assignee: zfd.text(z.string().optional()),
   description: zfd.text(z.string().optional()),
-  source: z.enum(riskSource),
-  severity: zfd.numeric(z.number().min(1).max(5).optional()),
+  itemId: zfd.text(z.string().optional()),
   likelihood: zfd.numeric(z.number().min(1).max(5).optional()),
-  status: z.enum(riskStatus),
-  assigneeUserId: zfd.text(z.string().optional()),
+  severity: zfd.numeric(z.number().min(1).max(5).optional()),
+  source: z.enum(riskSource),
   sourceId: zfd.text(z.string().optional()),
+  status: z.enum(riskStatus),
+  title: z.string().min(1, { message: "Title is required" })
 });

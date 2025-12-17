@@ -95,14 +95,13 @@ export default function PartDetailsRoute() {
             </Await>
           </Suspense>
 
-          <ItemRiskRegister itemId={itemId} />
-
           <CadModel
             isReadOnly={!permissions.can("update", "parts")}
             metadata={{ itemId }}
             modelPath={partData?.partSummary?.modelPath ?? null}
             title="CAD Model"
           />
+          <ItemRiskRegister itemId={itemId} />
         </>
       )}
     </VStack>

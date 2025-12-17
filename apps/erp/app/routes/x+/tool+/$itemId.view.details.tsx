@@ -96,14 +96,14 @@ export default function ToolDetailsRoute() {
             </Await>
           </Suspense>
 
-          <ItemRiskRegister itemId={itemId} />
-
           <CadModel
             isReadOnly={!permissions.can("update", "parts")}
             metadata={{ itemId }}
             modelPath={toolData?.toolSummary?.modelPath ?? null}
             title="CAD Model"
           />
+
+          <ItemRiskRegister itemId={itemId} />
         </>
       )}
     </VStack>

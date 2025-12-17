@@ -1,10 +1,12 @@
 import { MenuIcon, MenuItem, useDisclosure } from "@carbon/react";
+import { getItemReadableId } from "@carbon/utils";
 import type { ColumnDef } from "@tanstack/react-table";
 import { memo, useCallback, useMemo, useState } from "react";
 import {
   LuAlignLeft,
   LuPencil,
   LuShapes,
+  LuSquareStack,
   LuTrash,
   LuTriangleAlert,
   LuUser
@@ -16,8 +18,10 @@ import { Confirm } from "~/components/Modals";
 import { usePermissions, useUrlParams } from "~/hooks";
 import { riskSource, riskStatus } from "~/modules/quality/quality.models";
 import type { Risk } from "~/modules/quality/types";
-import { usePeople } from "~/stores";
+import { useItems, usePeople } from "~/stores";
 import { path } from "~/utils/path";
+import { getReadableIdWithRevision } from "~/utils/string";
+import RiskStatus from "./RiskStatus";
 
 type RiskRegistersTableProps = {
   data: Risk[];
@@ -33,6 +37,7 @@ const defaultColumnVisibility = {
 const RiskRegistersTable = memo(({ data, count }: RiskRegistersTableProps) => {
   const navigate = useNavigate();
   const [params] = useUrlParams();
+  const [items] = useItems();
   const [people] = usePeople();
 
   const permissions = usePermissions();
@@ -67,6 +72,21 @@ const RiskRegistersTable = memo(({ data, count }: RiskRegistersTableProps) => {
         }
       },
       {
+        accessorKey: "itemId",
+        header: "Item",
+        cell: ({ row }) => getItemReadableId(items, row.original.itemId),
+        meta: {
+          icon: <LuSquareStack />,
+          filter: {
+            type: "static",
+            options: items.map((item) => ({
+              value: item.id,
+              label: item.readableIdWithRevision
+            }))
+          }
+        }
+      },
+      {
         accessorKey: "source",
         header: "Source",
         cell: (item) => <Enumerable value={item.getValue<string>()} />,
@@ -74,19 +94,25 @@ const RiskRegistersTable = memo(({ data, count }: RiskRegistersTableProps) => {
           icon: <LuShapes />,
           filter: {
             type: "static",
-            options: riskSource.map((c) => ({ value: c, label: c }))
+            options: riskSource.map((c) => ({
+              value: c,
+              label: <Enumerable value={c} />
+            }))
           }
         }
       },
       {
         accessorKey: "status",
         header: "Status",
-        cell: (item) => <Enumerable value={item.getValue<string>()} />,
+        cell: ({ row }) => <RiskStatus status={row.original.status} />,
         meta: {
           icon: <LuTriangleAlert />,
           filter: {
             type: "static",
-            options: riskStatus.map((s) => ({ value: s, label: s }))
+            options: riskStatus.map((s) => ({
+              value: s,
+              label: <RiskStatus status={s} />
+            }))
           }
         }
       },
@@ -101,10 +127,10 @@ const RiskRegistersTable = memo(({ data, count }: RiskRegistersTableProps) => {
         cell: (item) => item.getValue<number>()
       },
       {
-        id: "assigneeUserId",
+        id: "assignee",
         header: "Assignee",
         cell: ({ row }) => (
-          <EmployeeAvatar employeeId={row.original.assigneeUserId} />
+          <EmployeeAvatar employeeId={row.original.assignee} />
         ),
         meta: {
           icon: <LuUser />,

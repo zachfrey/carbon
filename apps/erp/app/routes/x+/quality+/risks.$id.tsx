@@ -70,26 +70,25 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function EditRiskRoute() {
   const { risk } = useLoaderData<typeof loader>();
-  const formDisclosure = useDisclosure({
-    defaultIsOpen: true
-  });
+  const navigate = useNavigate();
   const onClose = () => {
-    formDisclosure.onClose();
+    navigate(-1);
   };
 
   return (
     <RiskRegisterForm
-      open={formDisclosure.isOpen}
+      open
       initialValues={{
         ...risk,
         id: risk.id,
         title: risk.title || "",
         description: risk.description ?? undefined,
+        itemId: risk.itemId ?? undefined,
         source: risk.source,
         status: risk.status || "Open",
         severity: risk.severity ?? undefined,
         likelihood: risk.likelihood ?? undefined,
-        assigneeUserId: risk.assigneeUserId ?? undefined,
+        assignee: risk.assignee ?? undefined,
         sourceId: risk.sourceId ?? undefined
       }}
       onClose={onClose}

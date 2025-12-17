@@ -984,7 +984,7 @@ export async function getRisks(
 ) {
   let query = client
     .from("riskRegister")
-    .select("*, assignee:assigneeUserId(id, firstName, lastName, avatarUrl)", {
+    .select("*, assignee:assignee(id, firstName, lastName, avatarUrl)", {
       count: "exact"
     })
     .eq("companyId", companyId);
@@ -1004,7 +1004,7 @@ export async function getRisks(
   }
 
   if (args?.assignee && args.assignee.length > 0) {
-    query = query.in("assigneeUserId", args.assignee);
+    query = query.in("assignee", args.assignee);
   }
 
   if (args) {
@@ -1641,7 +1641,7 @@ export async function upsertRisk(
   risk:
     | (Omit<z.infer<typeof riskRegisterValidator>, "id"> & {
         companyId: string;
-        createdByUserId: string;
+        createdBy: string;
       })
     | (Omit<z.infer<typeof riskRegisterValidator>, "id"> & {
         id: string;

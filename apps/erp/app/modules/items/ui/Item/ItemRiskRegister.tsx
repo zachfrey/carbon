@@ -5,5 +5,5 @@ type ItemRiskRegisterProps = {
 };
 
 export default function ItemRiskRegister({ itemId }: ItemRiskRegisterProps) {
-  return <RiskRegisterCard sourceId={itemId} source="Item" />;
+  return <RiskRegisterCard sourceId={itemId} source="Item" itemId={itemId} />;
 }

@@ -1,5 +1,6 @@
 import { useCarbon } from "@carbon/auth";
 import {
+  Badge,
   Card,
   CardAction,
   CardContent,
@@ -8,17 +9,17 @@ import {
   HStack,
   IconButton,
   Loading,
-  useDisclosure,
-  Badge,
   toast,
+  useDisclosure
 } from "@carbon/react";
-import { useEffect, useState, useCallback } from "react";
-import { LuPlus, LuShieldAlert, LuSettings2 } from "react-icons/lu";
-import { EmployeeAvatar } from "~/components";
-import type { Risk } from "~/modules/quality/types";
-import RiskRegisterForm from "./RiskRegisterForm";
+import { useCallback, useEffect, useState } from "react";
+import { LuPlus, LuSettings2, LuShieldAlert } from "react-icons/lu";
+import { EmployeeAvatar, Empty } from "~/components";
 import { useUser } from "~/hooks";
 import type { riskSource } from "~/modules/quality/quality.models";
+import type { Risk } from "~/modules/quality/types";
+import RiskRegisterForm from "./RiskRegisterForm";
+import RiskStatus from "./RiskStatus";
 
 type RiskRegisterProps = {
   documentId: string;
@@ -27,7 +28,7 @@ type RiskRegisterProps = {
 
 export default function RiskRegister({
   documentId,
-  documentType,
+  documentType
 }: RiskRegisterProps) {
   const { carbon } = useCarbon();
   const { company } = useUser();
@@ -41,7 +42,7 @@ export default function RiskRegister({
     setLoading(true);
     const { data, error } = await carbon
       .from("riskRegister")
-      .select("*, assignee:assigneeUserId(id, firstName, lastName, avatarUrl)")
+      .select("*, assignee:assignee(id, firstName, lastName, avatarUrl)")
       .eq("companyId", company.id)
       .eq("source", documentType)
       .eq("sourceId", documentId)
@@ -96,9 +97,7 @@ export default function RiskRegister({
             <Loading isLoading={true} />
           </div>
         ) : risks.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground text-sm">
-            No risks registered
-          </div>
+          <Empty>No risks registered</Empty>
         ) : (
           <div className="divide-y">
             {risks.map((risk) => (
@@ -109,17 +108,7 @@ export default function RiskRegister({
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{risk.title}</span>
-                    <Badge
-                      variant={
-                        risk.status === "Open"
-                          ? "destructive"
-                          : risk.status === "Closed"
-                          ? "default"
-                          : "secondary"
-                      }
-                    >
-                      {risk.status}
-                    </Badge>
+                    <RiskStatus status={risk.status} />
                     <Badge variant="outline">{risk.source}</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">
@@ -128,11 +117,11 @@ export default function RiskRegister({
                   <HStack className="mt-2 text-xs text-muted-foreground">
                     <span>Severity: {risk.severity}</span>
                     <span>Likelihood: {risk.likelihood}</span>
-                    {risk.assigneeUserId && (
+                    {risk.assignee && (
                       <div className="flex items-center gap-1 ml-2">
                         <span>Assignee:</span>
                         <EmployeeAvatar
-                          employeeId={risk.assigneeUserId}
+                          employeeId={risk.assignee}
                           className="h-5 w-5"
                         />
                       </div>
@@ -166,16 +155,18 @@ export default function RiskRegister({
               ? {
                   ...selectedRisk,
                   description: selectedRisk.description ?? undefined,
-                  assigneeUserId: selectedRisk.assigneeUserId ?? undefined,
+                  assignee: selectedRisk.assignee ?? undefined,
                   sourceId: selectedRisk.sourceId ?? undefined,
+                  itemId: selectedRisk.itemId ?? undefined,
                   severity: selectedRisk.severity ?? undefined,
-                  likelihood: selectedRisk.likelihood ?? undefined,
+                  likelihood: selectedRisk.likelihood ?? undefined
                 }
               : {
                   title: "",
                   status: "Open",
                   source: documentType ?? "General",
                   sourceId: documentId,
+                  itemId: undefined
                 }
           }
         />

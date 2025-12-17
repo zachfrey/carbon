@@ -257,8 +257,6 @@ export default function QuoteLine() {
         </Await>
       </Suspense>
 
-      <QuoteLineRiskRegister quoteLineId={lineId} />
-
       <CadModel
         isReadOnly={!permissions.can("update", "sales")}
         metadata={{
@@ -270,6 +268,8 @@ export default function QuoteLine() {
         uploadClassName="aspect-square min-h-[420px] max-h-[70vh]"
         viewerClassName="aspect-square min-h-[420px] max-h-[70vh]"
       />
+
+      <QuoteLineRiskRegister quoteLineId={lineId} itemId={line.itemId ?? ""} />
 
       <Outlet />
     </Fragment>

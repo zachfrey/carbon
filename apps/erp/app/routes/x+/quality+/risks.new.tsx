@@ -9,7 +9,6 @@ import { path } from "~/utils/path";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { client, userId, companyId } = await requirePermissions(request, {
-    create: "quality",
     role: "employee"
   });
 
@@ -21,11 +20,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   const { id: _, ...d } = validation.data;
+  console.log(d);
 
   const result = await upsertRisk(client, {
     ...d,
     companyId,
-    createdByUserId: userId
+    createdBy: userId
   });
 
   if (result.error) {

@@ -176,7 +176,6 @@ export default function JobDetailsRoute() {
           )}
         </Await>
       </Suspense>
-      <JobRiskRegister jobId={jobId} />
       <CadModel
         isReadOnly={!permissions.can("update", "production")}
         metadata={{
@@ -188,6 +187,7 @@ export default function JobDetailsRoute() {
         uploadClassName="aspect-square min-h-[420px] max-h-[70vh]"
         viewerClassName="aspect-square min-h-[420px] max-h-[70vh]"
       />
+      <JobRiskRegister jobId={jobId} itemId={jobData?.job?.itemId ?? ""} />
     </VStack>
   );
 }

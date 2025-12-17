@@ -31330,22 +31330,25 @@ export default {
             $ref: "#/parameters/rowFilter.riskRegister.source",
           },
           {
+            $ref: "#/parameters/rowFilter.riskRegister.sourceId",
+          },
+          {
             $ref: "#/parameters/rowFilter.riskRegister.severity",
           },
           {
             $ref: "#/parameters/rowFilter.riskRegister.likelihood",
           },
           {
-            $ref: "#/parameters/rowFilter.riskRegister.sourceId",
+            $ref: "#/parameters/rowFilter.riskRegister.itemId",
           },
           {
             $ref: "#/parameters/rowFilter.riskRegister.status",
           },
           {
-            $ref: "#/parameters/rowFilter.riskRegister.assigneeUserId",
+            $ref: "#/parameters/rowFilter.riskRegister.assignee",
           },
           {
-            $ref: "#/parameters/rowFilter.riskRegister.createdByUserId",
+            $ref: "#/parameters/rowFilter.riskRegister.createdBy",
           },
           {
             $ref: "#/parameters/rowFilter.riskRegister.createdAt",
@@ -31428,22 +31431,25 @@ export default {
             $ref: "#/parameters/rowFilter.riskRegister.source",
           },
           {
+            $ref: "#/parameters/rowFilter.riskRegister.sourceId",
+          },
+          {
             $ref: "#/parameters/rowFilter.riskRegister.severity",
           },
           {
             $ref: "#/parameters/rowFilter.riskRegister.likelihood",
           },
           {
-            $ref: "#/parameters/rowFilter.riskRegister.sourceId",
+            $ref: "#/parameters/rowFilter.riskRegister.itemId",
           },
           {
             $ref: "#/parameters/rowFilter.riskRegister.status",
           },
           {
-            $ref: "#/parameters/rowFilter.riskRegister.assigneeUserId",
+            $ref: "#/parameters/rowFilter.riskRegister.assignee",
           },
           {
-            $ref: "#/parameters/rowFilter.riskRegister.createdByUserId",
+            $ref: "#/parameters/rowFilter.riskRegister.createdBy",
           },
           {
             $ref: "#/parameters/rowFilter.riskRegister.createdAt",
@@ -31480,22 +31486,25 @@ export default {
             $ref: "#/parameters/rowFilter.riskRegister.source",
           },
           {
+            $ref: "#/parameters/rowFilter.riskRegister.sourceId",
+          },
+          {
             $ref: "#/parameters/rowFilter.riskRegister.severity",
           },
           {
             $ref: "#/parameters/rowFilter.riskRegister.likelihood",
           },
           {
-            $ref: "#/parameters/rowFilter.riskRegister.sourceId",
+            $ref: "#/parameters/rowFilter.riskRegister.itemId",
           },
           {
             $ref: "#/parameters/rowFilter.riskRegister.status",
           },
           {
-            $ref: "#/parameters/rowFilter.riskRegister.assigneeUserId",
+            $ref: "#/parameters/rowFilter.riskRegister.assignee",
           },
           {
-            $ref: "#/parameters/rowFilter.riskRegister.createdByUserId",
+            $ref: "#/parameters/rowFilter.riskRegister.createdBy",
           },
           {
             $ref: "#/parameters/rowFilter.riskRegister.createdAt",
@@ -76858,18 +76867,19 @@ export default {
         },
         source: {
           enum: [
+            "Customer",
             "General",
             "Item",
-            "Item Master",
-            "Quote Line",
             "Job",
-            "Work Center",
+            "Quote Line",
             "Supplier",
-            "Supplier Master",
-            "Customer",
-            "Customer Master",
+            "Work Center",
           ],
           format: 'public."riskSource"',
+          type: "string",
+        },
+        sourceId: {
+          format: "text",
           type: "string",
         },
         severity: {
@@ -76880,7 +76890,9 @@ export default {
           format: "integer",
           type: "integer",
         },
-        sourceId: {
+        itemId: {
+          description:
+            "Note:\nThis is a Foreign Key to `item.id`.<fk table='item' column='id'/>",
           format: "text",
           type: "string",
         },
@@ -76890,13 +76902,13 @@ export default {
           format: 'public."riskStatus"',
           type: "string",
         },
-        assigneeUserId: {
+        assignee: {
           description:
             "Note:\nThis is a Foreign Key to `user.id`.<fk table='user' column='id'/>",
           format: "text",
           type: "string",
         },
-        createdByUserId: {
+        createdBy: {
           description:
             "Note:\nThis is a Foreign Key to `user.id`.<fk table='user' column='id'/>",
           format: "text",
@@ -106280,6 +106292,12 @@ export default {
       in: "query",
       type: "string",
     },
+    "rowFilter.riskRegister.sourceId": {
+      name: "sourceId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
     "rowFilter.riskRegister.severity": {
       name: "severity",
       required: false,
@@ -106292,8 +106310,8 @@ export default {
       in: "query",
       type: "string",
     },
-    "rowFilter.riskRegister.sourceId": {
-      name: "sourceId",
+    "rowFilter.riskRegister.itemId": {
+      name: "itemId",
       required: false,
       in: "query",
       type: "string",
@@ -106304,14 +106322,14 @@ export default {
       in: "query",
       type: "string",
     },
-    "rowFilter.riskRegister.assigneeUserId": {
-      name: "assigneeUserId",
+    "rowFilter.riskRegister.assignee": {
+      name: "assignee",
       required: false,
       in: "query",
       type: "string",
     },
-    "rowFilter.riskRegister.createdByUserId": {
-      name: "createdByUserId",
+    "rowFilter.riskRegister.createdBy": {
+      name: "createdBy",
       required: false,
       in: "query",
       type: "string",

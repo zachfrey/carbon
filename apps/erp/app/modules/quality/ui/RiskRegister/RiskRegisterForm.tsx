@@ -31,6 +31,7 @@ import {
   riskStatus
 } from "~/modules/quality/quality.models";
 import { path } from "~/utils/path";
+import RiskStatus from "./RiskStatus";
 
 type RiskRegisterFormProps = {
   initialValues: z.infer<typeof riskRegisterValidator>;
@@ -104,8 +105,8 @@ const RiskRegisterForm = ({
             <ModalDrawerBody>
               <Hidden name="id" />
               <Hidden name="source" />
-              {/* Context field for the source entity ID */}
               <Hidden name="sourceId" />
+              <Hidden name="itemId" />
 
               <VStack spacing={4}>
                 <Input name="title" label="Title" />
@@ -114,7 +115,10 @@ const RiskRegisterForm = ({
                 <Select
                   name="status"
                   label="Status"
-                  options={riskStatus.map((s) => ({ value: s, label: s }))}
+                  options={riskStatus.map((s) => ({
+                    value: s,
+                    label: <RiskStatus status={s} />
+                  }))}
                 />
 
                 <HStack spacing={4} className="w-full">
@@ -132,7 +136,7 @@ const RiskRegisterForm = ({
                   />
                 </HStack>
 
-                <Employee name="assigneeUserId" label="Assignee" />
+                <Employee name="assignee" label="Assignee" />
               </VStack>
             </ModalDrawerBody>
             <ModalDrawerFooter>

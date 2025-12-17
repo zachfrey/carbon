@@ -1,15 +1,12 @@
 
 CREATE TYPE "riskSource" AS ENUM (
+  'Customer',
   'General',
   'Item',
-  'Item Master',
-  'Quote Line',
   'Job',
-  'Work Center',
+  'Quote Line',
   'Supplier',
-  'Supplier Master',
-  'Customer',
-  'Customer Master'
+  'Work Center'
 );
 
 CREATE TYPE "riskStatus" AS ENUM ('Open', 'In Review', 'Mitigating', 'Closed', 'Accepted');
@@ -20,24 +17,27 @@ CREATE TABLE "riskRegister" (
   "title" TEXT NOT NULL,
   "description" TEXT,
   "source" "riskSource" NOT NULL,
+  "sourceId" TEXT,
   "severity" INTEGER CHECK (severity BETWEEN 1 AND 5),
   "likelihood" INTEGER CHECK (likelihood BETWEEN 1 AND 5),
-  "sourceId" TEXT,
+  "itemId" TEXT,
   "status" "riskStatus" NOT NULL DEFAULT 'Open',
-  "assigneeUserId" TEXT,
-  "createdByUserId" TEXT,
+  "assignee" TEXT,
+  "createdBy" TEXT,
   "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
   "updatedAt" TIMESTAMP WITH TIME ZONE,
 
 
   CONSTRAINT "riskRegister_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "riskRegister_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "company"("id") ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT "riskRegister_assigneeUserId_fkey" FOREIGN KEY ("assigneeUserId") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT "riskRegister_createdByUserId_fkey" FOREIGN KEY ("createdByUserId") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT "riskRegister_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "item"("id") ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT "riskRegister_assignee_fkey" FOREIGN KEY ("assignee") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT "riskRegister_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE INDEX "riskRegister_companyId_idx" ON "riskRegister" ("companyId");
-CREATE INDEX "riskRegister_assigneeUserId_idx" ON "riskRegister" ("assigneeUserId");
+CREATE INDEX "riskRegister_assignee_idx" ON "riskRegister" ("assignee");
+CREATE INDEX "riskRegister_itemId_idx" ON "riskRegister" ("itemId");
 CREATE INDEX "riskRegister_status_idx" ON "riskRegister" ("status");
 CREATE INDEX "riskRegister_source_idx" ON "riskRegister" ("source");
 ALTER TABLE "riskRegister" ENABLE ROW LEVEL SECURITY;

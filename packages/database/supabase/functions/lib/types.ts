@@ -26512,12 +26512,13 @@ export type Database = {
       }
       riskRegister: {
         Row: {
-          assigneeUserId: string | null
+          assignee: string | null
           companyId: string
           createdAt: string
-          createdByUserId: string | null
+          createdBy: string | null
           description: string | null
           id: string
+          itemId: string | null
           likelihood: number | null
           severity: number | null
           source: Database["public"]["Enums"]["riskSource"]
@@ -26527,12 +26528,13 @@ export type Database = {
           updatedAt: string | null
         }
         Insert: {
-          assigneeUserId?: string | null
+          assignee?: string | null
           companyId: string
           createdAt?: string
-          createdByUserId?: string | null
+          createdBy?: string | null
           description?: string | null
           id?: string
+          itemId?: string | null
           likelihood?: number | null
           severity?: number | null
           source: Database["public"]["Enums"]["riskSource"]
@@ -26542,12 +26544,13 @@ export type Database = {
           updatedAt?: string | null
         }
         Update: {
-          assigneeUserId?: string | null
+          assignee?: string | null
           companyId?: string
           createdAt?: string
-          createdByUserId?: string | null
+          createdBy?: string | null
           description?: string | null
           id?: string
+          itemId?: string | null
           likelihood?: number | null
           severity?: number | null
           source?: Database["public"]["Enums"]["riskSource"]
@@ -26558,36 +26561,36 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "riskRegister_assigneeUserId_fkey"
-            columns: ["assigneeUserId"]
+            foreignKeyName: "riskRegister_assignee_fkey"
+            columns: ["assignee"]
             isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "riskRegister_assigneeUserId_fkey"
-            columns: ["assigneeUserId"]
+            foreignKeyName: "riskRegister_assignee_fkey"
+            columns: ["assignee"]
             isOneToOne: false
             referencedRelation: "employeesAcrossCompanies"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "riskRegister_assigneeUserId_fkey"
-            columns: ["assigneeUserId"]
+            foreignKeyName: "riskRegister_assignee_fkey"
+            columns: ["assignee"]
             isOneToOne: false
             referencedRelation: "employeeSummary"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "riskRegister_assigneeUserId_fkey"
-            columns: ["assigneeUserId"]
+            foreignKeyName: "riskRegister_assignee_fkey"
+            columns: ["assignee"]
             isOneToOne: false
             referencedRelation: "user"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "riskRegister_assigneeUserId_fkey"
-            columns: ["assigneeUserId"]
+            foreignKeyName: "riskRegister_assignee_fkey"
+            columns: ["assignee"]
             isOneToOne: false
             referencedRelation: "userDefaults"
             referencedColumns: ["userId"]
@@ -26621,39 +26624,74 @@ export type Database = {
             referencedColumns: ["companyId"]
           },
           {
-            foreignKeyName: "riskRegister_createdByUserId_fkey"
-            columns: ["createdByUserId"]
+            foreignKeyName: "riskRegister_createdBy_fkey"
+            columns: ["createdBy"]
             isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "riskRegister_createdByUserId_fkey"
-            columns: ["createdByUserId"]
+            foreignKeyName: "riskRegister_createdBy_fkey"
+            columns: ["createdBy"]
             isOneToOne: false
             referencedRelation: "employeesAcrossCompanies"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "riskRegister_createdByUserId_fkey"
-            columns: ["createdByUserId"]
+            foreignKeyName: "riskRegister_createdBy_fkey"
+            columns: ["createdBy"]
             isOneToOne: false
             referencedRelation: "employeeSummary"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "riskRegister_createdByUserId_fkey"
-            columns: ["createdByUserId"]
+            foreignKeyName: "riskRegister_createdBy_fkey"
+            columns: ["createdBy"]
             isOneToOne: false
             referencedRelation: "user"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "riskRegister_createdByUserId_fkey"
-            columns: ["createdByUserId"]
+            foreignKeyName: "riskRegister_createdBy_fkey"
+            columns: ["createdBy"]
             isOneToOne: false
             referencedRelation: "userDefaults"
             referencedColumns: ["userId"]
+          },
+          {
+            foreignKeyName: "riskRegister_itemId_fkey"
+            columns: ["itemId"]
+            isOneToOne: false
+            referencedRelation: "consumables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "riskRegister_itemId_fkey"
+            columns: ["itemId"]
+            isOneToOne: false
+            referencedRelation: "item"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "riskRegister_itemId_fkey"
+            columns: ["itemId"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "riskRegister_itemId_fkey"
+            columns: ["itemId"]
+            isOneToOne: false
+            referencedRelation: "parts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "riskRegister_itemId_fkey"
+            columns: ["itemId"]
+            isOneToOne: false
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -51623,16 +51661,13 @@ export type Database = {
         | "Manufacturing Output"
       receiptStatus: "Draft" | "Pending" | "Posted"
       riskSource:
+        | "Customer"
         | "General"
         | "Item"
-        | "Item Master"
-        | "Quote Line"
         | "Job"
-        | "Work Center"
+        | "Quote Line"
         | "Supplier"
-        | "Supplier Master"
-        | "Customer"
-        | "Customer Master"
+        | "Work Center"
       riskStatus: "Open" | "In Review" | "Mitigating" | "Closed" | "Accepted"
       role: "customer" | "employee" | "supplier"
       salesInvoiceLineType:
@@ -52758,16 +52793,13 @@ export const Constants = {
       ],
       receiptStatus: ["Draft", "Pending", "Posted"],
       riskSource: [
+        "Customer",
         "General",
         "Item",
-        "Item Master",
-        "Quote Line",
         "Job",
-        "Work Center",
+        "Quote Line",
         "Supplier",
-        "Supplier Master",
-        "Customer",
-        "Customer Master",
+        "Work Center",
       ],
       riskStatus: ["Open", "In Review", "Mitigating", "Closed", "Accepted"],
       role: ["customer", "employee", "supplier"],

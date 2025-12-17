@@ -23,15 +23,15 @@ CREATE TABLE "riskRegister" (
   "score" INTEGER,
   "sourceId" TEXT,
   "status" "riskStatus" NOT NULL DEFAULT 'OPEN',
-  "assigneeUserId" TEXT,
-  "createdByUserId" TEXT,
+  "assignee" TEXT,
+  "createdBy" TEXT,
   "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
   "updatedAt" TIMESTAMP WITH TIME ZONE,
 
   CONSTRAINT "riskRegister_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "riskRegister_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "company"("id") ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT "riskRegister_assigneeUserId_fkey" FOREIGN KEY ("assigneeUserId") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT "riskRegister_createdByUserId_fkey" FOREIGN KEY ("createdByUserId") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT "riskRegister_assignee_fkey" FOREIGN KEY ("assignee") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT "riskRegister_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE
 )
 ```
 
@@ -67,15 +67,15 @@ CREATE TABLE "riskRegister" (
 - `score` - Calculated risk score (severity × likelihood)
 - `sourceId` - ID of the source entity (generic field that stores the ID regardless of source type)
 - `status` - Current status of the risk
-- `assigneeUserId` - User assigned to manage this risk
-- `createdByUserId` - User who created the risk
+- `assignee` - User assigned to manage this risk
+- `createdBy` - User who created the risk
 - `createdAt` - Creation timestamp
 - `updatedAt` - Last update timestamp
 
 ### Indexes
 
 - `riskRegister_companyId_idx` - For filtering by company
-- `riskRegister_assigneeUserId_idx` - For filtering by assignee
+- `riskRegister_assignee_idx` - For filtering by assignee
 - `riskRegister_status_idx` - For filtering by status
 - `riskRegister_source_idx` - For filtering by source type
 
@@ -206,7 +206,7 @@ z.object({
   severity: zfd.numeric(z.number().min(1).max(5).optional()),
   likelihood: zfd.numeric(z.number().min(1).max(5).optional()),
   status: z.enum(riskStatus),
-  assigneeUserId: zfd.text(z.string().optional()),
+  assignee: zfd.text(z.string().optional()),
   sourceId: zfd.text(z.string().optional()),
 })
 ```
