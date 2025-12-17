@@ -1630,10 +1630,31 @@ export const nonConformanceTypes: Omit<
   },
 ];
 
-export const nonConformanceInvestigationTypes: Omit<
-  Database["public"]["Tables"]["nonConformanceInvestigationType"]["Insert"],
+
+export const nonConformanceRequiredActions: Omit<
+  Database["public"]["Tables"]["nonConformanceRequiredAction"]["Insert"],
   "companyId"
 >[] = [
+  {
+    name: "Corrective Action",
+    createdBy: "system",
+  },
+  {
+    name: "Preventive Action",
+    createdBy: "system",
+  },
+  {
+    name: "Containment Action",
+    createdBy: "system",
+  },
+  {
+    name: "Verification",
+    createdBy: "system",
+  },
+  {
+    name: "Customer Communication",
+    createdBy: "system",
+  },
   {
     name: "Root Cause Analysis",
     createdBy: "system",
@@ -1660,32 +1681,6 @@ export const nonConformanceInvestigationTypes: Omit<
   },
   {
     name: "Documentation",
-    createdBy: "system",
-  },
-];
-
-export const nonConformanceRequiredActions: Omit<
-  Database["public"]["Tables"]["nonConformanceRequiredAction"]["Insert"],
-  "companyId"
->[] = [
-  {
-    name: "Corrective Action",
-    createdBy: "system",
-  },
-  {
-    name: "Preventive Action",
-    createdBy: "system",
-  },
-  {
-    name: "Containment Action",
-    createdBy: "system",
-  },
-  {
-    name: "Verification",
-    createdBy: "system",
-  },
-  {
-    name: "Customer Communication",
     createdBy: "system",
   },
 ];

@@ -4,12 +4,10 @@ import type {
   getGaugeCalibrationRecords,
   getGauges,
   getGaugeTypes,
-  getInvestigationTypes,
   getIssueActionTasks,
   getIssueApprovalTasks,
   getIssueAssociations,
   getIssueFromExternalLink,
-  getIssueInvestigationTasks,
   getIssueItems,
   getIssueReviewers,
   getIssues,
@@ -71,10 +69,6 @@ export type AssociationItems = NonNullable<
   Awaited<ReturnType<typeof getIssueAssociations>>
 >["items"];
 
-export type InvestigationType = NonNullable<
-  Awaited<ReturnType<typeof getInvestigationTypes>>["data"]
->[number];
-
 export type RequiredAction = NonNullable<
   Awaited<ReturnType<typeof getRequiredActions>>["data"]
 >[number];
@@ -86,10 +80,6 @@ export type IssueType = NonNullable<
 export type IssueWorkflow = NonNullable<
   Awaited<ReturnType<typeof getIssueWorkflow>>["data"]
 >;
-
-export type IssueInvestigationTask = NonNullable<
-  Awaited<ReturnType<typeof getIssueInvestigationTasks>>["data"]
->[number];
 
 export type IssueActionTask = NonNullable<
   Awaited<ReturnType<typeof getIssueActionTasks>>["data"]
