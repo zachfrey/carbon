@@ -508,6 +508,7 @@ export const paperlessPartsTask = task({
           if (nextSequence.error) {
             throw new Error("Failed to get sequence");
           }
+          salesOrderReadableId = nextSequence.data;
         }
         if (orderCustomerPayment.error) {
           throw new Error("Failed to get customer payment");
