@@ -81,6 +81,7 @@ export const itemValidator = z.object({
       message: "Part type is required"
     })
   }),
+  postingGroupId: zfd.text(z.string().optional()),
   unitOfMeasureCode: z
     .string()
     .min(1, { message: "Unit of Measure is required" }),
@@ -337,7 +338,7 @@ export const methodOperationValidator = z
 
 export const itemCostValidator = z.object({
   itemId: z.string().min(1, { message: "Item ID is required" }),
-  // itemPostingGroupId: zfd.text(z.string().optional()),
+  itemPostingGroupId: zfd.text(z.string().optional()),
   // costingMethod: z.enum(itemCostingMethods, {
   //   errorMap: (issue, ctx) => ({
   //     message: "Costing method is required",

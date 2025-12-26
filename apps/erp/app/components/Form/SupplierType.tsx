@@ -3,6 +3,7 @@ import { CreatableCombobox } from "@carbon/form";
 import { useDisclosure, useMount } from "@carbon/react";
 import { useMemo, useRef, useState } from "react";
 import { useFetcher } from "react-router";
+import { Enumerable } from "~/components/Enumerable";
 import type { getSupplierTypesList } from "~/modules/purchasing";
 import SupplierTypeForm from "~/modules/purchasing/ui/SupplierTypes/SupplierTypeForm";
 
@@ -21,7 +22,12 @@ const SupplierType = (props: SupplierTypeSelectProps) => {
     <>
       <CreatableCombobox
         ref={triggerRef}
-        options={options}
+        options={
+          options.map((o) => ({
+            value: o.value,
+            label: <Enumerable value={o.label} />
+          })) ?? []
+        }
         {...props}
         label={props?.label ?? "SupplierType"}
         onCreateOption={(option) => {

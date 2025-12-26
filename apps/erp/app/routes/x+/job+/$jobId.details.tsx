@@ -38,7 +38,7 @@ import {
 import {
   JobDocuments,
   JobNotes,
-  JobRiskRegister,
+  JobRiskRegister
 } from "~/modules/production/ui/Jobs";
 import PurchasingStatus from "~/modules/purchasing/ui/PurchaseOrder/PurchasingStatus";
 import { useItems } from "~/stores";

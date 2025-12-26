@@ -89,6 +89,7 @@ export default function PartCostingRoute() {
         key={itemCost.itemId}
         initialValues={{
           ...itemCost,
+          itemPostingGroupId: itemCost.itemPostingGroupId ?? undefined,
           ...getCustomFields(itemCost.customFields)
         }}
       />

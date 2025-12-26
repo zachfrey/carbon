@@ -1,10 +1,11 @@
+import { QUICKBOOKS_CLIENT_ID } from "@carbon/auth";
 import type { ComponentProps } from "react";
 import { z } from "zod/v3";
 import type { IntegrationConfig } from "../types";
 
 export const QuickBooks: IntegrationConfig = {
   name: "QuickBooks",
-  id: "quick-books",
+  id: "quickbooks",
   active: false,
   category: "Accounting",
   logo: Logo,
@@ -14,7 +15,17 @@ export const QuickBooks: IntegrationConfig = {
     "Automatically post transactions from sales and purchase invoices.",
   images: [],
   settings: [],
-  schema: z.object({})
+  schema: z.object({}),
+  oauth: {
+    authUrl: "https://appcenter.intuit.com/connect/oauth2",
+    clientId: QUICKBOOKS_CLIENT_ID!,
+    redirectUri: "/api/integrations/quickbooks/oauth",
+    scopes: [
+      "com.intuit.quickbooks.accounting",
+      "com.intuit.quickbooks.payment"
+    ],
+    tokenUrl: "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
+  }
 };
 
 function Logo(props: ComponentProps<"svg">) {

@@ -55,7 +55,7 @@ export function usePartNavigation() {
       isActive: (pathname: string) => pathname.includes("manufacturing")
     },
     {
-      name: "Costing",
+      name: "Accounting",
       to: path.to.partCosting(itemId),
       role: ["employee"],
       permission: "purchasing",

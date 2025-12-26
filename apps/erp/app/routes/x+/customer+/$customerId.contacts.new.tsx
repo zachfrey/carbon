@@ -96,7 +96,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
 
     return modal
-      ? createCustomerContact
+      ? data(error(createCustomerContact.error, errorMessage), {
+          status: 400
+        })
       : redirect(
           path.to.customerContacts(customerId),
           await flash(request, error(createCustomerContact.error, errorMessage))

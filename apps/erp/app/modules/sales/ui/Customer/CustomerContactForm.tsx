@@ -8,6 +8,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   HStack,
+  toast,
   VStack
 } from "@carbon/react";
 import { useFetcher } from "react-router";
@@ -22,6 +23,7 @@ import {
   TextArea
 } from "~/components/Form";
 import { usePermissions } from "~/hooks";
+import { useAsyncFetcher } from "~/hooks/useAsyncFetcher";
 import { path } from "~/utils/path";
 import { customerContactValidator } from "../../sales.models";
 
@@ -40,7 +42,13 @@ const CustomerContactForm = ({
   type = "drawer",
   onClose
 }: CustomerContactFormProps) => {
-  const fetcher = useFetcher<{}>();
+  const fetcher = useAsyncFetcher<{ success?: boolean; message: string }>({
+    onStateChange(state) {
+      if (state === "idle" && fetcher.data && !fetcher.data.success) {
+        toast.error(fetcher.data.message);
+      }
+    }
+  });
 
   const permissions = usePermissions();
   const isEditing = !!initialValues?.id;
@@ -65,9 +73,10 @@ const CustomerContactForm = ({
               : path.to.newCustomerContact(customerId)
           }
           defaultValues={initialValues}
+          // @ts-expect-error TODO: ValidatedForm types doesn't yet support useAsyncFetcher - @sidwebworks
           fetcher={fetcher}
           className="flex flex-col h-full"
-          onSubmit={() => {
+          onAfterSubmit={() => {
             if (type === "modal") {
               onClose?.();
             }

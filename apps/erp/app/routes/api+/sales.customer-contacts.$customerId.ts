@@ -3,9 +3,9 @@ import { requirePermissions } from "@carbon/auth/auth.server";
 import { flash } from "@carbon/auth/session.server";
 import type {
   ClientLoaderFunctionArgs,
-  LoaderFunctionArgs,
-  SerializeFrom
+  LoaderFunctionArgs
 } from "react-router";
+
 import { data } from "react-router";
 import { getCustomerContacts } from "~/modules/sales";
 import { customerContactsQuery } from "~/utils/react-query";
@@ -47,8 +47,7 @@ export async function clientLoader({
   }
 
   const queryKey = customerContactsQuery(customerId).queryKey;
-  const data =
-    window?.clientCache?.getQueryData<SerializeFrom<typeof loader>>(queryKey);
+  const data = window?.clientCache?.getQueryData<typeof loader>(queryKey);
 
   if (!data) {
     const serverData = await serverLoader<typeof loader>();

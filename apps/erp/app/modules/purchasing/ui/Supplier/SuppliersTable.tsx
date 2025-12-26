@@ -1,4 +1,4 @@
-import { Badge, HStack, MenuIcon, MenuItem } from "@carbon/react";
+import { Badge, Button, HStack, MenuIcon, MenuItem } from "@carbon/react";
 import { formatDate } from "@carbon/utils";
 import type { ColumnDef } from "@tanstack/react-table";
 import { memo, useMemo } from "react";
@@ -15,7 +15,7 @@ import {
   LuTag,
   LuUser
 } from "react-icons/lu";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   EmployeeAvatar,
   Hyperlink,
@@ -297,7 +297,12 @@ const SuppliersTable = memo(
           ]}
           primaryAction={
             permissions.can("create", "purchasing") && (
-              <New label="Supplier" to={path.to.newSupplier} />
+              <div className="flex items-center gap-2">
+                <Button variant="secondary" leftIcon={<LuShapes />} asChild>
+                  <Link to={path.to.supplierTypes}>Supplier Types</Link>
+                </Button>
+                <New label="Supplier" to={path.to.newSupplier} />
+              </div>
             )
           }
           renderContextMenu={renderContextMenu}

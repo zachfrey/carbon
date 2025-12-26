@@ -70,7 +70,7 @@ export const getCarbon = (accessToken?: string) => {
   return getCarbonClient(SUPABASE_ANON_KEY, accessToken);
 };
 
-export const getCarbonServiceRole = () => {
+export const getCarbonServiceRole = (): SupabaseClient<Database> => {
   if (isBrowser)
     throw new Error(
       "getCarbonServiceRole is not available in browser and should NOT be used in insecure environments"

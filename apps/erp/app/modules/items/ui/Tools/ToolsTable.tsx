@@ -1,5 +1,6 @@
 import {
   Badge,
+  Button,
   Checkbox,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -30,6 +31,7 @@ import {
   LuCalendar,
   LuCheck,
   LuGitPullRequestArrow,
+  LuGroup,
   LuLoaderCircle,
   LuPencil,
   LuTag,
@@ -38,7 +40,7 @@ import {
 } from "react-icons/lu";
 import { RxCodesandboxLogo } from "react-icons/rx";
 import { TbTargetArrow } from "react-icons/tb";
-import { useFetcher, useNavigate } from "react-router";
+import { Link, useFetcher, useNavigate } from "react-router";
 import {
   EmployeeAvatar,
   Hyperlink,
@@ -49,6 +51,7 @@ import {
   TrackingTypeIcon
 } from "~/components";
 import { Enumerable } from "~/components/Enumerable";
+import { useItemPostingGroups } from "~/components/Form/ItemPostingGroup";
 import { ConfirmDelete } from "~/components/Modals";
 import { usePermissions } from "~/hooks";
 import { useCustomColumns } from "~/hooks/useCustomColumns";
@@ -76,6 +79,7 @@ const ToolsTable = memo(({ data, tags, count }: ToolsTableProps) => {
   const [selectedItem, setSelectedItem] = useState<Tool | null>(null);
 
   const [people] = usePeople();
+  const itemPostingGroups = useItemPostingGroups();
   const customColumns = useCustomColumns<Tool>("tool");
 
   const columns = useMemo<ColumnDef<Tool>[]>(() => {
@@ -114,6 +118,27 @@ const ToolsTable = memo(({ data, tags, count }: ToolsTableProps) => {
         ),
         meta: {
           icon: <LuAlignJustify />
+        }
+      },
+      {
+        accessorKey: "itemPostingGroupId",
+        header: "Item Group",
+        cell: (item) => {
+          const itemPostingGroupId = item.getValue<string>();
+          const itemPostingGroup = itemPostingGroups.find(
+            (group) => group.value === itemPostingGroupId
+          );
+          return <Enumerable value={itemPostingGroup?.label ?? null} />;
+        },
+        meta: {
+          filter: {
+            type: "static",
+            options: itemPostingGroups.map((group) => ({
+              value: group.value,
+              label: <Enumerable value={group.label} />
+            }))
+          },
+          icon: <LuGroup />
         }
       },
       {
@@ -290,7 +315,7 @@ const ToolsTable = memo(({ data, tags, count }: ToolsTableProps) => {
       }
     ];
     return [...defaultColumns, ...customColumns];
-  }, [customColumns, people, tags]);
+  }, [customColumns, people, tags, itemPostingGroups]);
 
   const fetcher = useFetcher<typeof action>();
   useEffect(() => {
@@ -303,7 +328,11 @@ const ToolsTable = memo(({ data, tags, count }: ToolsTableProps) => {
   const onBulkUpdate = useCallback(
     (
       selectedRows: typeof data,
-      field: "replenishmentSystem" | "defaultMethodType" | "itemTrackingType",
+      field:
+        | "replenishmentSystem"
+        | "defaultMethodType"
+        | "itemTrackingType"
+        | "itemPostingGroupId",
       value: string
     ) => {
       const formData = new FormData();
@@ -328,6 +357,27 @@ const ToolsTable = memo(({ data, tags, count }: ToolsTableProps) => {
           <DropdownMenuLabel>Update</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Item Group</DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  {itemPostingGroups.map((group) => (
+                    <DropdownMenuItem
+                      key={group.value}
+                      onClick={() =>
+                        onBulkUpdate(
+                          selectedRows,
+                          "itemPostingGroupId",
+                          group.value
+                        )
+                      }
+                    >
+                      <Enumerable value={group.label} />
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 Default Method Type
@@ -374,7 +424,7 @@ const ToolsTable = memo(({ data, tags, count }: ToolsTableProps) => {
         </DropdownMenuContent>
       );
     },
-    [onBulkUpdate]
+    [onBulkUpdate, itemPostingGroups]
   );
 
   const renderContextMenu = useMemo(() => {
@@ -450,7 +500,12 @@ const ToolsTable = memo(({ data, tags, count }: ToolsTableProps) => {
         ]}
         primaryAction={
           permissions.can("create", "parts") && (
-            <New label="Tool" to={path.to.newTool} />
+            <div className="flex items-center gap-2">
+              <Button variant="secondary" leftIcon={<LuGroup />} asChild>
+                <Link to={path.to.itemPostingGroups}>Item Groups</Link>
+              </Button>
+              <New label="Tool" to={path.to.newTool} />
+            </div>
           )
         }
         renderActions={renderActions}

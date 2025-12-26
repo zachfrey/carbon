@@ -22,7 +22,7 @@ export type CreatableComboboxProps = Omit<
   size?: "sm" | "md" | "lg";
   value?: string;
   options: {
-    label: string;
+    label: string | JSX.Element;
     value: string;
     helper?: string;
   }[];
@@ -33,7 +33,7 @@ export type CreatableComboboxProps = Omit<
   placeholder?: string;
   inline?: (
     value: string,
-    options: { value: string; label: string; helper?: string }[]
+    options: { value: string; label: string | JSX.Element; helper?: string }[]
   ) => React.ReactNode;
   inlineAddLabel?: string;
   onChange?: (selected: string) => void;
@@ -195,11 +195,15 @@ function VirtualizedCommand({
         })
       : options;
 
-    const isExactMatch = options.some((option) =>
-      [option.label.toLowerCase(), option.helper?.toLowerCase()].includes(
+    const isExactMatch = options.some((option) => {
+      const labelValue =
+        typeof option.label === "string"
+          ? option.label
+          : reactNodeToString(option.label);
+      return [labelValue.toLowerCase(), option.helper?.toLowerCase()].includes(
         search.toLowerCase()
-      )
-    );
+      );
+    });
 
     return isExactMatch
       ? filtered

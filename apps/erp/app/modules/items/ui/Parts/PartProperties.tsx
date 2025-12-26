@@ -29,8 +29,12 @@ import { Await, Link, useFetcher, useParams } from "react-router";
 import { z } from "zod/v3";
 import { zfd } from "zod-form-data";
 import { MethodBadge, MethodIcon, TrackingTypeIcon } from "~/components";
-// biome-ignore lint/suspicious/noShadowRestrictedNames: suppressed due to migration
-import { Boolean, Tags, UnitOfMeasure } from "~/components/Form";
+import {
+  Boolean,
+  ItemPostingGroup,
+  Tags,
+  UnitOfMeasure
+} from "~/components/Form";
 import CustomFormInlineFields from "~/components/Form/CustomFormInlineFields";
 import { ReplenishmentSystemIcon } from "~/components/Icons";
 import { ItemThumbnailUpload } from "~/components/ItemThumnailUpload";
@@ -97,6 +101,7 @@ const PartProperties = () => {
         | "active"
         | "defaultMethodType"
         | "itemTrackingType"
+        | "itemPostingGroupId"
         | "partId"
         | "name"
         | "replenishmentSystem"
@@ -290,6 +295,26 @@ const PartProperties = () => {
           isReadOnly={!permissions.can("update", "parts")}
         />
       </VStack> */}
+
+      <ValidatedForm
+        defaultValues={{
+          itemPostingGroupId:
+            routeData?.partSummary?.itemPostingGroupId ?? undefined
+        }}
+        validator={z.object({
+          itemPostingGroupId: z.string().nullable().optional()
+        })}
+        className="w-full"
+      >
+        <ItemPostingGroup
+          label="Item Group"
+          name="itemPostingGroupId"
+          inline
+          onChange={(value) => {
+            onUpdate("itemPostingGroupId", value?.value ?? null);
+          }}
+        />
+      </ValidatedForm>
 
       <VStack spacing={2}>
         <h3 className="text-xs text-muted-foreground">Tracking Type</h3>

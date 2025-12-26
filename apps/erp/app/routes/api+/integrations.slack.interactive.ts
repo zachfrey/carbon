@@ -177,9 +177,8 @@ async function handleShortcut(
   slackToken: string,
   serviceRole: SupabaseClient<Database>
 ) {
-  // Handle different shortcut types based on callback_id
   const callbackId = payload.callback_id;
-  console.log({ function: "handleShortcut", callbackId });
+
   switch (callbackId) {
     case "create_ncr_modal":
       return handleCreateNcrShortcut(
@@ -374,7 +373,6 @@ async function handleViewSubmission(
   serviceRole: SupabaseClient<Database>,
   integration: Database["public"]["Tables"]["companyIntegration"]["Row"]
 ) {
-  console.log({ function: "handleViewSubmission", payload });
   const view = payload.view;
 
   if (view.callback_id !== "create_ncr_modal") {

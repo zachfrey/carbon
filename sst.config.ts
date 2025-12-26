@@ -57,6 +57,9 @@ export default $config({
         OPENAI_API_KEY: process.env.OPENAI_API_KEY,
         POSTHOG_API_HOST: process.env.POSTHOG_API_HOST,
         POSTHOG_PROJECT_PUBLIC_KEY: process.env.POSTHOG_PROJECT_PUBLIC_KEY,
+        QUICKBOOKS_CLIENT_ID: process.env.QUICKBOOKS_CLIENT_ID,
+        QUICKBOOKS_CLIENT_SECRET: process.env.QUICKBOOKS_CLIENT_SECRET,
+        QUICKBOOKS_WEBHOOK_SECRET: process.env.QUICKBOOKS_WEBHOOK_SECRET,
         RESEND_API_KEY: process.env.RESEND_API_KEY,
         SESSION_SECRET: process.env.SESSION_SECRET,
         SLACK_BOT_TOKEN: process.env.SLACK_BOT_TOKEN,
@@ -81,6 +84,9 @@ export default $config({
         UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
         VERCEL_ENV: "production",
         VERCEL_URL: process.env.URL_ERP ?? "itar.carbon.ms",
+        XERO_CLIENT_ID: process.env.XERO_CLIENT_ID,
+        XERO_CLIENT_SECRET: process.env.XERO_CLIENT_SECRET,
+        XERO_WEBHOOK_SECRET: process.env.XERO_WEBHOOK_SECRET,
       },
       transform: {
         loadBalancer: {

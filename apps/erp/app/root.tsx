@@ -61,14 +61,16 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     CARBON_EDITION,
     CLOUDFLARE_TURNSTILE_SITE_KEY,
     CONTROLLED_ENVIRONMENT,
+    GOOGLE_PLACES_API_KEY,
+    NOVU_APPLICATION_ID,
     POSTHOG_API_HOST,
     POSTHOG_PROJECT_PUBLIC_KEY,
-    SUPABASE_URL,
+    QUICKBOOKS_CLIENT_ID,
     SUPABASE_ANON_KEY,
-    NOVU_APPLICATION_ID,
+    SUPABASE_URL,
     VERCEL_ENV,
     VERCEL_URL,
-    GOOGLE_PLACES_API_KEY
+    XERO_CLIENT_ID
   } = getBrowserEnv();
 
   const sessionFlash = await getSessionFlash(request);
@@ -79,14 +81,16 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
         CARBON_EDITION,
         CLOUDFLARE_TURNSTILE_SITE_KEY,
         CONTROLLED_ENVIRONMENT,
+        GOOGLE_PLACES_API_KEY,
+        NOVU_APPLICATION_ID,
         POSTHOG_API_HOST,
         POSTHOG_PROJECT_PUBLIC_KEY,
-        SUPABASE_URL,
+        QUICKBOOKS_CLIENT_ID,
         SUPABASE_ANON_KEY,
-        NOVU_APPLICATION_ID,
+        SUPABASE_URL,
         VERCEL_ENV,
         VERCEL_URL,
-        GOOGLE_PLACES_API_KEY
+        XERO_CLIENT_ID
       },
       mode: getMode(request),
       theme: getTheme(request),

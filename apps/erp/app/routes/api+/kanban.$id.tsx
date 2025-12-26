@@ -1,7 +1,6 @@
 import { getCarbonServiceRole, notFound } from "@carbon/auth";
 import { requirePermissions } from "@carbon/auth/auth.server";
 import type { Database } from "@carbon/database";
-import type { recalculateTask } from "@carbon/jobs/trigger/recalculate";
 import { Loading } from "@carbon/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { FunctionRegion, type SupabaseClient } from "@supabase/supabase-js";
@@ -158,7 +157,7 @@ async function handleKanban({
 
     if (!upsertMethod.error && kanban.data.autoRelease) {
       await Promise.all([
-        tasks.trigger<typeof recalculateTask>("recalculate", {
+        tasks.trigger("recalculate", {
           type: "jobRequirements",
           id,
           companyId,
@@ -183,7 +182,7 @@ async function handleKanban({
         serviceRole
           .from("job")
           .update({
-            status: "Ready"
+            status: "Ready" as const
           })
           .eq("id", jobReadableId)
       ]);

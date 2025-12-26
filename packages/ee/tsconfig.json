@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "ES2015"]
+    "lib": ["dom", "ES2015"],
+    "strict": true
   },
   "include": ["src", "../../apps/erp/app/components/OnshapeSync.tsx"],
   "exclude": ["node_modules"],

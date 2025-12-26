@@ -1,8 +1,10 @@
 import { type Database, fetchAllFromTable, type Json } from "@carbon/database";
+import { PickPartial } from "@carbon/utils";
 import { getLocalTimeZone, now, today } from "@internationalized/date";
 import {
   FunctionRegion,
   type PostgrestError,
+  PostgrestResponse,
   type PostgrestSingleResponse,
   type SupabaseClient
 } from "@supabase/supabase-js";
@@ -46,7 +48,7 @@ import type {
   salesRfqValidator,
   selectedLinesValidator
 } from "./sales.models";
-import type { Quotation, SalesOrder, SalesRFQ } from "./types";
+import type { CustomerContact, Quotation, SalesOrder, SalesRFQ } from "./types";
 
 export async function closeSalesOrder(
   client: SupabaseClient<Database>,
@@ -1417,7 +1419,7 @@ export async function insertCustomerContact(
   customerContact: {
     customerId: string;
     companyId: string;
-    contact: z.infer<typeof customerContactValidator>;
+    contact: PickPartial<z.infer<typeof customerContactValidator>, "email">;
     customerLocationId?: string;
     customFields?: Json;
   }
@@ -1573,7 +1575,7 @@ export async function upsertCustomer(
       })
 ) {
   if ("createdBy" in customer) {
-    return client.from("customer").insert([customer]).select("*").single();
+    return client.from("customer").insert([customer]).select("id").single();
   }
   return client
     .from("customer")

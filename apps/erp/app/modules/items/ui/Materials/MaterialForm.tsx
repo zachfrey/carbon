@@ -1,5 +1,4 @@
-// biome-ignore lint/suspicious/noShadowRestrictedNames: suppressed due to migration
-import { Array, ValidatedForm } from "@carbon/form";
+import { ValidatedForm } from "@carbon/form";
 import {
   cn,
   ModalCard,
@@ -19,10 +18,13 @@ import { useFetcher } from "react-router";
 import type { z } from "zod/v3";
 import { TrackingTypeIcon } from "~/components";
 import {
+  // biome-ignore lint/suspicious/noShadowRestrictedNames: suppressed due to migration
+  Array,
   CustomFormFields,
   DefaultMethodType,
   Hidden,
   InputControlled,
+  ItemPostingGroup,
   // biome-ignore lint/suspicious/noShadowRestrictedNames: suppressed due to migration
   Number,
   Select,
@@ -299,6 +301,7 @@ const MaterialForm = ({
                   minValue={0}
                 />
 
+                <ItemPostingGroup name="postingGroupId" label="Item Group" />
                 <Array name="sizes" label="Sizes" />
 
                 <CustomFormFields table="material" tags={initialValues.tags} />

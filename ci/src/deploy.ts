@@ -39,6 +39,9 @@ export type Workspace = {
   openai_api_key: string | null;
   posthog_api_host: string | null;
   posthog_project_public_key: string | null;
+  quickbooks_client_id: string | null;
+  quickbooks_client_secret: string | null;
+  quickbooks_webhook_secret: string | null;
   resend_api_key: string | null;
   session_secret: string | null;
   slack_bot_token: string | null;
@@ -57,6 +60,9 @@ export type Workspace = {
   upstash_redis_rest_url: string | null;
   url_erp: string | null;
   url_mes: string | null;
+  xero_client_id: string | null;
+  xero_client_secret: string | null;
+  xero_webhook_secret: string | null;
 };
 
 async function deploy(): Promise<void> {
@@ -97,6 +103,9 @@ async function deploy(): Promise<void> {
         openai_api_key,
         posthog_api_host,
         posthog_project_public_key,
+        quickbooks_client_id,
+        quickbooks_client_secret,
+        quickbooks_webhook_secret,
         resend_api_key,
         session_secret,
         slack_bot_token,
@@ -115,6 +124,9 @@ async function deploy(): Promise<void> {
         upstash_redis_rest_url,
         url_erp,
         url_mes,
+        xero_client_id,
+        xero_client_secret,
+        xero_webhook_secret,
       } = workspace;
 
       if (slug === "app") {
@@ -252,6 +264,9 @@ async function deploy(): Promise<void> {
           OPENAI_API_KEY: openai_api_key,
           POSTHOG_API_HOST: posthog_api_host ?? undefined,
           POSTHOG_PROJECT_PUBLIC_KEY: posthog_project_public_key ?? undefined,
+          QUICKBOOKS_CLIENT_ID: quickbooks_client_id ?? undefined,
+          QUICKBOOKS_CLIENT_SECRET: quickbooks_client_secret ?? undefined,
+          QUICKBOOKS_WEBHOOK_SECRET: quickbooks_webhook_secret ?? undefined,
           RESEND_API_KEY: resend_api_key,
           SESSION_SECRET: session_secret,
           SLACK_BOT_TOKEN: slack_bot_token ?? undefined,
@@ -277,17 +292,20 @@ async function deploy(): Promise<void> {
           URL_ERP: url_erp,
           URL_MES: url_mes,
           VERCEL_ENV: "production",
+          XERO_CLIENT_ID: xero_client_id ?? undefined,
+          XERO_CLIENT_SECRET: xero_client_secret ?? undefined,
+          XERO_WEBHOOK_SECRET: xero_webhook_secret ?? undefined,
         },
         // Run SST from the repository root where sst.config.ts is located
         cwd: "..",
         stdio: "pipe",
       });
 
-      console.log(`🚀 🧰 Deploying apps for ${workspace.id} with SST`);
+      console.log(`🚀 🐓 Deploying apps for ${workspace.id} with SST`);
 
       await $$`npx --yes sst deploy --stage prod`;
 
-      console.log(`✅ 🐓 Successfully deployed ${workspace.id}`);
+      console.log(`✅ 🍗 Successfully deployed ${workspace.id}`);
     } catch (error) {
       console.error(`🔴 🍳 Failed to deploy ${workspace.id}`, error);
     }

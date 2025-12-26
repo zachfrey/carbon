@@ -83,10 +83,12 @@ export default function ApiDocsRoute() {
 
 const tableBlacklist = new Set([
   "apiKey",
+  "challengeAttempt",
   "documentTransaction",
   "feedback",
   "groups_recursive",
   "invite",
+  "lessonCompletion",
   "oauthClient",
   "oauthCode",
   "oauthToken",

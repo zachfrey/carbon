@@ -5,7 +5,7 @@ type SupplierRiskRegisterProps = {
 };
 
 export default function SupplierRiskRegister({
-  supplierId,
+  supplierId
 }: SupplierRiskRegisterProps) {
   return <RiskRegisterCard sourceId={supplierId} source="Supplier" />;
 }

@@ -23,9 +23,11 @@ export type CreatableComboboxProps = Omit<
   isOptional?: boolean;
   inline?: (
     value: string,
-    options: { value: string; label: string; helper?: string }[]
+    options: { value: string; label: string | JSX.Element; helper?: string }[]
   ) => React.ReactNode;
-  onChange?: (newValue: { value: string; label: string } | null) => void;
+  onChange?: (
+    newValue: { value: string; label: string | JSX.Element } | null
+  ) => void;
   onConfigure?: () => void;
 };
 

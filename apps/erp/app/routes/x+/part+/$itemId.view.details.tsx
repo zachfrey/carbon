@@ -14,7 +14,7 @@ import { partValidator, upsertPart } from "~/modules/items";
 import {
   ItemDocuments,
   ItemNotes,
-  ItemRiskRegister,
+  ItemRiskRegister
 } from "~/modules/items/ui/Item";
 import { setCustomFields } from "~/utils/form";
 import { path } from "~/utils/path";

@@ -1,6 +1,7 @@
 import { error, notFound, success } from "@carbon/auth";
 import { requirePermissions } from "@carbon/auth/auth.server";
 import { flash } from "@carbon/auth/session.server";
+import { validationError, validator } from "@carbon/form";
 import type {
   ActionFunctionArgs,
   ClientActionFunctionArgs,
@@ -8,9 +9,9 @@ import type {
 } from "react-router";
 import { redirect, useLoaderData, useNavigate, useParams } from "react-router";
 import { ConfirmDelete } from "~/components/Modals";
-import { deleteShelf, getShelf } from "~/modules/inventory";
+import { deleteShelf, getShelf, shelfValidator } from "~/modules/inventory";
 import { getParams, path } from "~/utils/path";
-import { getCompanyId } from "~/utils/react-query";
+import { getCompanyId, shelvesQuery } from "~/utils/react-query";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client } = await requirePermissions(request, {
@@ -57,7 +58,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
   );
 }
 
-export async function clientAction({ serverAction }: ClientActionFunctionArgs) {
+export async function clientAction({
+  request,
+  serverAction
+}: ClientActionFunctionArgs) {
   const companyId = getCompanyId();
 
   window.clientCache?.invalidateQueries({
@@ -66,7 +70,19 @@ export async function clientAction({ serverAction }: ClientActionFunctionArgs) {
       return queryKey[0] === "shelves" && queryKey[1] === companyId;
     }
   });
+  const formData = await request.clone().formData();
+  const validation = await validator(shelfValidator).validate(formData);
 
+  if (validation.error) {
+    return validationError(validation.error);
+  }
+
+  if (companyId && validation.data.locationId) {
+    window.clientCache?.setQueryData(
+      shelvesQuery(companyId, validation.data.locationId).queryKey,
+      null
+    );
+  }
   return await serverAction();
 }
 

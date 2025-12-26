@@ -20,7 +20,6 @@ import {
   formatRelativeTime
 } from "@carbon/utils";
 import { cva } from "class-variance-authority";
-import { FaTasks } from "react-icons/fa";
 import {
   LuCalendarDays,
   LuCircleCheck,

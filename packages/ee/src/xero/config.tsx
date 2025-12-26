@@ -1,3 +1,4 @@
+import { XERO_CLIENT_ID } from "@carbon/auth";
 import type { ComponentProps } from "react";
 import { z } from "zod/v3";
 import type { IntegrationConfig } from "../types";
@@ -14,7 +15,19 @@ export const Xero: IntegrationConfig = {
     "Automatically post transactions from sales and purchase invoices.",
   images: [],
   settings: [],
-  schema: z.object({})
+  schema: z.object({}),
+  oauth: {
+    authUrl: "https://login.xero.com/identity/connect/authorize",
+    clientId: XERO_CLIENT_ID!,
+    redirectUri: "/api/integrations/xero/oauth",
+    scopes: [
+      "offline_access",
+      "accounting.contacts",
+      "accounting.transactions",
+      "accounting.settings"
+    ],
+    tokenUrl: "https://login.xero.com/identity/connect/token"
+  }
 };
 
 function Logo(props: ComponentProps<"svg">) {

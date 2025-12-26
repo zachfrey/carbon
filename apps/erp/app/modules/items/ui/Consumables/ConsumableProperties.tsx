@@ -23,8 +23,7 @@ import { z } from "zod/v3";
 import { zfd } from "zod-form-data";
 import { MethodBadge, MethodIcon, TrackingTypeIcon } from "~/components";
 import { Enumerable } from "~/components/Enumerable";
-// biome-ignore lint/suspicious/noShadowRestrictedNames: suppressed due to migration
-import { Boolean, Tags } from "~/components/Form";
+import { Boolean, ItemPostingGroup, Tags } from "~/components/Form";
 import CustomFormInlineFields from "~/components/Form/CustomFormInlineFields";
 import { ItemThumbnailUpload } from "~/components/ItemThumnailUpload";
 import { useRouteData } from "~/hooks";
@@ -85,6 +84,7 @@ const ConsumableProperties = () => {
         | "replenishmentSystem"
         | "defaultMethodType"
         | "itemTrackingType"
+        | "itemPostingGroupId"
         | "consumableId"
         | "active",
       value: string | null
@@ -260,6 +260,26 @@ const ConsumableProperties = () => {
           isReadOnly={!permissions.can("update", "parts")}
         />
       </VStack> */}
+
+      <ValidatedForm
+        defaultValues={{
+          itemPostingGroupId:
+            routeData?.consumableSummary?.itemPostingGroupId ?? undefined
+        }}
+        validator={z.object({
+          itemPostingGroupId: z.string().nullable().optional()
+        })}
+        className="w-full"
+      >
+        <ItemPostingGroup
+          label="Item Group"
+          name="itemPostingGroupId"
+          inline
+          onChange={(value) => {
+            onUpdate("itemPostingGroupId", value?.value ?? null);
+          }}
+        />
+      </ValidatedForm>
 
       <VStack spacing={2}>
         <h3 className="text-xs text-muted-foreground">Tracking Type</h3>

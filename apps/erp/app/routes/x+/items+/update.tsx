@@ -2,6 +2,7 @@ import { requirePermissions } from "@carbon/auth/auth.server";
 import type { Database } from "@carbon/database";
 import { getMaterialDescription, getMaterialId } from "@carbon/utils";
 import { type ActionFunctionArgs } from "react-router";
+
 import { getCompanySettings } from "~/modules/settings";
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -24,7 +25,6 @@ export async function action({ request }: ActionFunctionArgs) {
     case "name":
     case "replenishmentSystem":
     case "unitOfMeasureCode":
-      // For other fields, just update the specified field
       if (field === "replenishmentSystem" && value !== "Buy and Make") {
         return await client
           .from("item")
@@ -279,6 +279,61 @@ export async function action({ request }: ActionFunctionArgs) {
         })
         .in("id", items as string[])
         .eq("companyId", companyId);
+
+    case "itemPostingGroupId":
+      // Update itemCost table for all selected items
+      const itemCostUpdates = await Promise.all(
+        (items as string[]).map(async (itemId) => {
+          const existingCost = await client
+            .from("itemCost")
+            .select("itemId")
+            .eq("itemId", itemId)
+            .single();
+
+          if (existingCost.data) {
+            // Update existing record
+            return client
+              .from("itemCost")
+              .update({
+                itemPostingGroupId: value || null,
+                updatedBy: userId,
+                updatedAt: new Date().toISOString()
+              })
+              .eq("itemId", itemId);
+          } else {
+            // Create new record
+            return client.from("itemCost").insert({
+              itemId,
+              itemPostingGroupId: value || null,
+              costingMethod: "Standard",
+              standardCost: 0,
+              unitCost: 0,
+              costIsAdjusted: false,
+              companyId,
+              createdBy: userId,
+              updatedBy: userId,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            });
+          }
+        })
+      );
+
+      // Check for any errors
+      const errors = itemCostUpdates.filter((result) => result.error);
+      if (errors.length > 0) {
+        return {
+          error: {
+            message: errors[0].error?.message || "Failed to update item costs"
+          },
+          data: null
+        };
+      }
+
+      return {
+        data: null,
+        error: null
+      };
     case "partId":
       if (items.length > 1) {
         return {

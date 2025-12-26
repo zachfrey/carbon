@@ -2257,8 +2257,6 @@ export type Database = {
           id: string
           inventoryJobCompletedNotificationGroup: string[]
           kanbanOutput: Database["public"]["Enums"]["kanbanOutput"]
-          maintenanceAdvanceDays: number
-          maintenanceGenerateInAdvance: boolean
           materialGeneratedIds: boolean
           productLabelSize: string | null
           purchasePriceUpdateTiming: Database["public"]["Enums"]["purchasePriceUpdateTiming"]
@@ -2276,8 +2274,6 @@ export type Database = {
           id: string
           inventoryJobCompletedNotificationGroup?: string[]
           kanbanOutput?: Database["public"]["Enums"]["kanbanOutput"]
-          maintenanceAdvanceDays?: number
-          maintenanceGenerateInAdvance?: boolean
           materialGeneratedIds?: boolean
           productLabelSize?: string | null
           purchasePriceUpdateTiming?: Database["public"]["Enums"]["purchasePriceUpdateTiming"]
@@ -2295,8 +2291,6 @@ export type Database = {
           id?: string
           inventoryJobCompletedNotificationGroup?: string[]
           kanbanOutput?: Database["public"]["Enums"]["kanbanOutput"]
-          maintenanceAdvanceDays?: number
-          maintenanceGenerateInAdvance?: boolean
           materialGeneratedIds?: boolean
           productLabelSize?: string | null
           purchasePriceUpdateTiming?: Database["public"]["Enums"]["purchasePriceUpdateTiming"]
@@ -3002,7 +2996,7 @@ export type Database = {
       contact: {
         Row: {
           companyId: string
-          email: string
+          email: string | null
           externalId: Json | null
           fax: string | null
           firstName: string | null
@@ -3018,7 +3012,7 @@ export type Database = {
         }
         Insert: {
           companyId: string
-          email: string
+          email?: string | null
           externalId?: Json | null
           fax?: string | null
           firstName?: string | null
@@ -3034,7 +3028,7 @@ export type Database = {
         }
         Update: {
           companyId?: string
-          email?: string
+          email?: string | null
           externalId?: Json | null
           fax?: string | null
           firstName?: string | null
@@ -3593,9 +3587,11 @@ export type Database = {
           externalId: Json | null
           fax: string | null
           id: string
+          invoicingContactId: string | null
           logo: string | null
           name: string
           phone: string | null
+          salesContactId: string | null
           tags: string[] | null
           taxId: string | null
           taxPercent: number
@@ -3617,9 +3613,11 @@ export type Database = {
           externalId?: Json | null
           fax?: string | null
           id?: string
+          invoicingContactId?: string | null
           logo?: string | null
           name: string
           phone?: string | null
+          salesContactId?: string | null
           tags?: string[] | null
           taxId?: string | null
           taxPercent?: number
@@ -3641,9 +3639,11 @@ export type Database = {
           externalId?: Json | null
           fax?: string | null
           id?: string
+          invoicingContactId?: string | null
           logo?: string | null
           name?: string
           phone?: string | null
+          salesContactId?: string | null
           tags?: string[] | null
           taxId?: string | null
           taxPercent?: number
@@ -3804,6 +3804,20 @@ export type Database = {
             columns: ["customerTypeId"]
             isOneToOne: false
             referencedRelation: "customerType"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_invoicingContactId_fkey"
+            columns: ["invoicingContactId"]
+            isOneToOne: false
+            referencedRelation: "customerContact"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_salesContactId_fkey"
+            columns: ["salesContactId"]
+            isOneToOne: false
+            referencedRelation: "customerContact"
             referencedColumns: ["id"]
           },
           {
@@ -12420,1430 +12434,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "integrations"
             referencedColumns: ["companyId"]
-          },
-        ]
-      }
-      maintenanceDispatch: {
-        Row: {
-          actualEndTime: string | null
-          actualFailureModeId: string | null
-          actualStartTime: string | null
-          assignee: string | null
-          companyId: string
-          completedAt: string | null
-          content: Json
-          createdAt: string
-          createdBy: string
-          duration: number | null
-          id: string
-          isFailure: boolean
-          maintenanceDispatchId: string
-          maintenanceScheduleId: string | null
-          nonConformanceId: string | null
-          plannedEndTime: string | null
-          plannedStartTime: string | null
-          priority: Database["public"]["Enums"]["maintenanceDispatchPriority"]
-          severity: Database["public"]["Enums"]["maintenanceSeverity"] | null
-          source: Database["public"]["Enums"]["maintenanceSource"]
-          status: Database["public"]["Enums"]["maintenanceDispatchStatus"]
-          suspectedFailureModeId: string | null
-          updatedAt: string | null
-          updatedBy: string | null
-          workCenterId: string | null
-        }
-        Insert: {
-          actualEndTime?: string | null
-          actualFailureModeId?: string | null
-          actualStartTime?: string | null
-          assignee?: string | null
-          companyId: string
-          completedAt?: string | null
-          content?: Json
-          createdAt?: string
-          createdBy: string
-          duration?: number | null
-          id?: string
-          isFailure?: boolean
-          maintenanceDispatchId: string
-          maintenanceScheduleId?: string | null
-          nonConformanceId?: string | null
-          plannedEndTime?: string | null
-          plannedStartTime?: string | null
-          priority?: Database["public"]["Enums"]["maintenanceDispatchPriority"]
-          severity?: Database["public"]["Enums"]["maintenanceSeverity"] | null
-          source?: Database["public"]["Enums"]["maintenanceSource"]
-          status?: Database["public"]["Enums"]["maintenanceDispatchStatus"]
-          suspectedFailureModeId?: string | null
-          updatedAt?: string | null
-          updatedBy?: string | null
-          workCenterId?: string | null
-        }
-        Update: {
-          actualEndTime?: string | null
-          actualFailureModeId?: string | null
-          actualStartTime?: string | null
-          assignee?: string | null
-          companyId?: string
-          completedAt?: string | null
-          content?: Json
-          createdAt?: string
-          createdBy?: string
-          duration?: number | null
-          id?: string
-          isFailure?: boolean
-          maintenanceDispatchId?: string
-          maintenanceScheduleId?: string | null
-          nonConformanceId?: string | null
-          plannedEndTime?: string | null
-          plannedStartTime?: string | null
-          priority?: Database["public"]["Enums"]["maintenanceDispatchPriority"]
-          severity?: Database["public"]["Enums"]["maintenanceSeverity"] | null
-          source?: Database["public"]["Enums"]["maintenanceSource"]
-          status?: Database["public"]["Enums"]["maintenanceDispatchStatus"]
-          suspectedFailureModeId?: string | null
-          updatedAt?: string | null
-          updatedBy?: string | null
-          workCenterId?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "maintenanceDispatch_actualFailureModeId_fkey"
-            columns: ["actualFailureModeId"]
-            isOneToOne: false
-            referencedRelation: "maintenanceFailureMode"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_assignee_fkey"
-            columns: ["assignee"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_assignee_fkey"
-            columns: ["assignee"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_assignee_fkey"
-            columns: ["assignee"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_assignee_fkey"
-            columns: ["assignee"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_assignee_fkey"
-            columns: ["assignee"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "company"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "customFieldTables"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "integrations"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_maintenanceScheduleId_fkey"
-            columns: ["maintenanceScheduleId"]
-            isOneToOne: false
-            referencedRelation: "maintenanceSchedule"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_nonConformanceId_fkey"
-            columns: ["nonConformanceId"]
-            isOneToOne: false
-            referencedRelation: "issues"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_nonConformanceId_fkey"
-            columns: ["nonConformanceId"]
-            isOneToOne: false
-            referencedRelation: "nonConformance"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_suspectedFailureModeId_fkey"
-            columns: ["suspectedFailureModeId"]
-            isOneToOne: false
-            referencedRelation: "maintenanceFailureMode"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_workCenterId_fkey"
-            columns: ["workCenterId"]
-            isOneToOne: false
-            referencedRelation: "workCenter"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatch_workCenterId_fkey"
-            columns: ["workCenterId"]
-            isOneToOne: false
-            referencedRelation: "workCenters"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      maintenanceDispatchComment: {
-        Row: {
-          comment: string
-          companyId: string
-          createdAt: string
-          createdBy: string
-          id: string
-          maintenanceDispatchId: string
-          updatedAt: string | null
-          updatedBy: string | null
-        }
-        Insert: {
-          comment: string
-          companyId: string
-          createdAt?: string
-          createdBy: string
-          id?: string
-          maintenanceDispatchId: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-        }
-        Update: {
-          comment?: string
-          companyId?: string
-          createdAt?: string
-          createdBy?: string
-          id?: string
-          maintenanceDispatchId?: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "maintenanceDispatchComment_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "company"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "customFieldTables"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "integrations"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_maintenanceDispatchId_fkey"
-            columns: ["maintenanceDispatchId"]
-            isOneToOne: false
-            referencedRelation: "maintenanceDispatch"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchComment_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-        ]
-      }
-      maintenanceDispatchEvent: {
-        Row: {
-          companyId: string
-          createdAt: string
-          createdBy: string
-          duration: number | null
-          employeeId: string
-          endTime: string | null
-          id: string
-          maintenanceDispatchId: string
-          notes: string | null
-          startTime: string
-          updatedAt: string | null
-          updatedBy: string | null
-          workCenterId: string
-        }
-        Insert: {
-          companyId: string
-          createdAt?: string
-          createdBy: string
-          duration?: number | null
-          employeeId: string
-          endTime?: string | null
-          id?: string
-          maintenanceDispatchId: string
-          notes?: string | null
-          startTime: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-          workCenterId: string
-        }
-        Update: {
-          companyId?: string
-          createdAt?: string
-          createdBy?: string
-          duration?: number | null
-          employeeId?: string
-          endTime?: string | null
-          id?: string
-          maintenanceDispatchId?: string
-          notes?: string | null
-          startTime?: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-          workCenterId?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "maintenanceDispatchEvent_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "company"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "customFieldTables"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "integrations"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_employeeId_fkey"
-            columns: ["employeeId"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_employeeId_fkey"
-            columns: ["employeeId"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_employeeId_fkey"
-            columns: ["employeeId"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_employeeId_fkey"
-            columns: ["employeeId"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_employeeId_fkey"
-            columns: ["employeeId"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_maintenanceDispatchId_fkey"
-            columns: ["maintenanceDispatchId"]
-            isOneToOne: false
-            referencedRelation: "maintenanceDispatch"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_workCenterId_fkey"
-            columns: ["workCenterId"]
-            isOneToOne: false
-            referencedRelation: "workCenter"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchEvent_workCenterId_fkey"
-            columns: ["workCenterId"]
-            isOneToOne: false
-            referencedRelation: "workCenters"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      maintenanceDispatchItem: {
-        Row: {
-          companyId: string
-          createdAt: string
-          createdBy: string
-          id: string
-          itemId: string
-          maintenanceDispatchId: string
-          quantity: number
-          totalCost: number | null
-          unitCost: number | null
-          unitOfMeasureCode: string
-          updatedAt: string | null
-          updatedBy: string | null
-        }
-        Insert: {
-          companyId: string
-          createdAt?: string
-          createdBy: string
-          id?: string
-          itemId: string
-          maintenanceDispatchId: string
-          quantity: number
-          totalCost?: number | null
-          unitCost?: number | null
-          unitOfMeasureCode: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-        }
-        Update: {
-          companyId?: string
-          createdAt?: string
-          createdBy?: string
-          id?: string
-          itemId?: string
-          maintenanceDispatchId?: string
-          quantity?: number
-          totalCost?: number | null
-          unitCost?: number | null
-          unitOfMeasureCode?: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "maintenanceDispatchItem_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "company"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "customFieldTables"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "integrations"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "consumables"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "item"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "materials"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "parts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "tools"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_maintenanceDispatchId_fkey"
-            columns: ["maintenanceDispatchId"]
-            isOneToOne: false
-            referencedRelation: "maintenanceDispatch"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchItem_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-        ]
-      }
-      maintenanceDispatchWorkCenter: {
-        Row: {
-          companyId: string
-          createdAt: string
-          createdBy: string
-          id: string
-          maintenanceDispatchId: string
-          updatedAt: string | null
-          updatedBy: string | null
-          workCenterId: string
-        }
-        Insert: {
-          companyId: string
-          createdAt?: string
-          createdBy: string
-          id?: string
-          maintenanceDispatchId: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-          workCenterId: string
-        }
-        Update: {
-          companyId?: string
-          createdAt?: string
-          createdBy?: string
-          id?: string
-          maintenanceDispatchId?: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-          workCenterId?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "company"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "customFieldTables"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "integrations"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_maintenanceDispatchId_fkey"
-            columns: ["maintenanceDispatchId"]
-            isOneToOne: false
-            referencedRelation: "maintenanceDispatch"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_workCenterId_fkey"
-            columns: ["workCenterId"]
-            isOneToOne: false
-            referencedRelation: "workCenter"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceDispatchWorkCenter_workCenterId_fkey"
-            columns: ["workCenterId"]
-            isOneToOne: false
-            referencedRelation: "workCenters"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      maintenanceFailureMode: {
-        Row: {
-          companyId: string
-          createdAt: string
-          createdBy: string
-          id: string
-          name: string
-          updatedAt: string | null
-          updatedBy: string | null
-        }
-        Insert: {
-          companyId: string
-          createdAt?: string
-          createdBy: string
-          id?: string
-          name: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-        }
-        Update: {
-          companyId?: string
-          createdAt?: string
-          createdBy?: string
-          id?: string
-          name?: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "maintenanceFailureMode_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "company"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "customFieldTables"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "integrations"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceFailureMode_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-        ]
-      }
-      maintenanceSchedule: {
-        Row: {
-          active: boolean
-          companyId: string
-          createdAt: string
-          createdBy: string
-          description: string | null
-          estimatedDuration: number | null
-          frequency: Database["public"]["Enums"]["maintenanceFrequency"]
-          id: string
-          lastGeneratedAt: string | null
-          name: string
-          nextDueAt: string | null
-          priority: Database["public"]["Enums"]["maintenanceDispatchPriority"]
-          updatedAt: string | null
-          updatedBy: string | null
-          workCenterId: string
-        }
-        Insert: {
-          active?: boolean
-          companyId: string
-          createdAt?: string
-          createdBy: string
-          description?: string | null
-          estimatedDuration?: number | null
-          frequency: Database["public"]["Enums"]["maintenanceFrequency"]
-          id?: string
-          lastGeneratedAt?: string | null
-          name: string
-          nextDueAt?: string | null
-          priority?: Database["public"]["Enums"]["maintenanceDispatchPriority"]
-          updatedAt?: string | null
-          updatedBy?: string | null
-          workCenterId: string
-        }
-        Update: {
-          active?: boolean
-          companyId?: string
-          createdAt?: string
-          createdBy?: string
-          description?: string | null
-          estimatedDuration?: number | null
-          frequency?: Database["public"]["Enums"]["maintenanceFrequency"]
-          id?: string
-          lastGeneratedAt?: string | null
-          name?: string
-          nextDueAt?: string | null
-          priority?: Database["public"]["Enums"]["maintenanceDispatchPriority"]
-          updatedAt?: string | null
-          updatedBy?: string | null
-          workCenterId?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "maintenanceSchedule_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "company"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "customFieldTables"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "integrations"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_workCenterId_fkey"
-            columns: ["workCenterId"]
-            isOneToOne: false
-            referencedRelation: "workCenter"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceSchedule_workCenterId_fkey"
-            columns: ["workCenterId"]
-            isOneToOne: false
-            referencedRelation: "workCenters"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      maintenanceScheduleItem: {
-        Row: {
-          companyId: string
-          createdAt: string
-          createdBy: string
-          id: string
-          itemId: string
-          maintenanceScheduleId: string
-          quantity: number
-          unitOfMeasureCode: string
-          updatedAt: string | null
-          updatedBy: string | null
-        }
-        Insert: {
-          companyId: string
-          createdAt?: string
-          createdBy: string
-          id?: string
-          itemId: string
-          maintenanceScheduleId: string
-          quantity: number
-          unitOfMeasureCode: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-        }
-        Update: {
-          companyId?: string
-          createdAt?: string
-          createdBy?: string
-          id?: string
-          itemId?: string
-          maintenanceScheduleId?: string
-          quantity?: number
-          unitOfMeasureCode?: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "maintenanceScheduleItem_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "company"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "customFieldTables"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "integrations"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "consumables"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "item"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "materials"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "parts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "tools"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_maintenanceScheduleId_fkey"
-            columns: ["maintenanceScheduleId"]
-            isOneToOne: false
-            referencedRelation: "maintenanceSchedule"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenanceScheduleItem_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
           },
         ]
       }
@@ -33216,9 +31806,11 @@ export type Database = {
           externalId: Json | null
           fax: string | null
           id: string
+          invoicingContactId: string | null
           logo: string | null
           name: string
           phone: string | null
+          purchasingContactId: string | null
           supplierStatusId: string | null
           supplierTypeId: string | null
           tags: string[] | null
@@ -33240,9 +31832,11 @@ export type Database = {
           externalId?: Json | null
           fax?: string | null
           id?: string
+          invoicingContactId?: string | null
           logo?: string | null
           name: string
           phone?: string | null
+          purchasingContactId?: string | null
           supplierStatusId?: string | null
           supplierTypeId?: string | null
           tags?: string[] | null
@@ -33264,9 +31858,11 @@ export type Database = {
           externalId?: Json | null
           fax?: string | null
           id?: string
+          invoicingContactId?: string | null
           logo?: string | null
           name?: string
           phone?: string | null
+          purchasingContactId?: string | null
           supplierStatusId?: string | null
           supplierTypeId?: string | null
           tags?: string[] | null
@@ -33416,6 +32012,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "currencyCode"
             referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "supplier_invoicingContactId_fkey"
+            columns: ["invoicingContactId"]
+            isOneToOne: false
+            referencedRelation: "supplierContact"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_purchasingContactId_fkey"
+            columns: ["purchasingContactId"]
+            isOneToOne: false
+            referencedRelation: "supplierContact"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "supplier_supplierStatusId_fkey"
@@ -39625,193 +38235,6 @@ export type Database = {
           },
         ]
       }
-      workCenterReplacementPart: {
-        Row: {
-          companyId: string
-          createdAt: string
-          createdBy: string
-          id: string
-          itemId: string
-          quantity: number
-          unitOfMeasureCode: string
-          updatedAt: string | null
-          updatedBy: string | null
-          workCenterId: string
-        }
-        Insert: {
-          companyId: string
-          createdAt?: string
-          createdBy: string
-          id?: string
-          itemId: string
-          quantity: number
-          unitOfMeasureCode: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-          workCenterId: string
-        }
-        Update: {
-          companyId?: string
-          createdAt?: string
-          createdBy?: string
-          id?: string
-          itemId?: string
-          quantity?: number
-          unitOfMeasureCode?: string
-          updatedAt?: string | null
-          updatedBy?: string | null
-          workCenterId?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "workCenterReplacementPart_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "company"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "customFieldTables"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_companyId_fkey"
-            columns: ["companyId"]
-            isOneToOne: false
-            referencedRelation: "integrations"
-            referencedColumns: ["companyId"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_createdBy_fkey"
-            columns: ["createdBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "consumables"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "item"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "materials"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "parts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_itemId_fkey"
-            columns: ["itemId"]
-            isOneToOne: false
-            referencedRelation: "tools"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeesAcrossCompanies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "employeeSummary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_updatedBy_fkey"
-            columns: ["updatedBy"]
-            isOneToOne: false
-            referencedRelation: "userDefaults"
-            referencedColumns: ["userId"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_workCenterId_fkey"
-            columns: ["workCenterId"]
-            isOneToOne: false
-            referencedRelation: "workCenter"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workCenterReplacementPart_workCenterId_fkey"
-            columns: ["workCenterId"]
-            isOneToOne: false
-            referencedRelation: "workCenters"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       accountCategories: {
@@ -40403,6 +38826,7 @@ export type Database = {
           defaultMethodType: Database["public"]["Enums"]["methodType"] | null
           description: string | null
           id: string | null
+          itemPostingGroupId: string | null
           itemTrackingType:
             | Database["public"]["Enums"]["itemTrackingType"]
             | null
@@ -40589,6 +39013,13 @@ export type Database = {
             referencedRelation: "userDefaults"
             referencedColumns: ["userId"]
           },
+          {
+            foreignKeyName: "itemCost_itemPostingGroupId_fkey"
+            columns: ["itemPostingGroupId"]
+            isOneToOne: false
+            referencedRelation: "itemPostingGroup"
+            referencedColumns: ["id"]
+          },
         ]
       }
       contractors: {
@@ -40743,15 +39174,15 @@ export type Database = {
           customerStatusId: string | null
           customerTypeId: string | null
           customFields: Json | null
-          externalId: Json | null
           fax: string | null
           id: string | null
+          invoicingContactId: string | null
           logo: string | null
           name: string | null
           orderCount: number | null
           phone: string | null
+          salesContactId: string | null
           status: string | null
-          tags: string[] | null
           taxId: string | null
           taxPercent: number | null
           type: string | null
@@ -40912,6 +39343,20 @@ export type Database = {
             columns: ["customerTypeId"]
             isOneToOne: false
             referencedRelation: "customerType"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_invoicingContactId_fkey"
+            columns: ["invoicingContactId"]
+            isOneToOne: false
+            referencedRelation: "customerContact"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_salesContactId_fkey"
+            columns: ["salesContactId"]
+            isOneToOne: false
+            referencedRelation: "customerContact"
             referencedColumns: ["id"]
           },
           {
@@ -43645,6 +42090,7 @@ export type Database = {
           finish: string | null
           grade: string | null
           id: string | null
+          itemPostingGroupId: string | null
           itemTrackingType:
             | Database["public"]["Enums"]["itemTrackingType"]
             | null
@@ -43835,6 +42281,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "userDefaults"
             referencedColumns: ["userId"]
+          },
+          {
+            foreignKeyName: "itemCost_itemPostingGroupId_fkey"
+            columns: ["itemPostingGroupId"]
+            isOneToOne: false
+            referencedRelation: "itemPostingGroup"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "material_materialFormId_fkey"
@@ -44476,14 +42929,14 @@ export type Database = {
           },
           {
             foreignKeyName: "partner_id_fkey"
-            columns: ["supplierLocationId"]
+            columns: ["id"]
             isOneToOne: false
             referencedRelation: "supplierLocation"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "partner_id_fkey"
-            columns: ["id"]
+            columns: ["supplierLocationId"]
             isOneToOne: false
             referencedRelation: "supplierLocation"
             referencedColumns: ["id"]
@@ -44536,6 +42989,7 @@ export type Database = {
           defaultMethodType: Database["public"]["Enums"]["methodType"] | null
           description: string | null
           id: string | null
+          itemPostingGroupId: string | null
           itemTrackingType:
             | Database["public"]["Enums"]["itemTrackingType"]
             | null
@@ -44699,6 +43153,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "userDefaults"
             referencedColumns: ["userId"]
+          },
+          {
+            foreignKeyName: "itemCost_itemPostingGroupId_fkey"
+            columns: ["itemPostingGroupId"]
+            isOneToOne: false
+            referencedRelation: "itemPostingGroup"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -48911,14 +47372,14 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "address_countryCode_fkey"
-            columns: ["paymentCountryCode"]
+            columns: ["customerCountryCode"]
             isOneToOne: false
             referencedRelation: "country"
             referencedColumns: ["alpha2"]
           },
           {
             foreignKeyName: "address_countryCode_fkey"
-            columns: ["customerCountryCode"]
+            columns: ["paymentCountryCode"]
             isOneToOne: false
             referencedRelation: "country"
             referencedColumns: ["alpha2"]
@@ -50901,14 +49362,17 @@ export type Database = {
           createdBy: string | null
           currencyCode: string | null
           customFields: Json | null
+          embedding: unknown
           externalId: Json | null
           fax: string | null
           id: string | null
+          invoicingContactId: string | null
           logo: string | null
           name: string | null
           orderCount: number | null
           partCount: number | null
           phone: string | null
+          purchasingContactId: string | null
           status: string | null
           supplierStatusId: string | null
           supplierTypeId: string | null
@@ -51062,6 +49526,20 @@ export type Database = {
             referencedColumns: ["code"]
           },
           {
+            foreignKeyName: "supplier_invoicingContactId_fkey"
+            columns: ["invoicingContactId"]
+            isOneToOne: false
+            referencedRelation: "supplierContact"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_purchasingContactId_fkey"
+            columns: ["purchasingContactId"]
+            isOneToOne: false
+            referencedRelation: "supplierContact"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "supplier_supplierStatusId_fkey"
             columns: ["supplierStatusId"]
             isOneToOne: false
@@ -51123,6 +49601,7 @@ export type Database = {
           defaultMethodType: Database["public"]["Enums"]["methodType"] | null
           description: string | null
           id: string | null
+          itemPostingGroupId: string | null
           itemTrackingType:
             | Database["public"]["Enums"]["itemTrackingType"]
             | null
@@ -51286,6 +49765,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "userDefaults"
             referencedColumns: ["userId"]
+          },
+          {
+            foreignKeyName: "itemCost_itemPostingGroupId_fkey"
+            columns: ["itemPostingGroupId"]
+            isOneToOne: false
+            referencedRelation: "itemPostingGroup"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -51757,6 +50243,7 @@ export type Database = {
           defaultMethodType: Database["public"]["Enums"]["methodType"]
           description: string
           id: string
+          itemPostingGroupId: string
           itemTrackingType: Database["public"]["Enums"]["itemTrackingType"]
           modelName: string
           modelPath: string
@@ -52154,6 +50641,7 @@ export type Database = {
           grade: string
           gradeId: string
           id: string
+          itemPostingGroupId: string
           itemTrackingType: Database["public"]["Enums"]["itemTrackingType"]
           materialForm: string
           materialFormId: string
@@ -52268,6 +50756,7 @@ export type Database = {
           defaultMethodType: Database["public"]["Enums"]["methodType"]
           description: string
           id: string
+          itemPostingGroupId: string
           itemTrackingType: Database["public"]["Enums"]["itemTrackingType"]
           modelId: string
           modelName: string
@@ -52724,6 +51213,7 @@ export type Database = {
           defaultMethodType: Database["public"]["Enums"]["methodType"]
           description: string
           id: string
+          itemPostingGroupId: string
           itemTrackingType: Database["public"]["Enums"]["itemTrackingType"]
           modelId: string
           modelName: string
@@ -53158,25 +51648,6 @@ export type Database = {
         | "Blanket Order"
         | "Return Order"
       kanbanOutput: "label" | "qrcode" | "url"
-      maintenanceDispatchPriority: "Low" | "Medium" | "High" | "Critical"
-      maintenanceDispatchStatus:
-        | "Open"
-        | "Assigned"
-        | "In Progress"
-        | "Completed"
-        | "Cancelled"
-      maintenanceFrequency:
-        | "Daily"
-        | "Weekly"
-        | "Monthly"
-        | "Quarterly"
-        | "Annual"
-      maintenanceSeverity:
-        | "Preventive"
-        | "OPM"
-        | "Maintenance Required"
-        | "OEM Required"
-      maintenanceSource: "Scheduled" | "Reactive" | "Non-Conformance"
       makeMethodStatus: "Draft" | "Active" | "Archived"
       methodOperationOrder: "After Previous" | "With Previous"
       methodType: "Buy" | "Make" | "Pick"
@@ -54298,28 +52769,6 @@ export const Constants = {
         "Return Order",
       ],
       kanbanOutput: ["label", "qrcode", "url"],
-      maintenanceDispatchPriority: ["Low", "Medium", "High", "Critical"],
-      maintenanceDispatchStatus: [
-        "Open",
-        "Assigned",
-        "In Progress",
-        "Completed",
-        "Cancelled",
-      ],
-      maintenanceFrequency: [
-        "Daily",
-        "Weekly",
-        "Monthly",
-        "Quarterly",
-        "Annual",
-      ],
-      maintenanceSeverity: [
-        "Preventive",
-        "OPM",
-        "Maintenance Required",
-        "OEM Required",
-      ],
-      maintenanceSource: ["Scheduled", "Reactive", "Non-Conformance"],
       makeMethodStatus: ["Draft", "Active", "Archived"],
       methodOperationOrder: ["After Previous", "With Previous"],
       methodType: ["Buy", "Make", "Pick"],

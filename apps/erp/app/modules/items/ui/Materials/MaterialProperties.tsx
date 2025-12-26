@@ -31,8 +31,12 @@ import { Await, useFetcher, useParams } from "react-router";
 import { z } from "zod/v3";
 import { zfd } from "zod-form-data";
 import { MethodBadge, MethodIcon, TrackingTypeIcon } from "~/components";
-// biome-ignore lint/suspicious/noShadowRestrictedNames: suppressed due to migration
-import { Boolean, Tags, UnitOfMeasure } from "~/components/Form";
+import {
+  Boolean,
+  ItemPostingGroup,
+  Tags,
+  UnitOfMeasure
+} from "~/components/Form";
 import CustomFormInlineFields from "~/components/Form/CustomFormInlineFields";
 import MaterialDimension from "~/components/Form/MaterialDimension";
 import MaterialFinish from "~/components/Form/MaterialFinish";
@@ -118,6 +122,7 @@ const MaterialProperties = () => {
         | "replenishmentSystem"
         | "defaultMethodType"
         | "itemTrackingType"
+        | "itemPostingGroupId"
         | "active"
         | "unitOfMeasureCode"
         | "materialFormId"
@@ -150,6 +155,7 @@ const MaterialProperties = () => {
         | "replenishmentSystem"
         | "defaultMethodType"
         | "itemTrackingType"
+        | "itemPostingGroupId"
         | "active"
         | "unitOfMeasureCode"
         | "materialFormId"
@@ -376,6 +382,26 @@ const MaterialProperties = () => {
           isReadOnly={!permissions.can("update", "parts")}
         />
       </VStack> */}
+
+        <ValidatedForm
+          defaultValues={{
+            itemPostingGroupId:
+              routeData?.materialSummary?.itemPostingGroupId ?? undefined
+          }}
+          validator={z.object({
+            itemPostingGroupId: z.string().nullable().optional()
+          })}
+          className="w-full"
+        >
+          <ItemPostingGroup
+            label="Item Group"
+            name="itemPostingGroupId"
+            inline
+            onChange={(value) => {
+              onUpdate("itemPostingGroupId", value?.value ?? null);
+            }}
+          />
+        </ValidatedForm>
 
         <VStack spacing={2}>
           <h3 className="text-xs text-muted-foreground">Tracking Type</h3>

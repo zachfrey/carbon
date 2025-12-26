@@ -11,6 +11,10 @@ import {
 import { getIntegrations, IntegrationsList } from "~/modules/settings";
 import { path } from "~/utils/path";
 
+export const config = {
+  runtime: "nodejs"
+};
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {
     view: "settings"
@@ -30,7 +34,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return {
     installedIntegrations: (integrations.data
       .filter((i) => i.active)
-      .map((i) => i.id) ?? []) as string[]
+      .map((i) => i.id) ?? []) as string[],
+    state: crypto.randomUUID()
   };
 }
 

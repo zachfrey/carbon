@@ -30,6 +30,7 @@ import {
   Hidden,
   Input,
   InputControlled,
+  ItemPostingGroup,
   // biome-ignore lint/suspicious/noShadowRestrictedNames: suppressed due to migration
   Number,
   Select,
@@ -279,6 +280,9 @@ const ToolForm = ({ initialValues, type = "card", onClose }: ToolFormProps) => {
                   name="unitOfMeasureCode"
                   label="Unit of Measure"
                 />
+                {!isEditing && (
+                  <ItemPostingGroup name="postingGroupId" label="Item Group" />
+                )}
                 {!isEditing && (
                   <Number
                     name="unitCost"

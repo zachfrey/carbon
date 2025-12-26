@@ -18,6 +18,7 @@ import { useFetcher } from "react-router";
 import type { z } from "zod/v3";
 import {
   Currency,
+  CustomerContact,
   CustomerStatus,
   CustomerType,
   CustomFormFields,
@@ -129,9 +130,22 @@ const CustomerForm = ({
                     }}
                   />
 
-                  <PhoneInput name="phone" label="Phone" />
-                  <PhoneInput name="fax" label="Fax" />
                   <Input name="website" label="Website" />
+
+                  {isEditing && (
+                    <>
+                      <CustomerContact
+                        customer={initialValues.id}
+                        name="salesContactId"
+                        label="Sales Contact"
+                      />
+                      <CustomerContact
+                        customer={initialValues.id}
+                        name="invoicingContactId"
+                        label="Invoicing Contact"
+                      />
+                    </>
+                  )}
 
                   <CustomFormFields table="customer" />
                 </div>

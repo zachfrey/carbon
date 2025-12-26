@@ -66,9 +66,9 @@ export default function SupplierEditRoute() {
     accountManagerId: routeData?.supplier?.accountManagerId ?? undefined,
     taxId: routeData?.supplier?.taxId ?? "",
     currencyCode: routeData?.supplier?.currencyCode ?? undefined,
-    phone: routeData?.supplier?.phone ?? "",
-    fax: routeData?.supplier?.fax ?? "",
     website: routeData?.supplier?.website ?? "",
+    purchasingContactId: routeData?.supplier?.purchasingContactId ?? undefined,
+    invoicingContactId: routeData?.supplier?.invoicingContactId ?? undefined,
     ...getCustomFields(routeData?.supplier?.customFields)
   };
 

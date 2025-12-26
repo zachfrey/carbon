@@ -1351,6 +1351,9 @@ export default {
             $ref: "#/parameters/rowFilter.consumables.tags",
           },
           {
+            $ref: "#/parameters/rowFilter.consumables.itemPostingGroupId",
+          },
+          {
             $ref: "#/parameters/rowFilter.consumables.createdBy",
           },
           {
@@ -12925,6 +12928,12 @@ export default {
             $ref: "#/parameters/rowFilter.customers.assignee",
           },
           {
+            $ref: "#/parameters/rowFilter.customers.taxPercent",
+          },
+          {
+            $ref: "#/parameters/rowFilter.customers.website",
+          },
+          {
             $ref: "#/parameters/rowFilter.customers.companyId",
           },
           {
@@ -12946,22 +12955,10 @@ export default {
             $ref: "#/parameters/rowFilter.customers.currencyCode",
           },
           {
-            $ref: "#/parameters/rowFilter.customers.phone",
+            $ref: "#/parameters/rowFilter.customers.salesContactId",
           },
           {
-            $ref: "#/parameters/rowFilter.customers.fax",
-          },
-          {
-            $ref: "#/parameters/rowFilter.customers.website",
-          },
-          {
-            $ref: "#/parameters/rowFilter.customers.externalId",
-          },
-          {
-            $ref: "#/parameters/rowFilter.customers.taxPercent",
-          },
-          {
-            $ref: "#/parameters/rowFilter.customers.tags",
+            $ref: "#/parameters/rowFilter.customers.invoicingContactId",
           },
           {
             $ref: "#/parameters/rowFilter.customers.type",
@@ -12971,6 +12968,12 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.customers.orderCount",
+          },
+          {
+            $ref: "#/parameters/rowFilter.customers.phone",
+          },
+          {
+            $ref: "#/parameters/rowFilter.customers.fax",
           },
           {
             $ref: "#/parameters/select",
@@ -28102,12 +28105,6 @@ export default {
             $ref: "#/parameters/rowFilter.suppliers.currencyCode",
           },
           {
-            $ref: "#/parameters/rowFilter.suppliers.phone",
-          },
-          {
-            $ref: "#/parameters/rowFilter.suppliers.fax",
-          },
-          {
             $ref: "#/parameters/rowFilter.suppliers.website",
           },
           {
@@ -28120,6 +28117,15 @@ export default {
             $ref: "#/parameters/rowFilter.suppliers.taxPercent",
           },
           {
+            $ref: "#/parameters/rowFilter.suppliers.purchasingContactId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.suppliers.invoicingContactId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.suppliers.embedding",
+          },
+          {
             $ref: "#/parameters/rowFilter.suppliers.type",
           },
           {
@@ -28130,6 +28136,12 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.suppliers.partCount",
+          },
+          {
+            $ref: "#/parameters/rowFilter.suppliers.phone",
+          },
+          {
+            $ref: "#/parameters/rowFilter.suppliers.fax",
           },
           {
             $ref: "#/parameters/select",
@@ -35746,6 +35758,12 @@ export default {
             $ref: "#/parameters/rowFilter.customer.embedding",
           },
           {
+            $ref: "#/parameters/rowFilter.customer.salesContactId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.customer.invoicingContactId",
+          },
+          {
             $ref: "#/parameters/select",
           },
           {
@@ -35871,6 +35889,12 @@ export default {
             $ref: "#/parameters/rowFilter.customer.embedding",
           },
           {
+            $ref: "#/parameters/rowFilter.customer.salesContactId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.customer.invoicingContactId",
+          },
+          {
             $ref: "#/parameters/preferReturn",
           },
         ],
@@ -35948,6 +35972,12 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.customer.embedding",
+          },
+          {
+            $ref: "#/parameters/rowFilter.customer.salesContactId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.customer.invoicingContactId",
           },
           {
             $ref: "#/parameters/body.customer",
@@ -36676,6 +36706,9 @@ export default {
             $ref: "#/parameters/rowFilter.trackedEntity.createdBy",
           },
           {
+            $ref: "#/parameters/rowFilter.trackedEntity.readableId",
+          },
+          {
             $ref: "#/parameters/select",
           },
           {
@@ -36765,6 +36798,9 @@ export default {
             $ref: "#/parameters/rowFilter.trackedEntity.createdBy",
           },
           {
+            $ref: "#/parameters/rowFilter.trackedEntity.readableId",
+          },
+          {
             $ref: "#/parameters/preferReturn",
           },
         ],
@@ -36806,6 +36842,9 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.trackedEntity.createdBy",
+          },
+          {
+            $ref: "#/parameters/rowFilter.trackedEntity.readableId",
           },
           {
             $ref: "#/parameters/body.trackedEntity",
@@ -37555,6 +37594,9 @@ export default {
             $ref: "#/parameters/rowFilter.parts.tags",
           },
           {
+            $ref: "#/parameters/rowFilter.parts.itemPostingGroupId",
+          },
+          {
             $ref: "#/parameters/rowFilter.parts.createdBy",
           },
           {
@@ -38090,6 +38132,9 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.materials.tags",
+          },
+          {
+            $ref: "#/parameters/rowFilter.materials.itemPostingGroupId",
           },
           {
             $ref: "#/parameters/rowFilter.materials.createdBy",
@@ -39473,6 +39518,9 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.tools.tags",
+          },
+          {
+            $ref: "#/parameters/rowFilter.tools.itemPostingGroupId",
           },
           {
             $ref: "#/parameters/rowFilter.tools.createdBy",
@@ -50899,6 +50947,12 @@ export default {
             $ref: "#/parameters/rowFilter.supplier.embedding",
           },
           {
+            $ref: "#/parameters/rowFilter.supplier.purchasingContactId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.supplier.invoicingContactId",
+          },
+          {
             $ref: "#/parameters/select",
           },
           {
@@ -51024,6 +51078,12 @@ export default {
             $ref: "#/parameters/rowFilter.supplier.embedding",
           },
           {
+            $ref: "#/parameters/rowFilter.supplier.purchasingContactId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.supplier.invoicingContactId",
+          },
+          {
             $ref: "#/parameters/preferReturn",
           },
         ],
@@ -51101,6 +51161,12 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.supplier.embedding",
+          },
+          {
+            $ref: "#/parameters/rowFilter.supplier.purchasingContactId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.supplier.invoicingContactId",
           },
           {
             $ref: "#/parameters/body.supplier",
@@ -62659,6 +62725,12 @@ export default {
           },
           type: "array",
         },
+        itemPostingGroupId: {
+          description:
+            "Note:\nThis is a Foreign Key to `itemPostingGroup.id`.<fk table='itemPostingGroup' column='id'/>",
+          format: "text",
+          type: "string",
+        },
         createdBy: {
           description:
             "Note:\nThis is a Foreign Key to `user.id`.<fk table='user' column='id'/>",
@@ -65672,7 +65744,7 @@ export default {
       properties: {
         id: {
           description:
-            "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `supplierLocation.id`.<fk table='supplierLocation' column='id'/>",
+            "Note:\nThis is a Foreign Key to `supplierLocation.id`.<fk table='supplierLocation' column='id'/>",
           format: "text",
           type: "string",
         },
@@ -65721,7 +65793,7 @@ export default {
         },
         supplierLocationId: {
           description:
-            "Note:\nThis is a Foreign Key to `supplierLocation.id`.<fk table='supplierLocation' column='id'/>",
+            "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `supplierLocation.id`.<fk table='supplierLocation' column='id'/>",
           format: "text",
           type: "string",
         },
@@ -68231,6 +68303,14 @@ export default {
           format: "text",
           type: "string",
         },
+        taxPercent: {
+          format: "numeric",
+          type: "number",
+        },
+        website: {
+          format: "text",
+          type: "string",
+        },
         companyId: {
           description:
             "Note:\nThis is a Foreign Key to `company.id`.<fk table='company' column='id'/>",
@@ -68266,31 +68346,17 @@ export default {
           format: "text",
           type: "string",
         },
-        phone: {
+        salesContactId: {
+          description:
+            "Note:\nThis is a Foreign Key to `customerContact.id`.<fk table='customerContact' column='id'/>",
           format: "text",
           type: "string",
         },
-        fax: {
+        invoicingContactId: {
+          description:
+            "Note:\nThis is a Foreign Key to `customerContact.id`.<fk table='customerContact' column='id'/>",
           format: "text",
           type: "string",
-        },
-        website: {
-          format: "text",
-          type: "string",
-        },
-        externalId: {
-          format: "jsonb",
-        },
-        taxPercent: {
-          format: "numeric",
-          type: "number",
-        },
-        tags: {
-          format: "text[]",
-          items: {
-            type: "string",
-          },
-          type: "array",
         },
         type: {
           format: "text",
@@ -68303,6 +68369,14 @@ export default {
         orderCount: {
           format: "bigint",
           type: "integer",
+        },
+        phone: {
+          format: "text",
+          type: "string",
+        },
+        fax: {
+          format: "text",
+          type: "string",
         },
       },
       type: "object",
@@ -72151,7 +72225,7 @@ export default {
       type: "object",
     },
     contact: {
-      required: ["id", "email", "companyId", "isCustomer"],
+      required: ["id", "companyId", "isCustomer"],
       properties: {
         id: {
           default: "public.id('con'::text)",
@@ -75183,14 +75257,6 @@ export default {
           format: "text",
           type: "string",
         },
-        phone: {
-          format: "text",
-          type: "string",
-        },
-        fax: {
-          format: "text",
-          type: "string",
-        },
         website: {
           format: "text",
           type: "string",
@@ -75209,6 +75275,22 @@ export default {
           format: "numeric",
           type: "number",
         },
+        purchasingContactId: {
+          description:
+            "Note:\nThis is a Foreign Key to `supplierContact.id`.<fk table='supplierContact' column='id'/>",
+          format: "text",
+          type: "string",
+        },
+        invoicingContactId: {
+          description:
+            "Note:\nThis is a Foreign Key to `supplierContact.id`.<fk table='supplierContact' column='id'/>",
+          format: "text",
+          type: "string",
+        },
+        embedding: {
+          format: "extensions.halfvec(384)",
+          type: "string",
+        },
         type: {
           format: "text",
           type: "string",
@@ -75224,6 +75306,14 @@ export default {
         partCount: {
           format: "bigint",
           type: "integer",
+        },
+        phone: {
+          format: "text",
+          type: "string",
+        },
+        fax: {
+          format: "text",
+          type: "string",
         },
       },
       type: "object",
@@ -78642,6 +78732,18 @@ export default {
           format: "extensions.halfvec(384)",
           type: "string",
         },
+        salesContactId: {
+          description:
+            "Note:\nThis is a Foreign Key to `customerContact.id`.<fk table='customerContact' column='id'/>",
+          format: "text",
+          type: "string",
+        },
+        invoicingContactId: {
+          description:
+            "Note:\nThis is a Foreign Key to `customerContact.id`.<fk table='customerContact' column='id'/>",
+          format: "text",
+          type: "string",
+        },
       },
       type: "object",
     },
@@ -79147,6 +79249,10 @@ export default {
           format: "text",
           type: "string",
         },
+        readableId: {
+          format: "text",
+          type: "string",
+        },
       },
       type: "object",
     },
@@ -79620,6 +79726,12 @@ export default {
           },
           type: "array",
         },
+        itemPostingGroupId: {
+          description:
+            "Note:\nThis is a Foreign Key to `itemPostingGroup.id`.<fk table='itemPostingGroup' column='id'/>",
+          format: "text",
+          type: "string",
+        },
         createdBy: {
           description:
             "Note:\nThis is a Foreign Key to `user.id`.<fk table='user' column='id'/>",
@@ -79918,6 +80030,12 @@ export default {
             type: "string",
           },
           type: "array",
+        },
+        itemPostingGroupId: {
+          description:
+            "Note:\nThis is a Foreign Key to `itemPostingGroup.id`.<fk table='itemPostingGroup' column='id'/>",
+          format: "text",
+          type: "string",
         },
         createdBy: {
           description:
@@ -80555,6 +80673,12 @@ export default {
             type: "string",
           },
           type: "array",
+        },
+        itemPostingGroupId: {
+          description:
+            "Note:\nThis is a Foreign Key to `itemPostingGroup.id`.<fk table='itemPostingGroup' column='id'/>",
+          format: "text",
+          type: "string",
         },
         createdBy: {
           description:
@@ -86186,6 +86310,18 @@ export default {
           format: "extensions.halfvec(384)",
           type: "string",
         },
+        purchasingContactId: {
+          description:
+            "Note:\nThis is a Foreign Key to `supplierContact.id`.<fk table='supplierContact' column='id'/>",
+          format: "text",
+          type: "string",
+        },
+        invoicingContactId: {
+          description:
+            "Note:\nThis is a Foreign Key to `supplierContact.id`.<fk table='supplierContact' column='id'/>",
+          format: "text",
+          type: "string",
+        },
       },
       type: "object",
     },
@@ -90233,6 +90369,12 @@ export default {
     },
     "rowFilter.consumables.tags": {
       name: "tags",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.consumables.itemPostingGroupId": {
+      name: "itemPostingGroupId",
       required: false,
       in: "query",
       type: "string",
@@ -96540,6 +96682,18 @@ export default {
       in: "query",
       type: "string",
     },
+    "rowFilter.customers.taxPercent": {
+      name: "taxPercent",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.customers.website": {
+      name: "website",
+      required: false,
+      in: "query",
+      type: "string",
+    },
     "rowFilter.customers.companyId": {
       name: "companyId",
       required: false,
@@ -96582,38 +96736,14 @@ export default {
       in: "query",
       type: "string",
     },
-    "rowFilter.customers.phone": {
-      name: "phone",
+    "rowFilter.customers.salesContactId": {
+      name: "salesContactId",
       required: false,
       in: "query",
       type: "string",
     },
-    "rowFilter.customers.fax": {
-      name: "fax",
-      required: false,
-      in: "query",
-      type: "string",
-    },
-    "rowFilter.customers.website": {
-      name: "website",
-      required: false,
-      in: "query",
-      type: "string",
-    },
-    "rowFilter.customers.externalId": {
-      name: "externalId",
-      required: false,
-      in: "query",
-      type: "string",
-    },
-    "rowFilter.customers.taxPercent": {
-      name: "taxPercent",
-      required: false,
-      in: "query",
-      type: "string",
-    },
-    "rowFilter.customers.tags": {
-      name: "tags",
+    "rowFilter.customers.invoicingContactId": {
+      name: "invoicingContactId",
       required: false,
       in: "query",
       type: "string",
@@ -96632,6 +96762,18 @@ export default {
     },
     "rowFilter.customers.orderCount": {
       name: "orderCount",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.customers.phone": {
+      name: "phone",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.customers.fax": {
+      name: "fax",
       required: false,
       in: "query",
       type: "string",
@@ -104292,18 +104434,6 @@ export default {
       in: "query",
       type: "string",
     },
-    "rowFilter.suppliers.phone": {
-      name: "phone",
-      required: false,
-      in: "query",
-      type: "string",
-    },
-    "rowFilter.suppliers.fax": {
-      name: "fax",
-      required: false,
-      in: "query",
-      type: "string",
-    },
     "rowFilter.suppliers.website": {
       name: "website",
       required: false,
@@ -104328,6 +104458,24 @@ export default {
       in: "query",
       type: "string",
     },
+    "rowFilter.suppliers.purchasingContactId": {
+      name: "purchasingContactId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.suppliers.invoicingContactId": {
+      name: "invoicingContactId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.suppliers.embedding": {
+      name: "embedding",
+      required: false,
+      in: "query",
+      type: "string",
+    },
     "rowFilter.suppliers.type": {
       name: "type",
       required: false,
@@ -104348,6 +104496,18 @@ export default {
     },
     "rowFilter.suppliers.partCount": {
       name: "partCount",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.suppliers.phone": {
+      name: "phone",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.suppliers.fax": {
+      name: "fax",
       required: false,
       in: "query",
       type: "string",
@@ -108216,6 +108376,18 @@ export default {
       in: "query",
       type: "string",
     },
+    "rowFilter.customer.salesContactId": {
+      name: "salesContactId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.customer.invoicingContactId": {
+      name: "invoicingContactId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
     "body.purchaseOrder": {
       name: "purchaseOrder",
       description: "purchaseOrder",
@@ -108828,6 +109000,12 @@ export default {
       in: "query",
       type: "string",
     },
+    "rowFilter.trackedEntity.readableId": {
+      name: "readableId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
     "body.companyPlan": {
       name: "companyPlan",
       description: "companyPlan",
@@ -109410,6 +109588,12 @@ export default {
       in: "query",
       type: "string",
     },
+    "rowFilter.parts.itemPostingGroupId": {
+      name: "itemPostingGroupId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
     "rowFilter.parts.createdBy": {
       name: "createdBy",
       required: false,
@@ -109787,6 +109971,12 @@ export default {
     },
     "rowFilter.materials.tags": {
       name: "tags",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.materials.itemPostingGroupId": {
+      name: "itemPostingGroupId",
       required: false,
       in: "query",
       type: "string",
@@ -110492,6 +110682,12 @@ export default {
     },
     "rowFilter.tools.tags": {
       name: "tags",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.tools.itemPostingGroupId": {
+      name: "itemPostingGroupId",
       required: false,
       in: "query",
       type: "string",
@@ -116813,6 +117009,18 @@ export default {
     },
     "rowFilter.supplier.embedding": {
       name: "embedding",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.supplier.purchasingContactId": {
+      name: "purchasingContactId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.supplier.invoicingContactId": {
+      name: "invoicingContactId",
       required: false,
       in: "query",
       type: "string",

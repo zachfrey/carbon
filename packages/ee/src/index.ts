@@ -30,5 +30,7 @@ export const integrations = [
 export { Logo as OnshapeLogo, Onshape } from "./onshape/config";
 // TODO: export as @carbon/ee/paperless
 export { PaperlessPartsClient } from "./paperless-parts/lib/client";
+export { QuickBooks } from "./quickbooks/config";
 export { Slack } from "./slack/config";
 export * from "./slack/lib/messages";
+export { Xero } from "./xero/config";

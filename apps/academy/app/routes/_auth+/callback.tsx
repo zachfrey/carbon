@@ -56,6 +56,10 @@ export async function action({ request }: ActionFunctionArgs) {
     .select("companyId")
     .eq("userId", userId);
 
+  console.log({
+    companies
+  });
+
   const authSession = await refreshAccessToken(
     refreshToken,
     companies.data?.[0]?.companyId

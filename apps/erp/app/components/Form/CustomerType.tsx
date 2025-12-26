@@ -3,6 +3,7 @@ import { CreatableCombobox } from "@carbon/form";
 import { useDisclosure, useMount } from "@carbon/react";
 import { useMemo, useRef, useState } from "react";
 import { useFetcher } from "react-router";
+import { Enumerable } from "~/components/Enumerable";
 import type { getCustomerTypesList } from "~/modules/sales";
 import { CustomerTypeForm } from "~/modules/sales/ui/CustomerTypes";
 import { path } from "~/utils/path";
@@ -20,7 +21,12 @@ const CustomerType = (props: CustomerTypeSelectProps) => {
     <>
       <CreatableCombobox
         ref={triggerRef}
-        options={options}
+        options={
+          options.map((o) => ({
+            value: o.value,
+            label: <Enumerable value={o.label} />
+          })) ?? []
+        }
         {...props}
         label={props?.label ?? "CustomerType"}
         onCreateOption={(option) => {

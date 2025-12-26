@@ -625,6 +625,26 @@ export async function updateSequence(
     .eq("table", table);
 }
 
+export async function updateIntegrationMetadata(
+  client: SupabaseClient<Database>,
+  companyId: string,
+  integrationId: string,
+  metadata: any,
+  updatedBy?: string
+) {
+  return client
+    .from("companyIntegration")
+    .update(
+      sanitize({
+        metadata,
+        updatedAt: new Date().toISOString(),
+        updatedBy
+      })
+    )
+    .eq("companyId", companyId)
+    .eq("id", integrationId);
+}
+
 export async function upsertWebhook(
   client: SupabaseClient<Database>,
   webhook:

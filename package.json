@@ -2,6 +2,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.3.8",
     "@types/aws-lambda": "8.10.152",
+    "@typescript/native-preview": "^7.0.0-dev.20251215.1",
     "csv-parse": "^5.5.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.1.2",
@@ -68,7 +69,8 @@
     "test": "turbo run test",
     "tool:new": "tsx scripts/create-tool.ts",
     "agent:new": "tsx scripts/create-agent.ts",
-    "types": "turbo run types"
+    "types": "turbo run types",
+    "typecheck": "tsgo --noEmit"
   },
   "workspaces": [
     "apps/*",

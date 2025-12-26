@@ -3,6 +3,7 @@ import { CreatableCombobox } from "@carbon/form";
 import { useDisclosure, useMount } from "@carbon/react";
 import { useMemo, useRef, useState } from "react";
 import { useFetcher } from "react-router";
+import { Enumerable } from "~/components/Enumerable";
 import { useRouteData } from "~/hooks";
 import type {
   getSupplierStatusesList,
@@ -25,7 +26,12 @@ const SupplierStatus = (props: SupplierStatusSelectProps) => {
     <>
       <CreatableCombobox
         ref={triggerRef}
-        options={options}
+        options={
+          options.map((o) => ({
+            value: o.value,
+            label: <Enumerable value={o.label} />
+          })) ?? []
+        }
         {...props}
         label={props?.label ?? "SupplierStatus"}
         onCreateOption={(option) => {

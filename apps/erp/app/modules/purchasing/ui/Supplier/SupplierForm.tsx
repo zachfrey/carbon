@@ -23,6 +23,7 @@ import {
   Hidden,
   Input,
   Submit,
+  SupplierContact,
   SupplierStatus,
   SupplierType
 } from "~/components/Form";
@@ -116,9 +117,22 @@ const SupplierForm = ({
 
                   <Currency name="currencyCode" label="Currency" />
 
-                  <PhoneInput name="phone" label="Phone" />
-                  <PhoneInput name="fax" label="Fax" />
                   <Input name="website" label="Website" />
+
+                  {isEditing && (
+                    <>
+                      <SupplierContact
+                        supplier={initialValues.id}
+                        name="purchasingContactId"
+                        label="Purchasing Contact"
+                      />
+                      <SupplierContact
+                        supplier={initialValues.id}
+                        name="invoicingContactId"
+                        label="Invoicing Contact"
+                      />
+                    </>
+                  )}
 
                   <CustomFormFields table="supplier" />
                 </div>

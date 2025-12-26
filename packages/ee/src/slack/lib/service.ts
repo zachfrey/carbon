@@ -112,8 +112,6 @@ export async function createIssueSlackThread(
         : [])
     ];
 
-    console.log({ blocks, data });
-
     const threadMessage = await slackClient.chat.postMessage({
       channel: auth.channelId,
       unfurl_links: false,

@@ -105,6 +105,11 @@ export const suggestionValidator = z.object({
   userId: zfd.text(z.string().optional())
 });
 
+export const oAuthCallbackSchema = z.object({
+  code: z.string(),
+  state: z.string()
+});
+
 export const operationStepValidator = z
   .object({
     id: zfd.text(z.string().optional()),

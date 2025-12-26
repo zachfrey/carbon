@@ -72,8 +72,8 @@ export const customerValidator = z.object({
   taxPercent: zfd.numeric(
     z.number().min(0).max(1, { message: "Tax percent must be between 0 and 1" })
   ),
-  phone: zfd.text(z.string().optional()),
-  fax: zfd.text(z.string().optional()),
+  salesContactId: zfd.text(z.string().optional()),
+  invoicingContactId: zfd.text(z.string().optional()),
   website: zfd.text(z.string().optional())
 });
 

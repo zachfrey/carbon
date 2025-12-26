@@ -52,9 +52,6 @@ export const slackOAuthTokenResponseSchema = z.object({
     .optional()
 });
 
-// Legacy export for backward compatibility - should be removed eventually
-export const slackAuthResponseSchema = slackOAuthTokenResponseSchema;
-
 let slackInstaller: InstallProvider | null = null;
 
 export const createSlackApp = ({
