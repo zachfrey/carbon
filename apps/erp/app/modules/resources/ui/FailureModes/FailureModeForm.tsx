@@ -19,7 +19,7 @@ import type { z } from "zod/v3";
 import { CustomFormFields, Hidden, Input, Submit } from "~/components/Form";
 import { usePermissions } from "~/hooks";
 import { path } from "~/utils/path";
-import { failureModeValidator } from "../../production.models";
+import { failureModeValidator } from "../../resources.models";
 
 type FailureModeFormProps = {
   initialValues: z.infer<typeof failureModeValidator>;
@@ -52,8 +52,8 @@ const FailureModeForm = ({
 
   const isEditing = initialValues.id !== undefined;
   const isDisabled = isEditing
-    ? !permissions.can("update", "production")
-    : !permissions.can("create", "production");
+    ? !permissions.can("update", "resources")
+    : !permissions.can("create", "resources");
 
   return (
     <ModalDrawerProvider type={type}>

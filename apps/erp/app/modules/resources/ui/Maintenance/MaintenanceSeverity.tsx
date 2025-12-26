@@ -5,7 +5,7 @@ import {
   LuTriangleAlert,
   LuWrench
 } from "react-icons/lu";
-import type { maintenanceSeverity } from "../../production.models";
+import type { maintenanceSeverity } from "../../resources.models";
 
 type MaintenanceSeverityProps = {
   severity?: (typeof maintenanceSeverity)[number] | null;

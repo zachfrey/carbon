@@ -56,24 +56,6 @@ const productionRoutes: AuthenticatedRouteGroup[] = [
     ]
   },
   {
-    name: "Maintenance",
-    routes: [
-      {
-        name: "Dispatches",
-        to: path.to.maintenanceDispatches,
-        icon: <LuWrench />,
-        table: "maintenanceDispatch"
-      },
-      {
-        name: "Schedules",
-        to: path.to.maintenanceSchedules,
-        icon: <LuCalendarClock />,
-        table: "maintenanceSchedule",
-        role: "employee"
-      }
-    ]
-  },
-  {
     name: "Configure",
     routes: [
       {
@@ -81,12 +63,6 @@ const productionRoutes: AuthenticatedRouteGroup[] = [
         to: path.to.scrapReasons,
         role: "employee",
         icon: <LuTrash />
-      },
-      {
-        name: "Failure Modes",
-        to: path.to.failureModes,
-        role: "employee",
-        icon: <LuCircleAlert />
       }
     ]
   }

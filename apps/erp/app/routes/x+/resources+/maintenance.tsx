@@ -5,8 +5,8 @@ import { Outlet, useLoaderData } from "react-router";
 import {
   getFailureModesList,
   getMaintenanceDispatches
-} from "~/modules/production";
-import MaintenanceDispatchesTable from "~/modules/production/ui/Maintenance/MaintenanceDispatchesTable";
+} from "~/modules/resources";
+import MaintenanceDispatchesTable from "~/modules/resources/ui/Maintenance/MaintenanceDispatchesTable";
 import type { Handle } from "~/utils/handle";
 import { path } from "~/utils/path";
 import { getGenericQueryFilters } from "~/utils/query";
@@ -18,7 +18,7 @@ export const handle: Handle = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {
-    view: "production",
+    view: "resources",
     role: "employee"
   });
 

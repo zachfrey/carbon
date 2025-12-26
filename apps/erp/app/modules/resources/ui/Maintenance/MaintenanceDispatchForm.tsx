@@ -29,7 +29,7 @@ import {
   maintenanceSeverity,
   maintenanceSource,
   oeeImpact
-} from "../../production.models";
+} from "../../resources.models";
 import MaintenanceOeeImpact from "./MaintenanceOeeImpact";
 import MaintenanceSeverity from "./MaintenanceSeverity";
 import MaintenanceSource from "./MaintenanceSource";
@@ -66,8 +66,8 @@ const MaintenanceDispatchForm = ({
 
   const isEditing = initialValues.id !== undefined;
   const isDisabled = isEditing
-    ? !permissions.can("update", "production")
-    : !permissions.can("create", "production");
+    ? !permissions.can("update", "resources")
+    : !permissions.can("create", "resources");
 
   const [content, setContent] = useState<JSONContent>(
     initialValues?.content

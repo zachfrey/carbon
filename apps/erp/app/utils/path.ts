@@ -49,7 +49,7 @@ export const path = {
       docs: `${api}/docs`,
       employeeTypes: `${api}/users/employee-types`,
       emptyPermissions: `${api}/users/empty-permissions`,
-      failureModes: `${api}/production/failure-modes`,
+      failureModes: `${api}/resources/failure-modes`,
       gauges: `${api}/quality/gauges`,
       generateCsvColumns: (table: string) =>
         generatePath(`${api}/ai/csv/${table}/columns`),
@@ -76,8 +76,8 @@ export const path = {
       kanbanJobLink: (id: string) => generatePath(`${api}/kanban/link/${id}`),
       kanbanStart: (id: string) => generatePath(`${api}/kanban/start/${id}`),
       locations: `${api}/resources/locations`,
-      maintenanceDispatches: `${api}/production/maintenance`,
-      maintenanceSchedules: `${api}/production/scheduled-maintenance`,
+      maintenanceDispatches: `${api}/resources/maintenance`,
+      maintenanceSchedules: `${api}/resources/scheduled-maintenance`,
       materialDimensions: (formId: string) =>
         generatePath(`${api}/items/dimensions/${formId}`),
       materialFinishes: (substanceId: string) =>
@@ -541,7 +541,7 @@ export const path = {
     deleteEmployeeType: (id: string) =>
       generatePath(`${x}/users/employee-types/delete/${id}`),
     deleteFailureMode: (id: string) =>
-      generatePath(`${x}/production/failure-modes/delete/${id}`),
+      generatePath(`${x}/resources/failure-modes/delete/${id}`),
     deleteGauge: (id: string) =>
       generatePath(`${x}/quality/gauges/delete/${id}`),
     deleteGaugeCalibrationRecord: (id: string) =>
@@ -602,9 +602,9 @@ export const path = {
     deleteKanban: (id: string) =>
       generatePath(`${x}/inventory/kanbans/delete/${id}`),
     deleteMaintenanceDispatch: (id: string) =>
-      generatePath(`${x}/production/maintenance/delete/${id}`),
+      generatePath(`${x}/resources/maintenance/delete/${id}`),
     deleteMaintenanceSchedule: (id: string) =>
-      generatePath(`${x}/production/scheduled-maintenance/delete/${id}`),
+      generatePath(`${x}/resources/scheduled-maintenance/delete/${id}`),
     deleteNoQuoteReason: (id: string) =>
       generatePath(`${x}/sales/no-quote-reasons/delete/${id}`),
     deleteCustomerPortal: (id: string) =>
@@ -747,8 +747,8 @@ export const path = {
       generatePath(`/share/training/${assignmentId}`),
     feedback: `${x}/feedback`,
     failureMode: (id: string) =>
-      generatePath(`${x}/production/failure-modes/${id}`),
-    failureModes: `${x}/production/failure-modes`,
+      generatePath(`${x}/resources/failure-modes/${id}`),
+    failureModes: `${x}/resources/failure-modes`,
     fiscalYears: `${x}/accounting/years`,
     gauge: (id: string) => generatePath(`${x}/quality/gauges/${id}`),
     gauges: `${x}/quality/gauges`,
@@ -876,10 +876,10 @@ export const path = {
       generatePath(`${x}/maintenance/${dispatchId}/event/new`),
     deleteMaintenanceDispatchEvent: (dispatchId: string, eventId: string) =>
       generatePath(`${x}/maintenance/${dispatchId}/event/${eventId}/delete`),
-    maintenanceDispatches: `${x}/production/maintenance`,
+    maintenanceDispatches: `${x}/resources/maintenance`,
     maintenanceSchedule: (id: string) =>
-      generatePath(`${x}/production/scheduled-maintenance/${id}`),
-    maintenanceSchedules: `${x}/production/scheduled-maintenance`,
+      generatePath(`${x}/resources/scheduled-maintenance/${id}`),
+    maintenanceSchedules: `${x}/resources/scheduled-maintenance`,
     makeMethodGet: `${x}/items/methods/get`,
     makeMethodSave: `${x}/items/methods/save`,
     markTrainingComplete: `${x}/resources/assignments/complete`,
@@ -974,7 +974,7 @@ export const path = {
     newEmployeeAbility: (id: string) =>
       generatePath(`${x}/resources/ability/${id}/employee/new`),
     newEmployeeType: `${x}/users/employee-types/new`,
-    newFailureMode: `${x}/production/failure-modes/new`,
+    newFailureMode: `${x}/resources/failure-modes/new`,
     newFixture: `${x}/fixture/new`,
     newFixtureSupplier: (id: string) =>
       generatePath(`${x}/fixture/${id}/purchasing/new`),
@@ -1003,7 +1003,7 @@ export const path = {
     newKanban: `${x}/inventory/kanbans/new`,
     newLocation: `${x}/resources/locations/new`,
     newMaintenanceDispatch: `${x}/maintenance/new`,
-    newMaintenanceSchedule: `${x}/production/scheduled-maintenance/new`,
+    newMaintenanceSchedule: `${x}/resources/scheduled-maintenance/new`,
     newMakeMethodVersion: `${x}/items/methods/version/new`,
     newMaterial: `${x}/material/new`,
     newMethodMaterial: `${x}/items/methods/material/new`,

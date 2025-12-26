@@ -2,8 +2,8 @@ import { requirePermissions } from "@carbon/auth/auth.server";
 import { VStack } from "@carbon/react";
 import type { LoaderFunctionArgs } from "react-router";
 import { Outlet, useLoaderData } from "react-router";
-import { getMaintenanceSchedules } from "~/modules/production";
-import MaintenanceSchedulesTable from "~/modules/production/ui/MaintenanceSchedule/MaintenanceSchedulesTable";
+import { getMaintenanceSchedules } from "~/modules/resources";
+import MaintenanceSchedulesTable from "~/modules/resources/ui/MaintenanceSchedule/MaintenanceSchedulesTable";
 import type { Handle } from "~/utils/handle";
 import { path } from "~/utils/path";
 import { getGenericQueryFilters } from "~/utils/query";
@@ -15,7 +15,7 @@ export const handle: Handle = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {
-    view: "production",
+    view: "resources",
     role: "employee"
   });
 

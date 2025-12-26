@@ -27,7 +27,7 @@ import {
   maintenanceDispatchStatus,
   maintenanceSource,
   oeeImpact
-} from "../../production.models";
+} from "../../resources.models";
 import type { MaintenanceDispatch } from "../../types";
 import MaintenanceOeeImpact from "./MaintenanceOeeImpact";
 import MaintenancePriority from "./MaintenancePriority";
@@ -322,7 +322,7 @@ const MaintenanceDispatchesTable = memo(
             </MenuItem>
             <MenuItem
               destructive
-              disabled={!permissions.can("delete", "production")}
+              disabled={!permissions.can("delete", "resources")}
               onClick={() => {
                 navigate(
                   `${path.to.deleteMaintenanceDispatch(row.id)}?${params.toString()}`
@@ -352,7 +352,7 @@ const MaintenanceDispatchesTable = memo(
         }}
         count={count}
         primaryAction={
-          permissions.can("create", "production") && (
+          permissions.can("create", "resources") && (
             <New
               label="Dispatch"
               to={`${path.to.newMaintenanceDispatch}?${params.toString()}`}

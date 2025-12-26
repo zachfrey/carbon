@@ -59,7 +59,7 @@ import { path } from "~/utils/path";
 import {
   maintenanceDispatchEventValidator,
   maintenanceDispatchItemValidator
-} from "../../production.models";
+} from "../../resources.models";
 import type {
   MaintenanceDispatchEvent,
   MaintenanceDispatchItem
@@ -234,7 +234,7 @@ function MaintenanceExplorerItem({
             )}
           </div>
         </button>
-        {permissions.can("update", "production") && (
+        {permissions.can("update", "resources") && (
           <IconButton
             aria-label="Add"
             size="sm"
@@ -322,7 +322,7 @@ function MaintenanceExplorerChildItem({
       ) : (
         <div className="flex w-full">{content}</div>
       )}
-      {permissions.can("delete", "production") && (
+      {permissions.can("delete", "resources") && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <IconButton

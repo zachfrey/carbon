@@ -3,6 +3,7 @@ import { CreatableCombobox } from "@carbon/form";
 import { useDisclosure, useMount } from "@carbon/react";
 import { useMemo, useRef, useState } from "react";
 import { useFetcher } from "react-router";
+import { Enumerable } from "~/components/Enumerable";
 import { useUser } from "~/hooks";
 import type { getWorkCentersList } from "~/modules/resources";
 import WorkCenterForm from "~/modules/resources/ui/WorkCenters/WorkCenterForm";
@@ -37,7 +38,10 @@ const WorkCenter = (props: WorkCenterSelectProps) => {
           workCenterFetcher.state === "idle"
         }
         ref={triggerRef}
-        options={options}
+        options={options.map((o) => ({
+          value: o.value,
+          label: <Enumerable value={o.label} />
+        }))}
         {...props}
         label={props?.label ?? "Work Center"}
         onCreateOption={(option) => {

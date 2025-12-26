@@ -7,13 +7,13 @@ import { redirect } from "react-router";
 import {
   maintenanceDispatchEventValidator,
   upsertMaintenanceDispatchEvent
-} from "~/modules/production";
+} from "~/modules/resources";
 import { path, requestReferrer } from "~/utils/path";
 
 export async function action({ request, params }: ActionFunctionArgs) {
   assertIsPost(request);
   const { client, companyId, userId } = await requirePermissions(request, {
-    update: "production"
+    update: "resources"
   });
 
   const { dispatchId } = params;
@@ -39,8 +39,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
     employeeId,
     workCenterId,
     startTime,
-    endTime: endTime ?? null,
-    notes: notes ?? null,
+    endTime: endTime ?? undefined,
+    notes: notes ?? undefined,
     companyId,
     createdBy: userId
   });

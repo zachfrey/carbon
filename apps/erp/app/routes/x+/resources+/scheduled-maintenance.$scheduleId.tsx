@@ -8,13 +8,13 @@ import {
   getMaintenanceSchedule,
   maintenanceScheduleValidator,
   upsertMaintenanceSchedule
-} from "~/modules/production";
-import MaintenanceScheduleForm from "~/modules/production/ui/MaintenanceSchedule/MaintenanceScheduleForm";
+} from "~/modules/resources";
+import MaintenanceScheduleForm from "~/modules/resources/ui/MaintenanceSchedule/MaintenanceScheduleForm";
 import { path } from "~/utils/path";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client } = await requirePermissions(request, {
-    view: "production",
+    view: "resources",
     role: "employee"
   });
 
@@ -41,7 +41,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
   assertIsPost(request);
   const { client, userId } = await requirePermissions(request, {
-    update: "production"
+    update: "resources"
   });
 
   const formData = await request.formData();

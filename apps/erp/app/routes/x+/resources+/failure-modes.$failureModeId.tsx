@@ -8,14 +8,14 @@ import {
   failureModeValidator,
   getFailureMode,
   upsertFailureMode
-} from "~/modules/production";
-import FailureModeForm from "~/modules/production/ui/FailureModes/FailureModeForm";
+} from "~/modules/resources";
+import FailureModeForm from "~/modules/resources/ui/FailureModes/FailureModeForm";
 import { getCustomFields, setCustomFields } from "~/utils/form";
 import { path } from "~/utils/path";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client } = await requirePermissions(request, {
-    view: "production",
+    view: "resources",
     role: "employee"
   });
 
@@ -42,7 +42,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
   assertIsPost(request);
   const { client, userId } = await requirePermissions(request, {
-    update: "production"
+    update: "resources"
   });
 
   const formData = await request.formData();

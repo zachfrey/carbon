@@ -7,12 +7,12 @@ import { ConfirmDelete } from "~/components/Modals";
 import {
   deleteMaintenanceDispatch,
   getMaintenanceDispatch
-} from "~/modules/production";
+} from "~/modules/resources";
 import { getParams, path } from "~/utils/path";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client } = await requirePermissions(request, {
-    view: "production",
+    view: "resources",
     role: "employee"
   });
   const { dispatchId } = params;

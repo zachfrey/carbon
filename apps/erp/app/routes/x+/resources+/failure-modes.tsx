@@ -2,8 +2,8 @@ import { requirePermissions } from "@carbon/auth/auth.server";
 import { VStack } from "@carbon/react";
 import type { LoaderFunctionArgs } from "react-router";
 import { Outlet, useLoaderData } from "react-router";
-import { getFailureModes } from "~/modules/production";
-import FailureModesTable from "~/modules/production/ui/FailureModes/FailureModesTable";
+import { getFailureModes } from "~/modules/resources";
+import FailureModesTable from "~/modules/resources/ui/FailureModes/FailureModesTable";
 import type { Handle } from "~/utils/handle";
 import { path } from "~/utils/path";
 import { getGenericQueryFilters } from "~/utils/query";
@@ -15,7 +15,7 @@ export const handle: Handle = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {
-    view: "production",
+    view: "resources",
     role: "employee"
   });
 

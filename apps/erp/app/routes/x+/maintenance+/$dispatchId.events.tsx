@@ -16,17 +16,14 @@ import type { ActionFunctionArgs } from "react-router";
 import { data, useFetcher, useParams } from "react-router";
 import { EmployeeAvatar } from "~/components";
 import { usePermissions, useRouteData, useUser } from "~/hooks";
-import {
-  maintenanceDispatchEventValidator,
-  upsertMaintenanceDispatchEvent
-} from "~/modules/production";
-import type { MaintenanceDispatchEvent } from "~/modules/production/types";
+import { maintenanceDispatchEventValidator } from "~/modules/resources";
+import type { MaintenanceDispatchEvent } from "~/modules/resources/types";
 import { path } from "~/utils/path";
 
 export async function action({ request, params }: ActionFunctionArgs) {
   assertIsPost(request);
-  const { client, userId } = await requirePermissions(request, {
-    update: "production"
+  const { client, companyId, userId } = await requirePermissions(request, {
+    update: "resources"
   });
 
   const { dispatchId } = params;
@@ -35,13 +32,33 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("intent");
 
+  const dispatch = await client
+    .from("maintenanceDispatch")
+    .select("id, workCenterId")
+    .eq("id", dispatchId)
+    .single();
+  if (dispatch.error) {
+    return data(
+      {},
+      await flash(request, error(dispatch.error, "Failed to get dispatch"))
+    );
+  }
+
+  const { workCenterId } = dispatch.data;
+
   if (intent === "start") {
-    const insertEvent = await upsertMaintenanceDispatchEvent(client, {
-      maintenanceDispatchId: dispatchId,
-      employeeId: userId,
-      startTime: new Date().toISOString(),
-      createdBy: userId
-    });
+    const insertEvent = await client
+      .from("maintenanceDispatchEvent")
+      .insert({
+        maintenanceDispatchId: dispatchId!,
+        employeeId: userId,
+        workCenterId,
+        startTime: new Date().toISOString(),
+        companyId,
+        createdBy: userId
+      })
+      .select("id")
+      .single();
 
     if (insertEvent.error) {
       return data(
@@ -57,11 +74,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const eventId = formData.get("eventId") as string;
     if (!eventId) throw new Error("eventId not found");
 
-    const updateEvent = await upsertMaintenanceDispatchEvent(client, {
-      id: eventId,
-      endTime: new Date().toISOString(),
-      updatedBy: userId
-    });
+    const updateEvent = await client
+      .from("maintenanceDispatchEvent")
+      .update({
+        endTime: new Date().toISOString(),
+        updatedBy: userId
+      })
+      .eq("id", eventId);
 
     if (updateEvent.error) {
       return data(
@@ -81,11 +100,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return validationError(validation.error);
   }
 
-  const upsertEvent = await upsertMaintenanceDispatchEvent(client, {
+  const upsertEvent = await client.from("maintenanceDispatchEvent").insert({
     ...validation.data,
-    maintenanceDispatchId: dispatchId,
-    createdBy: userId,
-    updatedBy: validation.data.id ? userId : undefined
+    companyId,
+    createdBy: userId
   });
 
   if (upsertEvent.error) {
@@ -112,14 +130,14 @@ export default function MaintenanceDispatchEventsRoute() {
 
   const events = routeData?.events ?? [];
   const activeEvent = events.find(
-    (e) => e.employeeId === user.id && !e.endTime
+    (e) => e.employee?.id === user.id && !e.endTime
   );
 
   return (
     <VStack spacing={4}>
       <HStack className="justify-between w-full">
         <h2 className="text-lg font-semibold">Time Events</h2>
-        {permissions.can("update", "production") && (
+        {permissions.can("update", "resources") && (
           <fetcher.Form method="post">
             {activeEvent ? (
               <>
@@ -165,7 +183,7 @@ export default function MaintenanceDispatchEventsRoute() {
               <CardHeader className="pb-2">
                 <HStack className="justify-between">
                   <HStack>
-                    <EmployeeAvatar employeeId={event.employeeId} size="xs" />
+                    <EmployeeAvatar employeeId={event.employee?.id} size="xs" />
                     <span className="text-sm font-medium">
                       {event.employee?.fullName ?? "Unknown"}
                     </span>

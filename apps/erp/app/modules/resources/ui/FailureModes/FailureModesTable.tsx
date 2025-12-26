@@ -20,7 +20,6 @@ const FailureModesTable = memo(({ data, count }: FailureModesTableProps) => {
   const navigate = useNavigate();
   const permissions = usePermissions();
 
-  const customColumns = useCustomColumns<FailureMode>("maintenanceFailureMode");
   const columns = useMemo<ColumnDef<FailureMode>[]>(() => {
     const defaultColumns: ColumnDef<FailureMode>[] = [
       {
@@ -33,8 +32,8 @@ const FailureModesTable = memo(({ data, count }: FailureModesTableProps) => {
         )
       }
     ];
-    return [...defaultColumns, ...customColumns];
-  }, [customColumns]);
+    return [...defaultColumns];
+  }, []);
 
   const renderContextMenu = useCallback(
     (row: FailureMode) => {
@@ -50,7 +49,7 @@ const FailureModesTable = memo(({ data, count }: FailureModesTableProps) => {
           </MenuItem>
           <MenuItem
             destructive
-            disabled={!permissions.can("delete", "production")}
+            disabled={!permissions.can("delete", "resources")}
             onClick={() => {
               navigate(
                 `${path.to.deleteFailureMode(row.id)}?${params.toString()}`
@@ -72,7 +71,7 @@ const FailureModesTable = memo(({ data, count }: FailureModesTableProps) => {
       columns={columns}
       count={count}
       primaryAction={
-        permissions.can("create", "production") && (
+        permissions.can("create", "resources") && (
           <New
             label="Failure Mode"
             to={`${path.to.newFailureMode}?${params.toString()}`}

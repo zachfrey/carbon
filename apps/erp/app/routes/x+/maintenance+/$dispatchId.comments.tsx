@@ -19,14 +19,14 @@ import { usePermissions, useRouteData } from "~/hooks";
 import {
   maintenanceDispatchCommentValidator,
   upsertMaintenanceDispatchComment
-} from "~/modules/production";
-import type { MaintenanceDispatchComment } from "~/modules/production/types";
+} from "~/modules/resources";
+import type { MaintenanceDispatchComment } from "~/modules/resources/types";
 import { path } from "~/utils/path";
 
 export async function action({ request, params }: ActionFunctionArgs) {
   assertIsPost(request);
   const { client, userId } = await requirePermissions(request, {
-    update: "production"
+    update: "resources"
   });
 
   const { dispatchId } = params;
@@ -44,7 +44,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const upsertComment = await upsertMaintenanceDispatchComment(client, {
     ...validation.data,
     maintenanceDispatchId: dispatchId,
-    createdBy: userId,
+    createdBy: validation.data.id ? undefined : userId,
+    // @ts-expect-error - stfu typescript
     updatedBy: validation.data.id ? userId : undefined
   });
 
@@ -87,7 +88,7 @@ export default function MaintenanceDispatchCommentsRoute() {
         <h2 className="text-lg font-semibold">Comments</h2>
       </HStack>
 
-      {permissions.can("update", "production") && (
+      {permissions.can("update", "resources") && (
         <Card>
           <CardContent className="py-4">
             <VStack spacing={2}>
@@ -127,10 +128,7 @@ export default function MaintenanceDispatchCommentsRoute() {
                 <VStack spacing={2}>
                   <HStack className="justify-between w-full">
                     <HStack>
-                      <EmployeeAvatar employeeId={c.createdBy} size="xs" />
-                      <span className="text-sm font-medium">
-                        {c.user?.fullName ?? "Unknown"}
-                      </span>
+                      <EmployeeAvatar employeeId={c.createdBy.id} size="xs" />
                     </HStack>
                     <span className="text-xs text-muted-foreground">
                       {new Date(c.createdAt).toLocaleString()}

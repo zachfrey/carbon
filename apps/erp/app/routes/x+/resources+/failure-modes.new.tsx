@@ -4,14 +4,13 @@ import { flash } from "@carbon/auth/session.server";
 import { validationError, validator } from "@carbon/form";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect, useNavigate } from "react-router";
-import { failureModeValidator, upsertFailureMode } from "~/modules/production";
-import FailureModeForm from "~/modules/production/ui/FailureModes/FailureModeForm";
-import { setCustomFields } from "~/utils/form";
+import { failureModeValidator, upsertFailureMode } from "~/modules/resources";
+import FailureModeForm from "~/modules/resources/ui/FailureModes/FailureModeForm";
 import { getParams, path, requestReferrer } from "~/utils/path";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requirePermissions(request, {
-    create: "production"
+    create: "resources"
   });
 
   return null;
@@ -20,7 +19,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
   assertIsPost(request);
   const { client, companyId, userId } = await requirePermissions(request, {
-    create: "production"
+    create: "resources"
   });
 
   const formData = await request.formData();

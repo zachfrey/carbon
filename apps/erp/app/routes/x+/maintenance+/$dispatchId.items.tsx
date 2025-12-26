@@ -9,14 +9,14 @@ import { useRouteData } from "~/hooks";
 import {
   maintenanceDispatchItemValidator,
   upsertMaintenanceDispatchItem
-} from "~/modules/production";
-import type { MaintenanceDispatchItem } from "~/modules/production/types";
+} from "~/modules/resources";
+import type { MaintenanceDispatchItem } from "~/modules/resources/types";
 import { path } from "~/utils/path";
 
 export async function action({ request, params }: ActionFunctionArgs) {
   assertIsPost(request);
   const { client, userId } = await requirePermissions(request, {
-    update: "production"
+    update: "resources"
   });
 
   const { dispatchId } = params;
@@ -34,7 +34,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const upsertItem = await upsertMaintenanceDispatchItem(client, {
     ...validation.data,
     maintenanceDispatchId: dispatchId,
-    createdBy: userId,
+    createdBy: validation.data.id ? undefined : userId,
+    // @ts-expect-error - stfu typescript
     updatedBy: validation.data.id ? userId : undefined
   });
 

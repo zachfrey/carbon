@@ -64,7 +64,7 @@ const MaintenanceDispatchHeader = () => {
                 <DropdownMenuItem
                   destructive
                   disabled={
-                    !permissions.can("delete", "production") ||
+                    !permissions.can("delete", "resources") ||
                     !permissions.is("employee")
                   }
                   onClick={deleteModal.onOpen}
@@ -94,7 +94,7 @@ const MaintenanceDispatchHeader = () => {
               isDisabled={
                 !["Open", "Assigned"].includes(status ?? "") ||
                 statusFetcher.state !== "idle" ||
-                !permissions.can("update", "production")
+                !permissions.can("update", "resources")
               }
               isLoading={
                 statusFetcher.state !== "idle" &&
@@ -117,7 +117,7 @@ const MaintenanceDispatchHeader = () => {
               isDisabled={
                 status !== "In Progress" ||
                 statusFetcher.state !== "idle" ||
-                !permissions.can("update", "production")
+                !permissions.can("update", "resources")
               }
               isLoading={
                 statusFetcher.state !== "idle" &&
@@ -140,7 +140,7 @@ const MaintenanceDispatchHeader = () => {
               isDisabled={
                 !["In Progress", "Completed"].includes(status ?? "") ||
                 statusFetcher.state !== "idle" ||
-                !permissions.can("update", "production")
+                !permissions.can("update", "resources")
               }
             >
               Reopen

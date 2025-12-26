@@ -1,5 +1,5 @@
 import { Status } from "@carbon/react";
-import type { maintenanceDispatchStatus } from "../../production.models";
+import type { maintenanceDispatchStatus } from "../../resources.models";
 
 type MaintenanceStatusProps = {
   status?: (typeof maintenanceDispatchStatus)[number] | null;

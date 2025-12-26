@@ -5,7 +5,7 @@ import {
   LuShieldX,
   LuTriangleAlert
 } from "react-icons/lu";
-import type { maintenanceSource } from "../../production.models";
+import type { maintenanceSource } from "../../resources.models";
 
 type MaintenanceSourceProps = {
   source?: (typeof maintenanceSource)[number] | null;

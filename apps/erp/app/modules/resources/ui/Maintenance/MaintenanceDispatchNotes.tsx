@@ -102,7 +102,7 @@ export function MaintenanceDispatchNotes({
       </CardHeader>
 
       <CardContent>
-        {permissions.can("update", "production") && !isDisabled ? (
+        {permissions.can("update", "resources") && !isDisabled ? (
           <Editor
             initialValue={(content ?? {}) as JSONContent}
             onUpload={onUploadImage}
@@ -172,7 +172,7 @@ export function MaintenanceDispatchFiles({
                 dispatchId={dispatchId}
                 files={resolvedFiles ?? []}
                 isReadOnly={
-                  !permissions.can("update", "production") || isDisabled
+                  !permissions.can("update", "resources") || isDisabled
                 }
               />
             )}

@@ -20,6 +20,7 @@ import type { z } from "zod/v3";
 import { HighPriorityIcon } from "~/assets/icons/HighPriorityIcon";
 import { LowPriorityIcon } from "~/assets/icons/LowPriorityIcon";
 import { MediumPriorityIcon } from "~/assets/icons/MediumPriorityIcon";
+import { Enumerable } from "~/components/Enumerable";
 import { Hidden, Input, Submit, WorkCenter } from "~/components/Form";
 import { usePermissions } from "~/hooks";
 import { path } from "~/utils/path";
@@ -27,7 +28,7 @@ import {
   maintenanceDispatchPriority,
   maintenanceFrequency,
   maintenanceScheduleValidator
-} from "../../production.models";
+} from "../../resources.models";
 
 function getPriorityIcon(
   priority: (typeof maintenanceDispatchPriority)[number]
@@ -115,7 +116,7 @@ const MaintenanceScheduleForm = ({
                   label="Frequency"
                   options={maintenanceFrequency.map((freq) => ({
                     value: freq,
-                    label: freq
+                    label: <Enumerable value={freq} />
                   }))}
                 />
                 <Select

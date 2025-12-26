@@ -5,12 +5,12 @@ import type { ActionFunctionArgs } from "react-router";
 import {
   maintenanceDispatchItemValidator,
   upsertMaintenanceDispatchItem
-} from "~/modules/production";
+} from "~/modules/resources";
 
 export async function action({ request, params }: ActionFunctionArgs) {
   assertIsPost(request);
   const { client, companyId, userId } = await requirePermissions(request, {
-    update: "production"
+    update: "resources"
   });
 
   const { dispatchId } = params;

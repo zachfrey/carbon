@@ -21,7 +21,7 @@ import { path } from "~/utils/path";
 import {
   maintenanceDispatchPriority,
   maintenanceFrequency
-} from "../../production.models";
+} from "../../resources.models";
 import type { MaintenanceSchedule } from "../../types";
 import { MaintenancePriority } from "../Maintenance";
 

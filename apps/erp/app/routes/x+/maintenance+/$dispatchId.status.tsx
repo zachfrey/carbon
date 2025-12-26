@@ -6,13 +6,13 @@ import { redirect } from "react-router";
 import {
   maintenanceDispatchStatus,
   upsertMaintenanceDispatch
-} from "~/modules/production";
+} from "~/modules/resources";
 import { path, requestReferrer } from "~/utils/path";
 
 export async function action({ request, params }: ActionFunctionArgs) {
   assertIsPost(request);
   const { client, userId } = await requirePermissions(request, {
-    update: "production"
+    update: "resources"
   });
 
   const { dispatchId } = params;
@@ -30,12 +30,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
     );
   }
 
-  const update = await upsertMaintenanceDispatch(client, {
-    id: dispatchId,
-    status,
-    assignee: ["Completed", "Cancelled"].includes(status) ? null : undefined,
-    updatedBy: userId
-  });
+  const update = await client
+    .from("maintenanceDispatch")
+    .update({
+      status,
+      assignee: ["Completed", "Cancelled"].includes(status) ? null : undefined,
+      updatedBy: userId
+    })
+    .eq("id", dispatchId);
 
   if (update.error) {
     throw redirect(

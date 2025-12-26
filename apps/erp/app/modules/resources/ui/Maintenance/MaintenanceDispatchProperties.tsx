@@ -35,7 +35,7 @@ import {
   maintenanceSeverity,
   maintenanceSource,
   oeeImpact
-} from "../../production.models";
+} from "../../resources.models";
 import type {
   MaintenanceDispatchDetail,
   MaintenanceDispatchEvent
@@ -215,7 +215,7 @@ const MaintenanceDispatchProperties = () => {
           table="maintenanceDispatch"
           size="sm"
           value={assignee ?? ""}
-          isReadOnly={!permissions.can("update", "production")}
+          isReadOnly={!permissions.can("update", "resources")}
         />
       </VStack>
 
@@ -230,7 +230,7 @@ const MaintenanceDispatchProperties = () => {
       >
         <Select
           options={workCenterOptions}
-          isReadOnly={!permissions.can("update", "production")}
+          isReadOnly={!permissions.can("update", "resources")}
           label="Work Center"
           name="workCenterId"
           inline={(value) => {
@@ -266,7 +266,7 @@ const MaintenanceDispatchProperties = () => {
               </div>
             )
           }))}
-          isReadOnly={!permissions.can("update", "production")}
+          isReadOnly={!permissions.can("update", "resources")}
           label="Priority"
           name="priority"
           inline={(value) => {
@@ -298,7 +298,7 @@ const MaintenanceDispatchProperties = () => {
             value: severity,
             label: severity
           }))}
-          isReadOnly={!permissions.can("update", "production")}
+          isReadOnly={!permissions.can("update", "resources")}
           label="Severity"
           name="severity"
           inline={(value) => {
@@ -330,7 +330,7 @@ const MaintenanceDispatchProperties = () => {
             value: source,
             label: <MaintenanceSource source={source} />
           }))}
-          isReadOnly={!permissions.can("update", "production")}
+          isReadOnly={!permissions.can("update", "resources")}
           label="Source"
           name="source"
           inline={(value) => {
@@ -362,7 +362,7 @@ const MaintenanceDispatchProperties = () => {
             value: impact,
             label: <MaintenanceOeeImpact oeeImpact={impact} />
           }))}
-          isReadOnly={!permissions.can("update", "production")}
+          isReadOnly={!permissions.can("update", "resources")}
           label="OEE Impact"
           name="oeeImpact"
           inline={(value) => {
@@ -394,7 +394,7 @@ const MaintenanceDispatchProperties = () => {
           name="plannedStartTime"
           label="Planned Start"
           inline
-          isDisabled={!permissions.can("update", "production") || isCompleted}
+          isDisabled={!permissions.can("update", "resources") || isCompleted}
           onChange={(date) => {
             onUpdate("plannedStartTime", date?.toString() ?? null);
           }}
@@ -414,7 +414,7 @@ const MaintenanceDispatchProperties = () => {
           name="plannedEndTime"
           label="Planned End"
           inline
-          isDisabled={!permissions.can("update", "production") || isCompleted}
+          isDisabled={!permissions.can("update", "resources") || isCompleted}
           onChange={(date) => {
             onUpdate("plannedEndTime", date?.toString() ?? null);
           }}
@@ -434,7 +434,7 @@ const MaintenanceDispatchProperties = () => {
           name="actualStartTime"
           label="Actual Start"
           inline
-          isDisabled={!permissions.can("update", "production") || isCompleted}
+          isDisabled={!permissions.can("update", "resources") || isCompleted}
           onChange={(date) => {
             onUpdate("actualStartTime", date?.toString() ?? null);
           }}
@@ -454,7 +454,7 @@ const MaintenanceDispatchProperties = () => {
           name="actualEndTime"
           label="Actual End"
           inline
-          isDisabled={!permissions.can("update", "production") || isCompleted}
+          isDisabled={!permissions.can("update", "resources") || isCompleted}
           onChange={(date) => {
             onUpdate("actualEndTime", date?.toString() ?? null);
           }}
@@ -478,7 +478,7 @@ const MaintenanceDispatchProperties = () => {
                 value: mode.id,
                 label: mode.name
               }))}
-              isReadOnly={!permissions.can("update", "production")}
+              isReadOnly={!permissions.can("update", "resources")}
               label="Suspected Failure Mode"
               name="suspectedFailureModeId"
               inline={(value) => {
@@ -511,7 +511,7 @@ const MaintenanceDispatchProperties = () => {
                 value: mode.id,
                 label: mode.name
               }))}
-              isReadOnly={!permissions.can("update", "production")}
+              isReadOnly={!permissions.can("update", "resources")}
               label="Actual Failure Mode"
               name="actualFailureModeId"
               inline={(value) => {
@@ -642,12 +642,12 @@ const MaintenanceDispatchProperties = () => {
                   <DateTimePicker
                     name="startTime"
                     label="Start Time"
-                    isDisabled={!permissions.can("update", "production")}
+                    isDisabled={!permissions.can("update", "resources")}
                   />
                   <DateTimePicker
                     name="endTime"
                     label="End Time"
-                    isDisabled={!permissions.can("update", "production")}
+                    isDisabled={!permissions.can("update", "resources")}
                   />
                 </VStack>
               </ModalBody>
@@ -664,7 +664,7 @@ const MaintenanceDispatchProperties = () => {
                 <Button
                   type="submit"
                   isLoading={eventFetcher.state !== "idle"}
-                  isDisabled={!permissions.can("update", "production")}
+                  isDisabled={!permissions.can("update", "resources")}
                 >
                   Save
                 </Button>

@@ -8,9 +8,9 @@ export const meta: MetaFunction = () => {
 };
 
 export const handle: Handle = {
-  breadcrumb: "Production",
-  to: path.to.production,
-  module: "production"
+  breadcrumb: "Resources",
+  to: path.to.resources,
+  module: "resources"
 };
 
 export default function MaintenanceRoute() {

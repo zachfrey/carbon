@@ -11,21 +11,21 @@ import {
   getMaintenanceDispatchComments,
   getMaintenanceDispatchEvents,
   getMaintenanceDispatchItems
-} from "~/modules/production";
+} from "~/modules/resources";
 import {
   MaintenanceDispatchExplorer,
   MaintenanceDispatchFiles,
   MaintenanceDispatchHeader,
   MaintenanceDispatchNotes,
   MaintenanceDispatchProperties
-} from "~/modules/production/ui/Maintenance";
+} from "~/modules/resources/ui/Maintenance";
 import type { Handle } from "~/utils/handle";
 import { path } from "~/utils/path";
 
 export const handle: Handle = {
   breadcrumb: "Maintenance",
   to: path.to.maintenanceDispatches,
-  module: "production"
+  module: "resources"
 };
 
 async function getMaintenanceDispatchFiles(
@@ -41,7 +41,7 @@ async function getMaintenanceDispatchFiles(
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {
-    view: "production"
+    view: "resources"
   });
 
   const { dispatchId } = params;

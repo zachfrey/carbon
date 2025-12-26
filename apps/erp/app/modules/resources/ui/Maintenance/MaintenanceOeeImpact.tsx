@@ -5,7 +5,7 @@ import {
   LuCircleX,
   LuTriangleAlert
 } from "react-icons/lu";
-import type { oeeImpact } from "../../production.models";
+import type { oeeImpact } from "../../resources.models";
 
 type MaintenanceOeeImpactProps = {
   oeeImpact?: (typeof oeeImpact)[number] | null;

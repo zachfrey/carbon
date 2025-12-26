@@ -1,10 +1,10 @@
 import { requirePermissions } from "@carbon/auth/auth.server";
 import { type ActionFunctionArgs } from "react-router";
-import { upsertMaintenanceDispatch } from "~/modules/production";
+import { upsertMaintenanceDispatch } from "~/modules/resources";
 
 export async function action({ request }: ActionFunctionArgs) {
   const { client, userId } = await requirePermissions(request, {
-    update: "production"
+    update: "resources"
   });
 
   const formData = await request.formData();

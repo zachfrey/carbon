@@ -9,8 +9,8 @@ import {
   getFailureModesList,
   maintenanceDispatchValidator,
   upsertMaintenanceDispatch
-} from "~/modules/production";
-import { MaintenanceDispatchForm } from "~/modules/production/ui/Maintenance";
+} from "~/modules/resources";
+import { MaintenanceDispatchForm } from "~/modules/resources/ui/Maintenance";
 import { getNextSequence } from "~/modules/settings";
 import type { Handle } from "~/utils/handle";
 import { path } from "~/utils/path";
@@ -18,12 +18,12 @@ import { path } from "~/utils/path";
 export const handle: Handle = {
   breadcrumb: "Maintenance",
   to: path.to.maintenanceDispatches,
-  module: "production"
+  module: "resources"
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { client, companyId } = await requirePermissions(request, {
-    create: "production"
+    create: "resources"
   });
 
   const failureModes = await getFailureModesList(client, companyId);
@@ -36,7 +36,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
   assertIsPost(request);
   const { client, companyId, userId } = await requirePermissions(request, {
-    create: "production"
+    create: "resources"
   });
 
   const formData = await request.formData();
