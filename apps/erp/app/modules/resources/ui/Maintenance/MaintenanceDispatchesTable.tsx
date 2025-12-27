@@ -341,6 +341,9 @@ const MaintenanceDispatchesTable = memo(
       <Table<MaintenanceDispatch>
         data={data}
         columns={columns}
+        defaultColumnPinning={{
+          left: ["maintenanceDispatchId"]
+        }}
         defaultColumnVisibility={{
           suspectedFailureModeId: false,
           createdBy: false,

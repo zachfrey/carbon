@@ -37,9 +37,11 @@ import { flushSync } from "react-dom";
 import {
   LuBox,
   LuChevronRight,
+  LuCircleCheck,
   LuCirclePlus,
   LuClock,
   LuEllipsisVertical,
+  LuPencil,
   LuSearch,
   LuTrash
 } from "react-icons/lu";
@@ -98,6 +100,7 @@ export function MaintenanceDispatchExplorer({
 
   const [filterText, setFilterText] = useState("");
   const deleteDisclosure = useDisclosure();
+  const editDisclosure = useDisclosure();
   const [selectedChild, setSelectedChild] =
     useState<MaintenanceExplorerChild | null>(null);
 
@@ -111,6 +114,18 @@ export function MaintenanceDispatchExplorer({
   const onDeleteCancel = () => {
     setSelectedChild(null);
     deleteDisclosure.onClose();
+  };
+
+  const onEdit = (child: MaintenanceExplorerChild) => {
+    flushSync(() => {
+      setSelectedChild(child);
+    });
+    editDisclosure.onOpen();
+  };
+
+  const onEditClose = () => {
+    setSelectedChild(null);
+    editDisclosure.onClose();
   };
 
   const getDeleteAction = () => {
@@ -172,6 +187,7 @@ export function MaintenanceDispatchExplorer({
               filterText={filterText}
               dispatchId={dispatchId}
               onDelete={onDelete}
+              onEdit={onEdit}
             />
           ))}
         </VStack>
@@ -186,6 +202,16 @@ export function MaintenanceDispatchExplorer({
           onSubmit={onDeleteCancel}
         />
       )}
+      {editDisclosure.isOpen &&
+        selectedChild?.id &&
+        selectedChild.type === "event" && (
+          <EditTimecardModal
+            open={editDisclosure.isOpen}
+            onClose={onEditClose}
+            dispatchId={dispatchId}
+            event={selectedChild}
+          />
+        )}
     </ScrollArea>
   );
 }
@@ -194,12 +220,14 @@ function MaintenanceExplorerItem({
   node,
   filterText,
   dispatchId,
-  onDelete
+  onDelete,
+  onEdit
 }: {
   node: MaintenanceExplorerNode;
   filterText: string;
   dispatchId: string;
   onDelete: (child: MaintenanceExplorerChild) => void;
+  onEdit: (child: MaintenanceExplorerChild) => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(
     node.children.length > 0 && node.children.length < 10
@@ -263,7 +291,9 @@ function MaintenanceExplorerItem({
                 key={child.id}
                 child={child}
                 nodeKey={node.key}
+                dispatchId={dispatchId}
                 onDelete={onDelete}
+                onEdit={onEdit}
               />
             ))
           )}
@@ -291,14 +321,18 @@ function MaintenanceExplorerItem({
 function MaintenanceExplorerChildItem({
   child,
   nodeKey,
-  onDelete
+  dispatchId,
+  onDelete,
+  onEdit
 }: {
   child: MaintenanceExplorerChild;
   nodeKey: MaintenanceExplorerNode["key"];
+  dispatchId: string;
   onDelete: (child: MaintenanceExplorerChild) => void;
+  onEdit: (child: MaintenanceExplorerChild) => void;
 }) {
   const link = getChildLink(child);
-  const icon = getNodeIcon(nodeKey);
+  const icon = getChildIcon(child);
   const label = getChildLabel(child);
   const permissions = usePermissions();
 
@@ -322,7 +356,7 @@ function MaintenanceExplorerChildItem({
       ) : (
         <div className="flex w-full">{content}</div>
       )}
-      {permissions.can("delete", "resources") && (
+      {permissions.can("update", "resources") && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <IconButton
@@ -334,15 +368,27 @@ function MaintenanceExplorerChildItem({
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem
-              destructive
-              onSelect={() => {
-                onDelete(child);
-              }}
-            >
-              <DropdownMenuIcon icon={<LuTrash />} />
-              Delete
-            </DropdownMenuItem>
+            {child.type === "event" && (
+              <DropdownMenuItem
+                onSelect={() => {
+                  onEdit(child);
+                }}
+              >
+                <DropdownMenuIcon icon={<LuPencil />} />
+                Edit
+              </DropdownMenuItem>
+            )}
+            {permissions.can("delete", "resources") && (
+              <DropdownMenuItem
+                destructive
+                onSelect={() => {
+                  onDelete(child);
+                }}
+              >
+                <DropdownMenuIcon icon={<LuTrash />} />
+                Delete
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       )}
@@ -467,7 +513,7 @@ function NewTimecardModal({
   const fetcher = useFetcher();
 
   useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data) {
+    if (fetcher.state === "idle" && fetcher.data?.success === true) {
       onClose();
     }
   }, [fetcher.state, fetcher.data, onClose]);
@@ -511,12 +557,82 @@ function NewTimecardModal({
   );
 }
 
-function getNodeIcon(key: MaintenanceExplorerNode["key"]) {
-  switch (key) {
-    case "items":
+function EditTimecardModal({
+  open,
+  onClose,
+  dispatchId,
+  event
+}: {
+  open: boolean;
+  onClose: () => void;
+  dispatchId: string;
+  event: MaintenanceDispatchEvent & { type: "event" };
+}) {
+  const fetcher = useFetcher();
+
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data?.success === true) {
+      onClose();
+    }
+  }, [fetcher.state, fetcher.data, onClose]);
+
+  return (
+    <Modal
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <ModalContent>
+        <ValidatedForm
+          method="post"
+          action={path.to.editMaintenanceDispatchEvent(dispatchId, event.id)}
+          validator={maintenanceDispatchEventValidator}
+          fetcher={fetcher}
+          defaultValues={{
+            maintenanceDispatchId: dispatchId,
+            employeeId: event.employee?.id,
+            workCenterId: event.workCenter?.id,
+            startTime: event.startTime,
+            endTime: event.endTime ?? undefined,
+            notes: event.notes ?? undefined
+          }}
+        >
+          <ModalHeader>
+            <ModalTitle>Edit Timecard</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            <Hidden name="maintenanceDispatchId" value={dispatchId} />
+            <VStack spacing={4}>
+              <Employee name="employeeId" label="Employee" />
+              <WorkCenter name="workCenterId" label="Work Center" />
+              <DateTimePicker name="startTime" label="Start Time" />
+              <DateTimePicker name="endTime" label="End Time" />
+              <TextArea name="notes" label="Notes" />
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="secondary" onClick={onClose}>
+              Cancel
+            </Button>
+            <Submit>Save</Submit>
+          </ModalFooter>
+        </ValidatedForm>
+      </ModalContent>
+    </Modal>
+  );
+}
+
+function getChildIcon(child: MaintenanceExplorerChild) {
+  switch (child.type) {
+    case "item":
       return <LuBox className="text-blue-500" />;
-    case "events":
-      return <LuClock className="text-green-500" />;
+    case "event":
+      // Blue clock for open (no end time), green check for completed (has end time)
+      if (child.endTime) {
+        return <LuCircleCheck className="text-green-500" />;
+      }
+      return <LuClock className="text-blue-500" />;
     default:
       return null;
   }
@@ -526,10 +642,13 @@ function getChildLabel(child: MaintenanceExplorerChild): string {
   switch (child.type) {
     case "item":
       return child.item?.name ?? child.itemId;
-    case "event":
-      return child.startTime
+    case "event": {
+      const employeeName = child.employee?.fullName;
+      const timeLabel = child.startTime
         ? new Date(child.startTime).toLocaleString()
         : "Timecard";
+      return employeeName ? `${employeeName} - ${timeLabel}` : timeLabel;
+    }
     default:
       return "";
   }
@@ -539,8 +658,14 @@ function getChildSearchText(child: MaintenanceExplorerChild): string {
   switch (child.type) {
     case "item":
       return child.item?.name ?? child.itemId;
-    case "event":
-      return child.notes ?? new Date(child.startTime).toLocaleString();
+    case "event": {
+      const parts = [
+        child.employee?.fullName,
+        child.notes,
+        child.startTime ? new Date(child.startTime).toLocaleString() : null
+      ].filter(Boolean);
+      return parts.join(" ");
+    }
     default:
       return "";
   }

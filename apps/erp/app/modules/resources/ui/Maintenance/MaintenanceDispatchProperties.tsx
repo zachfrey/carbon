@@ -25,7 +25,7 @@ import {
   EmployeeAvatar,
   useOptimisticAssignment
 } from "~/components";
-import { useWorkCenters } from "~/components/Form/WorkCenter";
+import { WorkCenter } from "~/components/Form";
 import { usePermissions, useRouteData } from "~/hooks";
 import { path } from "~/utils/path";
 import { copyToClipboard } from "~/utils/string";
@@ -72,8 +72,6 @@ const MaintenanceDispatchProperties = () => {
   }>(path.to.maintenanceDispatch(dispatchId));
 
   const events = routeData?.events ?? [];
-
-  const { options: workCenterOptions } = useWorkCenters({});
 
   const optimisticAssignment = useOptimisticAssignment({
     id: dispatchId,
@@ -228,19 +226,11 @@ const MaintenanceDispatchProperties = () => {
         })}
         className="w-full"
       >
-        <Select
-          options={workCenterOptions}
+        <WorkCenter
           isReadOnly={!permissions.can("update", "resources")}
           label="Work Center"
           name="workCenterId"
-          inline={(value) => {
-            return (
-              <span>
-                {workCenterOptions.find((option) => option.value === value)
-                  ?.label ?? ""}
-              </span>
-            );
-          }}
+          inline
           isClearable
           onChange={(value) => {
             onUpdate("workCenterId", value?.value ?? null);

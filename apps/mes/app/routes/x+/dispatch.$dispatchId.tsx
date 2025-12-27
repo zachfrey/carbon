@@ -3,7 +3,6 @@ import { Database } from "@carbon/database";
 // biome-ignore lint/suspicious/noShadowRestrictedNames: suppressed due to migration
 import { Combobox, Hidden, Number, Submit, ValidatedForm } from "@carbon/form";
 import {
-  Badge,
   Button,
   Heading,
   HStack,
@@ -25,6 +24,7 @@ import { LowPriorityIcon } from "~/assets/icons/LowPriorityIcon";
 import { MediumPriorityIcon } from "~/assets/icons/MediumPriorityIcon";
 import EmployeeAvatar from "~/components/EmployeeAvatar";
 import MaintenanceOeeImpact from "~/components/MaintenanceOeeImpact";
+import MaintenanceSeverity from "~/components/MaintenanceSeverity";
 import {
   getActiveMaintenanceEventByEmployee,
   getMaintenanceDispatch,
@@ -32,7 +32,10 @@ import {
   getMaintenanceDispatchItems,
   getWorkCenterReplacementParts
 } from "~/services/maintenance.service";
-import type { maintenanceDispatchPriority } from "~/services/models";
+import type {
+  maintenanceDispatchPriority,
+  maintenanceSeverity
+} from "~/services/models";
 import { useItems } from "~/stores";
 import { path } from "~/utils/path";
 
@@ -187,29 +190,11 @@ export default function MaintenanceDetailRoute() {
 
   // Create item options with suggestions from replacement parts
   const itemOptions = useMemo(() => {
-    // Start with replacement parts as suggestions
-    const suggestions =
-      replacementParts
-        ?.filter((part) => !addedItemIds.has(part.itemId))
-        .map((part) => ({
-          value: part.itemId,
-          label: part.item?.name ?? "Unknown",
-          helper: `Suggested - Qty: ${part.quantity} ${part.unitOfMeasureCode}`
-        })) ?? [];
-
-    // Add all other items not in suggestions
-    const suggestionIds = new Set(suggestions.map((s) => s.value));
-    const otherItems = allItems
-      .filter(
-        (item) => !suggestionIds.has(item.id) && !addedItemIds.has(item.id)
-      )
-      .map((item) => ({
-        value: item.id,
-        label: item.readableIdWithRevision,
-        helper: item.name
-      }));
-
-    return [...suggestions, ...otherItems];
+    return allItems.map((item) => ({
+      value: item.id,
+      label: item.name,
+      helper: item.readableIdWithRevision
+    }));
   }, [replacementParts, allItems, addedItemIds]);
 
   // Close add part form after successful submission
@@ -260,7 +245,11 @@ export default function MaintenanceDetailRoute() {
               </span>
               <HStack className="mt-2">
                 <MaintenanceOeeImpact oeeImpact={dispatch.oeeImpact} />
-                <Badge variant="outline">{dispatch.severity}</Badge>
+                <MaintenanceSeverity
+                  severity={
+                    dispatch.severity as (typeof maintenanceSeverity)[number]
+                  }
+                />
               </HStack>
             </VStack>
           </div>

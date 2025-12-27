@@ -9,12 +9,13 @@ import {
 
 export async function action({ request, params }: ActionFunctionArgs) {
   assertIsPost(request);
-  const { client, companyId, userId } = await requirePermissions(request, {
+  const { client, userId } = await requirePermissions(request, {
     update: "resources"
   });
 
-  const { dispatchId } = params;
+  const { dispatchId, eventId } = params;
   if (!dispatchId) throw new Error("Could not find dispatchId");
+  if (!eventId) throw new Error("Could not find eventId");
 
   const formData = await request.formData();
   const validation = await validator(
@@ -32,20 +33,20 @@ export async function action({ request, params }: ActionFunctionArgs) {
     validation.data;
 
   const result = await upsertMaintenanceDispatchEvent(client, {
+    id: eventId,
     maintenanceDispatchId: dispatchId,
     employeeId,
     workCenterId,
     startTime,
     endTime: endTime ?? undefined,
     notes: notes ?? undefined,
-    companyId,
-    createdBy: userId
+    updatedBy: userId
   });
 
   if (result.error) {
     return {
       success: false,
-      message: "Failed to add timecard"
+      message: "Failed to update timecard"
     };
   }
 

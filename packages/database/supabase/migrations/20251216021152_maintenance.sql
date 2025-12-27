@@ -77,6 +77,28 @@ CREATE TABLE "maintenanceFailureMode" (
 
 CREATE INDEX IF NOT EXISTS "maintenanceFailureMode_companyId_idx" ON "maintenanceFailureMode" ("companyId");
 
+-- Insert default failure modes for each existing company
+INSERT INTO "maintenanceFailureMode" ("name", "companyId", "createdBy")
+SELECT 
+  failure_mode,
+  c."id" as "companyId",
+  'system'
+FROM (
+  VALUES 
+    ('Bearing Failure'),
+    ('Lubrication Failure'),
+    ('Electrical Fault'),
+    ('Leak'),
+    ('Excessive Wear'),
+    ('Misalignment'),
+    ('Overheating'),
+    ('Cracking/Fatigue'),
+    ('Blockage'),
+    ('Excessive Vibration')
+) AS failure_modes(failure_mode)
+CROSS JOIN "company" c;
+
+
 ALTER TABLE "maintenanceFailureMode" ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "SELECT" ON "public"."maintenanceFailureMode"

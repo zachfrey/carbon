@@ -1588,13 +1588,13 @@ export const failureModes: string[] = [
   "Bearing Failure",
   "Lubrication Failure",
   "Electrical Fault",
-  "Leakage",
-  "Excessive Wear/Abrasion",
+  "Leak",
+  "Excessive Wear",
   "Misalignment",
   "Overheating",
-  "Fatigue/Crack",
-  "Blockage/Clogging",
-  "Vibration (Excessive)"
+  "Cracking/Fatigue",
+  "Blockage",
+  "Excessive Vibration"
 ];
 
 export const nonConformanceTypes: Omit<
