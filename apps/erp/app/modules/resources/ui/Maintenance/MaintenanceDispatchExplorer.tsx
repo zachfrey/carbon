@@ -42,6 +42,9 @@ import { Employee, TextArea, WorkCenter } from "~/components/Form";
 import { ConfirmDelete } from "~/components/Modals";
 import { LevelLine } from "~/components/TreeView";
 import { usePermissions } from "~/hooks";
+import { getLinkToItemDetails } from "~/modules/items/ui/Item/ItemForm";
+import type { MethodItemType } from "~/modules/shared";
+import { useItems } from "~/stores/items";
 import { path } from "~/utils/path";
 import { maintenanceDispatchEventValidator } from "../../resources.models";
 import type {
@@ -313,7 +316,8 @@ function MaintenanceExplorerChildItem({
   onDelete: (child: MaintenanceExplorerChild) => void;
   onEdit: (child: MaintenanceExplorerChild) => void;
 }) {
-  const link = getChildLink(child);
+  const [items] = useItems();
+  const link = getChildLink(child, items);
   const icon = getChildIcon(child);
   const label = getChildLabel(child);
   const permissions = usePermissions();
@@ -548,10 +552,16 @@ function getChildSearchText(child: MaintenanceExplorerChild): string {
   }
 }
 
-function getChildLink(child: MaintenanceExplorerChild): string | null {
+function getChildLink(
+  child: MaintenanceExplorerChild,
+  items: ReturnType<typeof useItems>[0]
+): string | null {
   switch (child.type) {
-    case "item":
-      return path.to.part(child.itemId);
+    case "item": {
+      const item = items.find((i) => i.id === child.itemId);
+      if (!item) return null;
+      return getLinkToItemDetails(item.type as MethodItemType, child.itemId);
+    }
     default:
       return null;
   }

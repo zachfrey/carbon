@@ -57,6 +57,7 @@ export type UsedInKey =
   | "issues"
   | "jobMaterials"
   | "jobs"
+  | "maintenanceDispatchItems"
   | "methodMaterials"
   | "purchaseOrderLines"
   | "receiptLines"
@@ -105,6 +106,8 @@ export function UsedInTree({
   hasSizesInsteadOfRevisions?: boolean;
 }) {
   const [filterText, setFilterText] = useState("");
+
+  console.log({ tree });
 
   const revisions = (
     revisionValidator.safeParse(revisionsJson)?.data ?? []
@@ -470,6 +473,9 @@ function getUseInLink(
       return `${path.to.jobMaterials(
         child.documentId
       )}?filter=readableIdWithRevision:eq:${itemReadableIdWithRevision}`;
+    case "maintenanceDispatchItems":
+      if (!child.documentId) return "#";
+      return path.to.maintenanceDispatch(child.documentId);
     case "methodMaterials":
       if (!child.documentId || !child.itemType) return "#";
       return getPathToMakeMethod(
