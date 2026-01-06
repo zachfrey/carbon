@@ -3,10 +3,10 @@ import path from "node:path";
 import { defineConfig, PluginOption } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-export default defineConfig(({ isSsrBuild }) => ({
+export default defineConfig(({ mode, isSsrBuild }) => ({
   build: {
     minify: true,
-    sourcemap: false,
+    sourcemap: mode === "development" ? "inline" : false,
     rollupOptions: {
       onwarn(warning, defaultHandler) {
         if (warning.code === "SOURCEMAP_ERROR") {

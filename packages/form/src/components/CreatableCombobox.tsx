@@ -85,12 +85,12 @@ const CreatableCombobox = forwardRef<HTMLButtonElement, CreatableComboboxProps>(
         )}
         <input
           {...getInputProps({
-            id: name
+            id: name,
+            value: value
           })}
           type="hidden"
           name={name}
           id={name}
-          value={value}
         />
         <CreatableComboboxBase
           ref={ref}
