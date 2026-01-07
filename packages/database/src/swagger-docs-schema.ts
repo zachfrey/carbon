@@ -92430,7 +92430,7 @@ export default {
       type: "object",
     },
     opportunity: {
-      required: ["id", "companyId", "customerId"],
+      required: ["id", "companyId"],
       properties: {
         id: {
           default: "public.id('opp'::text)",

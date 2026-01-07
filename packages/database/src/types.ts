@@ -19891,21 +19891,21 @@ export type Database = {
       opportunity: {
         Row: {
           companyId: string
-          customerId: string
+          customerId: string | null
           id: string
           purchaseOrderDocumentPath: string | null
           requestForQuoteDocumentPath: string | null
         }
         Insert: {
           companyId: string
-          customerId: string
+          customerId?: string | null
           id?: string
           purchaseOrderDocumentPath?: string | null
           requestForQuoteDocumentPath?: string | null
         }
         Update: {
           companyId?: string
-          customerId?: string
+          customerId?: string | null
           id?: string
           purchaseOrderDocumentPath?: string | null
           requestForQuoteDocumentPath?: string | null

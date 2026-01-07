@@ -2118,13 +2118,13 @@ export async function upsertQuote(
     // Only update the exchange rate if the currency code has changed
     const existingQuote = await client
       .from("quote")
-      .select("companyId, currencyCode")
+      .select("companyId, currencyCode, opportunityId")
       .eq("id", quote.id)
       .single();
 
     if (existingQuote.error) return existingQuote;
 
-    const { companyId, currencyCode } = existingQuote.data;
+    const { companyId, currencyCode, opportunityId } = existingQuote.data;
 
     if (quote.currencyCode && currencyCode !== quote.currencyCode) {
       const currency = await getCurrencyByCode(
@@ -2137,6 +2137,15 @@ export async function upsertQuote(
         quote.exchangeRateUpdatedAt = new Date().toISOString();
       }
     }
+
+    // If customerId is being updated, also update the opportunity's customerId
+    if (quote.customerId && opportunityId) {
+      await client
+        .from("opportunity")
+        .update({ customerId: quote.customerId })
+        .eq("id", opportunityId);
+    }
+
     return client
       .from("quote")
       .update({
@@ -2638,13 +2647,13 @@ export async function upsertSalesOrder(
     // Only update the exchange rate if the currency code has changed
     const existingSalesOrder = await client
       .from("salesOrder")
-      .select("companyId, currencyCode")
+      .select("companyId, currencyCode, opportunityId")
       .eq("id", salesOrder.id)
       .single();
 
     if (existingSalesOrder.error) return existingSalesOrder;
 
-    const { companyId, currencyCode } = existingSalesOrder.data;
+    const { companyId, currencyCode, opportunityId } = existingSalesOrder.data;
 
     if (salesOrder.currencyCode && currencyCode !== salesOrder.currencyCode) {
       const currency = await getCurrencyByCode(
@@ -2657,6 +2666,15 @@ export async function upsertSalesOrder(
         salesOrder.exchangeRateUpdatedAt = new Date().toISOString();
       }
     }
+
+    // If customerId is being updated, also update the opportunity's customerId
+    if (salesOrder.customerId && opportunityId) {
+      await client
+        .from("opportunity")
+        .update({ customerId: salesOrder.customerId })
+        .eq("id", opportunityId);
+    }
+
     return client
       .from("salesOrder")
       .update(sanitize(salesOrder))
@@ -2906,6 +2924,22 @@ export async function upsertSalesRFQ(
 
     return insert;
   } else {
+    // If customerId is being updated, also update the opportunity's customerId
+    if (rfq.customerId) {
+      const existingRfq = await client
+        .from("salesRfq")
+        .select("opportunityId")
+        .eq("id", rfq.id)
+        .single();
+
+      if (existingRfq.data?.opportunityId) {
+        await client
+          .from("opportunity")
+          .update({ customerId: rfq.customerId })
+          .eq("id", existingRfq.data.opportunityId);
+      }
+    }
+
     return client
       .from("salesRfq")
       .update({
