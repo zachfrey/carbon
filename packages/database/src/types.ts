@@ -25292,7 +25292,7 @@ export type Database = {
           currencyCode: string | null
           customerContactId: string | null
           customerEngineeringContactId: string | null
-          customerId: string | null
+          customerId: string
           customerLocationId: string | null
           customerReference: string | null
           customFields: Json | null
@@ -25328,7 +25328,7 @@ export type Database = {
           currencyCode?: string | null
           customerContactId?: string | null
           customerEngineeringContactId?: string | null
-          customerId?: string | null
+          customerId: string
           customerLocationId?: string | null
           customerReference?: string | null
           customFields?: Json | null
@@ -25364,7 +25364,7 @@ export type Database = {
           currencyCode?: string | null
           customerContactId?: string | null
           customerEngineeringContactId?: string | null
-          customerId?: string | null
+          customerId?: string
           customerLocationId?: string | null
           customerReference?: string | null
           customFields?: Json | null
@@ -29345,7 +29345,7 @@ export type Database = {
           currencyCode: string
           customerContactId: string | null
           customerEngineeringContactId: string | null
-          customerId: string | null
+          customerId: string
           customerLocationId: string | null
           customerReference: string | null
           customFields: Json | null
@@ -29377,7 +29377,7 @@ export type Database = {
           currencyCode: string
           customerContactId?: string | null
           customerEngineeringContactId?: string | null
-          customerId?: string | null
+          customerId: string
           customerLocationId?: string | null
           customerReference?: string | null
           customFields?: Json | null
@@ -29409,7 +29409,7 @@ export type Database = {
           currencyCode?: string
           customerContactId?: string | null
           customerEngineeringContactId?: string | null
-          customerId?: string | null
+          customerId?: string
           customerLocationId?: string | null
           customerReference?: string | null
           customFields?: Json | null
