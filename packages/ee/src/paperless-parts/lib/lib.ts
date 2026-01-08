@@ -11,11 +11,18 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateObject } from "ai";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import type { PaperlessPartsClient, QuoteCostingVariable } from "./client";
+import type {
+  ComponentChild,
+  PaperlessPartsClient,
+  QuoteComponent,
+  QuoteCostingVariable,
+  QuoteItem
+} from "./client";
 import type {
   AddressSchema,
   ContactSchema,
   FacilitySchema,
+  OrderItemSchema,
   OrderSchema,
   SalesPersonSchema
 } from "./schemas";
@@ -536,7 +543,7 @@ export async function getOrCreateMaterial(
   itemId: string;
   unitOfMeasureCode: string;
   quantity: number;
-}> | null {
+} | null> {
   if (
     args.input.process?.name?.toLowerCase().includes("laser") ||
     args.input.process?.name?.toLowerCase().includes("plasma") ||
@@ -642,8 +649,8 @@ export async function getOrCreateMaterial(
       }
 
       return {
-        itemId: item.data[0].id,
-        unitOfMeasureCode: item.data[0].unitOfMeasureCode ?? "EA",
+        itemId: item.data[0]?.id ?? "",
+        unitOfMeasureCode: item.data[0]?.unitOfMeasureCode ?? "EA",
         quantity
       };
     } else {
@@ -1051,7 +1058,7 @@ export async function getCustomerIdAndContactId(
       search: customerName
     });
 
-    let paperlessPartsAccountId: number;
+    let paperlessPartsAccountId: number = 0;
     let existingPaperlessAccount = null;
 
     if (
@@ -1169,7 +1176,7 @@ export async function getCustomerIdAndContactId(
         );
         paperlessPartsAccountId = 0; // Use 0 as a fallback
       } else {
-        paperlessPartsAccountId = newPaperlessPartsAccount.data.id;
+        paperlessPartsAccountId = newPaperlessPartsAccount.data.id!;
       }
     }
 
@@ -1282,11 +1289,46 @@ export async function getCustomerIdAndContactId(
   if (existingCustomerContact.data) {
     customerContactId = existingCustomerContact.data.id;
   } else {
-    // If there is no matching contact in Carbon, we need to create a new contact in Carbon
-    const newContact = await carbon
+    // If there is no matching contact in Carbon, check if contact exists by email first
+    const existingContactByEmail = await carbon
       .from("contact")
-      .upsert(
-        {
+      .select("id")
+      .eq("companyId", company.id)
+      .eq("email", contact.email!)
+      .eq("isCustomer", true)
+      .maybeSingle();
+
+    let contactId: string;
+
+    if (existingContactByEmail.data) {
+      // Update the existing contact with the external ID
+      const updatedContact = await carbon
+        .from("contact")
+        .update({
+          firstName: contact.first_name!,
+          lastName: contact.last_name!,
+          externalId: {
+            paperlessPartsId: contact.id
+          }
+        })
+        .eq("id", existingContactByEmail.data.id)
+        .select()
+        .single();
+
+      if (updatedContact.error || !updatedContact.data) {
+        console.error("Failed to update contact in Carbon", updatedContact);
+        return {
+          customerContactId: null,
+          customerId
+        };
+      }
+
+      contactId = updatedContact.data.id;
+    } else {
+      // Create a new contact in Carbon
+      const newContact = await carbon
+        .from("contact")
+        .insert({
           companyId: company.id,
           firstName: contact.first_name!,
           lastName: contact.last_name!,
@@ -1295,40 +1337,51 @@ export async function getCustomerIdAndContactId(
           externalId: {
             paperlessPartsId: contact.id
           }
-        },
-        {
-          onConflict: "companyId, email, isCustomer"
-        }
-      )
-      .select()
-      .single();
+        })
+        .select()
+        .single();
 
-    if (newContact.error || !newContact.data) {
-      console.error("Failed to create contact in Carbon", newContact);
-      return {
-        customerContactId: null,
-        customerId
-      };
+      if (newContact.error || !newContact.data) {
+        console.error("Failed to create contact in Carbon", newContact);
+        return {
+          customerContactId: null,
+          customerId
+        };
+      }
+
+      contactId = newContact.data.id;
     }
 
-    const newCustomerContact = await carbon
+    // Check if customerContact already exists for this customer and contact
+    const existingCustomerContactLink = await carbon
       .from("customerContact")
-      .insert({
-        customerId,
-        contactId: newContact.data.id
-      })
-      .select()
-      .single();
+      .select("id")
+      .eq("customerId", customerId)
+      .eq("contactId", contactId)
+      .maybeSingle();
 
-    if (newCustomerContact.error || !newCustomerContact.data) {
-      console.error("Failed to create customerContact", newCustomerContact);
-      return {
-        customerContactId: null,
-        customerId
-      };
+    if (existingCustomerContactLink.data) {
+      customerContactId = existingCustomerContactLink.data.id;
+    } else {
+      const newCustomerContact = await carbon
+        .from("customerContact")
+        .insert({
+          customerId,
+          contactId
+        })
+        .select()
+        .single();
+
+      if (newCustomerContact.error || !newCustomerContact.data) {
+        console.error("Failed to create customerContact", newCustomerContact);
+        return {
+          customerContactId: null,
+          customerId
+        };
+      }
+
+      customerContactId = newCustomerContact.data.id;
     }
-
-    customerContactId = newCustomerContact.data.id;
   }
 
   return {
@@ -1374,7 +1427,7 @@ export async function getCustomerLocationIds(
         .ilike("city", billingInfo.city!)
         .maybeSingle();
 
-      let addressId: string;
+      let addressId: string | null = null;
 
       if (existingAddress.data) {
         // Check if there's already a customer location for this address and customer
@@ -1396,7 +1449,7 @@ export async function getCustomerLocationIds(
         if (!addressId) {
           let countryCode = billingInfo.country;
 
-          if (countryCode.length == 3) {
+          if (countryCode && countryCode.length == 3) {
             const country = await carbon
               .from("country")
               .select("alpha2")
@@ -1408,7 +1461,7 @@ export async function getCustomerLocationIds(
             }
           }
 
-          if (countryCode.length > 3) {
+          if (countryCode && countryCode.length > 3) {
             countryCode = countryCode.slice(0, 2);
           }
 
@@ -1489,7 +1542,7 @@ export async function getCustomerLocationIds(
         .ilike("city", shippingInfo.city!)
         .maybeSingle();
 
-      let addressId: string;
+      let addressId: string | null = null;
 
       if (existingAddress.data) {
         // Check if there's already a customer location for this address and customer
@@ -1511,7 +1564,7 @@ export async function getCustomerLocationIds(
         if (!addressId) {
           let countryCode = shippingInfo.country;
 
-          if (countryCode.length == 3) {
+          if (countryCode && countryCode.length == 3) {
             const country = await carbon
               .from("country")
               .select("alpha2")
@@ -1523,7 +1576,7 @@ export async function getCustomerLocationIds(
             }
           }
 
-          if (countryCode.length > 3) {
+          if (countryCode && countryCode.length > 3) {
             countryCode = countryCode.slice(0, 2);
           }
           // Create new address
@@ -1552,11 +1605,15 @@ export async function getCustomerLocationIds(
           addressId = newAddress.data.id;
         }
 
+        let name = shippingInfo.facility_name || shippingInfo.business_name;
+        if (!name) {
+          name = shippingInfo.city || shippingInfo.state || "";
+        }
         // Create customer location
         const newCustomerLocation = await carbon
           .from("customerLocation")
           .insert({
-            name: shippingInfo.facility_name || shippingInfo.business_name,
+            name,
             customerId,
             addressId,
             externalId: {
@@ -1639,23 +1696,26 @@ export async function getOrderLocationId(
 
   if (sendFrom) {
     const location = locations.data?.find(
-      (location) => location.name.toLowerCase() === sendFrom.name.toLowerCase()
+      (location) =>
+        location.name?.toLowerCase() === sendFrom.name?.toLowerCase()
     );
 
     if (location) {
       return location.id;
     }
   }
-
+  if (locations.data && locations.data.length > 0 && locations.data[0]?.id) {
+    return locations.data[0]?.id ?? null;
+  }
   const hq = locations.data?.filter((location) =>
-    location.name.toLowerCase().includes("headquarters")
+    location.name?.toLowerCase().includes("headquarters")
   );
 
-  if (hq?.length) {
-    return hq[0].id;
+  if (hq && hq.length > 0) {
+    return hq[0]?.id ?? null;
   }
 
-  return locations.data?.[0]?.id ?? null;
+  return null;
 }
 
 export function getCarbonOrderStatus(
@@ -1830,12 +1890,12 @@ export async function createPartFromComponent(
   args: {
     companyId: string;
     createdBy: string;
-    component: z.infer<
-      typeof OrderSchema
-    >["order_items"][number]["components"][number];
+    component: NonNullable<
+      z.infer<typeof OrderItemSchema>["components"]
+    >[number];
     componentsIndex?: Map<
       number,
-      z.infer<typeof OrderSchema>["order_items"][number]["components"][number]
+      NonNullable<z.infer<typeof OrderItemSchema>["components"]>[number]
     >;
     defaultMethodType: "Buy" | "Pick";
     defaultTrackingType: "Inventory" | "Non-Inventory" | "Batch";
@@ -1864,7 +1924,10 @@ export async function createPartFromComponent(
     const material = await getOrCreateMaterial(carbon, {
       companyId,
       createdBy,
-      input: component,
+      input: {
+        ...(component as any),
+        description: component.description || component.part_name || ""
+      },
       defaultMethodType,
       defaultTrackingType
     });
@@ -2267,7 +2330,7 @@ export async function getOrCreatePart(
     };
     componentsIndex?: Map<
       number,
-      z.infer<typeof OrderSchema>["order_items"][number]["components"][number]
+      NonNullable<z.infer<typeof OrderItemSchema>["components"]>[number]
     >;
     defaultMethodType: "Buy" | "Pick";
     defaultTrackingType: "Inventory" | "Non-Inventory" | "Batch";
@@ -2481,7 +2544,7 @@ export async function insertOrderLines(
         const { itemId } = await getOrCreatePart(carbon, {
           companyId,
           createdBy,
-          component,
+          component: component as any,
           componentsIndex,
           defaultMethodType,
           defaultTrackingType,
@@ -2538,7 +2601,7 @@ export async function insertOrderLines(
             quantitySent: component.deliver_quantity,
             promisedDate:
               (promisedDate ?? orderItem.ships_on)
-                ? new Date(orderItem.ships_on).toISOString()
+                ? new Date(promisedDate ?? orderItem.ships_on!).toISOString()
                 : null,
             internalNotes: orderItem.private_notes
               ? textToTiptap(orderItem.private_notes)
@@ -2587,9 +2650,13 @@ export async function insertOrderLines(
               );
               supportingFiles.push(...validSupportingFiles);
             }
+            const supportingFilesArray = supportingFiles.filter(
+              (file): file is { filename: string; url: string } =>
+                Boolean(file.filename && file.url)
+            );
 
             await processSupportingFiles(carbon, {
-              supportingFiles,
+              supportingFiles: supportingFilesArray,
               companyId,
               itemId,
               lineId, // Use the actual line ID
@@ -2627,4 +2694,537 @@ export async function insertOrderLines(
     console.warn("No valid order lines were inserted");
     return;
   }
+}
+
+/**
+ * Insert quote lines from Paperless Parts quote items
+ */
+export async function insertQuoteLines(
+  carbon: SupabaseClient<Database>,
+  args: {
+    quoteId: string;
+    opportunityId: string | undefined;
+    locationId: string | null;
+    companyId: string;
+    createdBy: string;
+    quoteItems: QuoteItem[];
+    defaultMethodType: "Buy" | "Pick";
+    defaultTrackingType: "Inventory" | "Non-Inventory" | "Batch";
+    billOfProcessBlackList?: string[];
+  }
+): Promise<void> {
+  const {
+    quoteId,
+    locationId,
+    companyId,
+    createdBy,
+    quoteItems,
+    defaultMethodType,
+    defaultTrackingType,
+    billOfProcessBlackList = []
+  } = args;
+
+  if (!quoteItems?.length) {
+    return;
+  }
+
+  let insertedLinesCount = 0;
+
+  for (const quoteItem of quoteItems) {
+    // Skip manual quote items (no actual part)
+    if (quoteItem.type === "manual") {
+      continue;
+    }
+
+    if (!quoteItem.components?.length) {
+      continue;
+    }
+
+    // Build an index of all components by id for quick child lookup
+    const componentsIndex = new Map<number, QuoteComponent>();
+    for (const c of quoteItem.components) {
+      if (typeof c.id === "number") {
+        componentsIndex.set(c.id, c);
+      } else if (typeof c.id === "string") {
+        componentsIndex.set(parseInt(c.id), c);
+      }
+    }
+
+    // Only create a quote line for root components
+    const rootComponents = quoteItem.components.filter(
+      (c: any) => c.is_root_component === true || !c.parent_ids?.length
+    );
+
+    for (const component of rootComponents) {
+      try {
+        const { itemId } = await getOrCreatePart(carbon, {
+          companyId,
+          createdBy,
+          component: component as any,
+          componentsIndex: componentsIndex as any,
+          defaultMethodType,
+          defaultTrackingType,
+          billOfProcessBlackList
+        });
+
+        // Extract quantities array from component
+        const quantities =
+          component.quantities?.map((q) => q.quantity ?? 1) ?? [];
+
+        // Determine method type
+        const isPurchased =
+          (component as any).obtain_method === "purchased" ||
+          component.type === "purchased" ||
+          component.process?.name === "Purchased Components";
+        const rootMethodType = isPurchased ? "Buy" : "Make";
+
+        // Insert quote line
+        const quoteLine: Database["public"]["Tables"]["quoteLine"]["Insert"] = {
+          quoteId,
+          itemId,
+          description: component.description || component.part_name || "",
+          methodType: rootMethodType as "Make" | "Buy",
+          quantity: quantities.length > 0 ? quantities : null,
+          unitOfMeasureCode: "EA",
+          status: "Not Started",
+          locationId,
+          companyId,
+          createdBy,
+          internalNotes: quoteItem.private_notes
+            ? textToTiptap(quoteItem.private_notes)
+            : null,
+          externalNotes: quoteItem.public_notes
+            ? textToTiptap(quoteItem.public_notes)
+            : null
+        };
+
+        const lineResult = await carbon
+          .from("quoteLine")
+          .insert(quoteLine)
+          .select("id")
+          .single();
+
+        if (lineResult.error) {
+          console.error(
+            `Failed to insert quote line for component ${component.part_uuid}:`,
+            lineResult.error
+          );
+          continue;
+        }
+
+        const quoteLineId = lineResult.data.id;
+        insertedLinesCount++;
+
+        // Insert quote line prices for each quantity break
+        if (component.quantities?.length) {
+          const quoteLinePrices: Database["public"]["Tables"]["quoteLinePrice"]["Insert"][] =
+            component.quantities.map((qp) => ({
+              quoteId,
+              quoteLineId,
+              quantity: qp.quantity ?? 1,
+              unitPrice: qp.unit_price ?? 0,
+              leadTime: qp.lead_time ?? 0,
+              discountPercent: 0,
+              createdBy
+            }));
+
+          const priceResult = await carbon
+            .from("quoteLinePrice")
+            .insert(quoteLinePrices);
+
+          if (priceResult.error) {
+            console.error(
+              `Failed to insert quote line prices for component ${component.part_uuid}:`,
+              priceResult.error
+            );
+          }
+        }
+
+        // For Make items, get the auto-created quoteMakeMethod and add materials/operations
+        if (rootMethodType === "Make") {
+          const makeMethodResult = await carbon
+            .from("quoteMakeMethod")
+            .select("id")
+            .eq("quoteLineId", quoteLineId)
+            .is("parentMaterialId", null)
+            .single();
+
+          const rootQuoteMakeMethodId = makeMethodResult.data?.id;
+
+          if (rootQuoteMakeMethodId) {
+            // Recursive function to traverse component tree and add operations/materials
+            async function traverseComponent(
+              comp: QuoteComponent,
+              quoteMakeMethodId: string
+            ) {
+              let materialOrder = 1;
+
+              // 1. Insert quote operations from shop_operations FIRST
+              if (
+                Array.isArray(comp.shop_operations) &&
+                comp.shop_operations.length > 0
+              ) {
+                let operationOrder = 1;
+
+                for (const operation of comp.shop_operations) {
+                  if (operation.category !== "operation") continue;
+
+                  const operationName =
+                    operation.operation_definition_name ?? operation.name;
+
+                  // Check blacklist
+                  if (operationName && billOfProcessBlackList.length > 0) {
+                    const isBlacklisted = billOfProcessBlackList.some((bl) =>
+                      operationName.toLowerCase().includes(bl.toLowerCase())
+                    );
+                    if (isBlacklisted) continue;
+                  }
+
+                  // Get or create process
+                  const process = await getOrCreateProcess(
+                    carbon,
+                    operation,
+                    companyId,
+                    createdBy
+                  );
+                  if (!process) continue;
+
+                  const quoteOperation: Database["public"]["Tables"]["quoteOperation"]["Insert"] =
+                    {
+                      quoteId,
+                      quoteLineId,
+                      quoteMakeMethodId,
+                      processId: process.id,
+                      order: operation.position ?? operationOrder++,
+                      operationType:
+                        process.processType === "Inside" ? "Inside" : "Outside",
+                      description:
+                        operationName ?? `Operation ${operationOrder}`,
+                      setupTime: (operation.setup_time ?? 0) * 60,
+                      setupUnit: "Total Minutes",
+                      laborTime: 0,
+                      laborUnit: "Minutes/Piece",
+                      machineTime: (operation.runtime ?? 0) * 60,
+                      machineUnit: "Minutes/Piece",
+                      workInstruction: operation.notes
+                        ? textToTiptap(operation.notes)
+                        : {},
+                      companyId,
+                      createdBy
+                    };
+
+                  const opResult = await carbon
+                    .from("quoteOperation")
+                    .insert(quoteOperation);
+
+                  if (opResult.error) {
+                    console.error(
+                      `Failed to insert quote operation ${operationName}:`,
+                      opResult.error
+                    );
+                  }
+                }
+              }
+
+              // 2. Insert raw material from component.material (always Buy/Pick, no child quoteMakeMethod)
+              if (comp.material?.display_name || comp.material?.name) {
+                try {
+                  const materialResult = await getOrCreateMaterial(carbon, {
+                    input: comp as any,
+                    createdBy,
+                    companyId,
+                    defaultMethodType,
+                    defaultTrackingType
+                  });
+
+                  if (materialResult) {
+                    const materialItemResult = await carbon
+                      .from("item")
+                      .select("readableId, name")
+                      .eq("id", materialResult.itemId)
+                      .single();
+
+                    const quoteMaterial: Database["public"]["Tables"]["quoteMaterial"]["Insert"] =
+                      {
+                        quoteId,
+                        quoteLineId,
+                        quoteMakeMethodId,
+                        itemId: materialResult.itemId,
+                        itemType: "Material",
+                        methodType: defaultMethodType,
+                        description:
+                          materialItemResult.data?.name ??
+                          comp.material?.display_name ??
+                          comp.material?.name ??
+                          "",
+                        quantity: materialResult.quantity,
+                        unitCost: 0,
+                        unitOfMeasureCode: materialResult.unitOfMeasureCode,
+                        order: materialOrder++,
+                        companyId,
+                        createdBy
+                      };
+
+                    await carbon.from("quoteMaterial").insert(quoteMaterial);
+                  }
+                } catch (error) {
+                  console.error(
+                    `Failed to create quote material for component ${comp.part_uuid}:`,
+                    error
+                  );
+                }
+              }
+
+              // 3. Process child components - separate into Make vs non-Make
+              if (Array.isArray(comp.children) && comp.children.length > 0) {
+                const madeChildren: {
+                  childRef: ComponentChild;
+                  childComponent: QuoteComponent;
+                  childItemId: string;
+                }[] = [];
+                const pickedOrBoughtChildren: {
+                  childRef: ComponentChild;
+                  childComponent: QuoteComponent;
+                  childItemId: string;
+                }[] = [];
+
+                // First pass: categorize children
+                for (const childRef of comp.children) {
+                  if (!childRef?.child_id) continue;
+                  const childComponent = componentsIndex.get(childRef.child_id);
+                  if (!childComponent) continue;
+
+                  try {
+                    const { itemId: childItemId } = await getOrCreatePart(
+                      carbon,
+                      {
+                        companyId,
+                        createdBy,
+                        component: childComponent as any,
+                        componentsIndex: componentsIndex as any,
+                        defaultMethodType,
+                        defaultTrackingType,
+                        billOfProcessBlackList
+                      }
+                    );
+
+                    const childMethodType =
+                      (childComponent as any)?.obtain_method === "purchased" ||
+                      (childComponent as any)?.type === "purchased"
+                        ? "Buy"
+                        : "Make";
+
+                    if (childMethodType === "Make") {
+                      madeChildren.push({
+                        childRef,
+                        childComponent,
+                        childItemId
+                      });
+                    } else {
+                      pickedOrBoughtChildren.push({
+                        childRef,
+                        childComponent,
+                        childItemId
+                      });
+                    }
+                  } catch (err) {
+                    console.error(
+                      "Failed to get or create part for child component:",
+                      childRef,
+                      err
+                    );
+                  }
+                }
+
+                // 4. Insert "Make" materials first - a trigger will create quoteMakeMethod for each
+                if (madeChildren.length > 0) {
+                  const madeMaterialInserts: Database["public"]["Tables"]["quoteMaterial"]["Insert"][] =
+                    [];
+
+                  for (const { childComponent, childItemId } of madeChildren) {
+                    const childItemResult = await carbon
+                      .from("item")
+                      .select("readableId, name")
+                      .eq("id", childItemId)
+                      .single();
+
+                    madeMaterialInserts.push({
+                      quoteId,
+                      quoteLineId,
+                      quoteMakeMethodId,
+                      itemId: childItemId,
+                      itemType: "Part",
+                      methodType: "Make",
+                      description:
+                        childItemResult.data?.name ??
+                        (childComponent as any).description ??
+                        "",
+                      quantity:
+                        madeChildren.find((c) => c.childItemId === childItemId)
+                          ?.childRef.quantity ??
+                        (childComponent as any)?.innate_quantity ??
+                        1,
+                      unitCost: 0,
+                      unitOfMeasureCode: "EA",
+                      order: materialOrder++,
+                      companyId,
+                      createdBy
+                    });
+                  }
+
+                  const madeMaterialResult = await carbon
+                    .from("quoteMaterial")
+                    .insert(madeMaterialInserts)
+                    .select("id");
+
+                  if (madeMaterialResult.error) {
+                    console.error(
+                      "Failed to insert made materials:",
+                      madeMaterialResult.error
+                    );
+                  } else if (madeMaterialResult.data) {
+                    // Query for auto-created quoteMakeMethod records
+                    const childQuoteMakeMethods = await carbon
+                      .from("quoteMakeMethod")
+                      .select("id, parentMaterialId")
+                      .in(
+                        "parentMaterialId",
+                        madeMaterialResult.data.map((m) => m.id)
+                      );
+
+                    if (childQuoteMakeMethods.data) {
+                      // Create mapping from parentMaterialId to quoteMakeMethodId
+                      const materialIdToQuoteMakeMethodId: Record<
+                        string,
+                        string
+                      > = {};
+                      for (const qmm of childQuoteMakeMethods.data) {
+                        if (qmm.parentMaterialId && qmm.id) {
+                          materialIdToQuoteMakeMethodId[qmm.parentMaterialId] =
+                            qmm.id;
+                        }
+                      }
+
+                      // Recursively process each "Make" child
+                      for (const [
+                        index,
+                        { childComponent }
+                      ] of madeChildren.entries()) {
+                        const materialId = madeMaterialResult.data[index]?.id;
+                        const childQuoteMakeMethodId = materialId
+                          ? materialIdToQuoteMakeMethodId[materialId]
+                          : null;
+
+                        if (childQuoteMakeMethodId) {
+                          await traverseComponent(
+                            childComponent,
+                            childQuoteMakeMethodId
+                          );
+                        }
+                      }
+                    }
+                  }
+                }
+
+                // 5. Insert non-Make (Buy/Pick) materials
+                if (pickedOrBoughtChildren.length > 0) {
+                  for (const {
+                    childRef,
+                    childComponent,
+                    childItemId
+                  } of pickedOrBoughtChildren) {
+                    const childItemResult = await carbon
+                      .from("item")
+                      .select("readableId, name")
+                      .eq("id", childItemId)
+                      .single();
+
+                    const childMaterial: Database["public"]["Tables"]["quoteMaterial"]["Insert"] =
+                      {
+                        quoteId,
+                        quoteLineId,
+                        quoteMakeMethodId,
+                        itemId: childItemId,
+                        itemType: "Part",
+                        methodType: "Buy",
+                        description:
+                          childItemResult.data?.name ??
+                          (childComponent as any).description ??
+                          "",
+                        quantity:
+                          childRef.quantity ??
+                          (childComponent as any)?.innate_quantity ??
+                          1,
+                        unitCost: 0,
+                        unitOfMeasureCode: "EA",
+                        order: materialOrder++,
+                        companyId,
+                        createdBy
+                      };
+
+                    await carbon.from("quoteMaterial").insert(childMaterial);
+                  }
+                }
+              }
+            }
+
+            // Start traversing from the root component
+            await traverseComponent(component, rootQuoteMakeMethodId);
+          }
+        }
+
+        // Process supporting files (non-ITAR items)
+        if (!quoteItem.export_controlled && !component.export_controlled) {
+          try {
+            let supportingFiles = [
+              {
+                filename: component.part_name ?? "",
+                url: component.part_url
+              }
+            ];
+
+            if (component.supporting_files) {
+              const validSupportingFiles = (
+                component.supporting_files as unknown as Array<{
+                  filename?: string;
+                  url?: string;
+                }>
+              ).filter((file): file is { filename: string; url: string } =>
+                Boolean(file.filename && file.url)
+              );
+              supportingFiles.push(...validSupportingFiles);
+            }
+
+            await processSupportingFiles(carbon, {
+              supportingFiles,
+              companyId,
+              itemId,
+              lineId: quoteLineId,
+              sourceDocumentType: "Quote",
+              sourceDocumentId: quoteId,
+              createdBy
+            });
+          } catch (error) {
+            console.error(
+              `Failed to process supporting files for component ${component.part_uuid}:`,
+              error
+            );
+          }
+        }
+      } catch (error) {
+        console.error(
+          `Failed to process component ${component.part_uuid}:`,
+          error
+        );
+        continue;
+      }
+    }
+  }
+
+  if (insertedLinesCount === 0) {
+    console.warn("No valid quote lines were inserted");
+    return;
+  }
+
+  console.log(`✅ Successfully inserted ${insertedLinesCount} quote lines`);
 }

@@ -25305,6 +25305,7 @@ export type Database = {
           exchangeRate: number | null
           exchangeRateUpdatedAt: string | null
           expirationDate: string | null
+          externalId: Json | null
           externalLinkId: string | null
           externalNotes: Json | null
           id: string
@@ -25341,6 +25342,7 @@ export type Database = {
           exchangeRate?: number | null
           exchangeRateUpdatedAt?: string | null
           expirationDate?: string | null
+          externalId?: Json | null
           externalLinkId?: string | null
           externalNotes?: Json | null
           id?: string
@@ -25377,6 +25379,7 @@ export type Database = {
           exchangeRate?: number | null
           exchangeRateUpdatedAt?: string | null
           expirationDate?: string | null
+          externalId?: Json | null
           externalLinkId?: string | null
           externalNotes?: Json | null
           id?: string

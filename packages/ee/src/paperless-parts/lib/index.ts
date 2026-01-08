@@ -9,7 +9,8 @@ export {
   getOrCreatePart,
   getOrderLocationId,
   getPaperlessPart,
-  insertOrderLines
+  insertOrderLines,
+  insertQuoteLines
 } from "./lib";
 export { OrderSchema } from "./schemas";
 

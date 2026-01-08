@@ -8,6 +8,7 @@ import {
   getOrderLocationId,
   getPaperlessParts,
   insertOrderLines,
+  insertQuoteLines,
   OrderSchema,
 } from "@carbon/ee/paperless-parts";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -203,6 +204,23 @@ export const paperlessPartsTask = task({
           );
         }
 
+        // Check if quote already exists
+        const existingQuote = await carbon
+          .from("quote")
+          .select("id")
+          .eq("externalId->>paperlessId", quotePayload.uuid)
+          .eq("companyId", payload.companyId)
+          .maybeSingle();
+
+        if (existingQuote?.data?.id) {
+          console.log("Quote already exists", existingQuote.data.id);
+          result = {
+            success: true,
+            message: "Quote already exists",
+          };
+          break;
+        }
+
         const [
           {
             customerId: quoteCustomerId,
@@ -217,7 +235,7 @@ export const paperlessPartsTask = task({
           getEmployeeAndSalesPersonId(carbon, {
             company: company.data,
             estimator: ppQuote.data.estimator,
-            salesPerson: ppQuote.data.sales_person,
+            salesPerson: ppQuote.data.salesperson,
           }),
         ]);
 
@@ -246,23 +264,20 @@ export const paperlessPartsTask = task({
         }
 
         // Create a quote object from the Paperless Parts data
-        const quote = {
+        const quote: Database["public"]["Tables"]["quote"]["Insert"] = {
           companyId: payload.companyId,
           customerId: quoteCustomerId,
           customerContactId: quoteCustomerContactId,
           quoteId: quoteReadableId,
-          name: `Quote for ${
-            ppQuote.data.contact?.account?.name ||
-            `${ppQuote.data.contact?.first_name} ${ppQuote.data.contact?.last_name}`
-          }`,
           status: "Draft" as const,
           currencyCode: company.data.baseCurrencyCode,
           createdBy: quoteCreatedBy,
           exchangeRate: 1 as number | undefined,
           exchangeRateUpdatedAt: undefined as string | undefined,
           expirationDate: undefined as string | undefined,
+          revisionId: ppQuoteRevisionNumber ?? 0,
           externalId: {
-            paperlessPartsId: quotePayload.uuid,
+            paperlessId: quotePayload.uuid,
           },
         };
 
@@ -378,6 +393,30 @@ export const paperlessPartsTask = task({
             .from("quote")
             .update({ externalLinkId: quoteExternalLink.data.id })
             .eq("id", quoteId);
+        }
+
+        // Insert quote lines from Paperless Parts quote items
+        try {
+          await insertQuoteLines(carbon, {
+            quoteId,
+            opportunityId: quoteOpportunity.data?.id,
+            locationId: quoteLocationId,
+            companyId: payload.companyId,
+            createdBy: quoteCreatedBy,
+            quoteItems: ppQuote.data.quote_items ?? [],
+            defaultMethodType: methodType,
+            defaultTrackingType: trackingType,
+            billOfProcessBlackList,
+          });
+          console.log("✅ Quote lines successfully created");
+        } catch (error) {
+          console.error("Failed to insert quote lines:", error);
+          await deleteQuote(carbon, quoteId);
+          result = {
+            success: false,
+            message: "Failed to insert quote lines",
+          };
+          break;
         }
 
         console.info("🔰 New Carbon quote created from Paperless Parts");

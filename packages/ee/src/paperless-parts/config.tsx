@@ -70,7 +70,7 @@ export const PaperlessParts: IntegrationConfig = {
       .min(1, { message: "Webhook Signing Secret is required" }),
     methodType: z.enum(["Buy", "Pick"]),
     trackingType: z.enum(["Inventory", "Non-Inventory", "Batch"]),
-    billOfProcessBlackList: z.array(z.string()),
+    billOfProcessBlackList: z.array(z.string()).optional(),
     usePaperlessOrderNumber: zfd.checkbox()
   })
 };
