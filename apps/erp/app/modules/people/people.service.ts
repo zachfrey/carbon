@@ -349,6 +349,38 @@ export async function getPeople(
   };
 }
 
+export async function getContacts(
+  client: SupabaseClient<Database>,
+  companyId: string,
+  args: GenericQueryFilters & {
+    search: string | null;
+  }
+) {
+  let query = client
+    .from("contact")
+    .select("*", { count: "exact" })
+    .eq("companyId", companyId);
+
+  if (args.search) {
+    query = query.or(
+      `firstName.ilike.%${args.search}%,lastName.ilike.%${args.search}%,email.ilike.%${args.search}%`
+    );
+  }
+
+  query = setGenericQueryFilters(query, args, [
+    { column: "lastName", ascending: true }
+  ]);
+
+  const contacts = await query;
+
+  if (!contacts.data) throw new Error("Failed to get contacts data");
+
+  return {
+    count: contacts.count,
+    data: contacts.data,
+    error: null
+  };
+}
 export async function getShift(
   client: SupabaseClient<Database>,
   shiftId: string

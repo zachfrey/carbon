@@ -2,6 +2,7 @@ import type {
   getAttribute,
   getAttributeCategories,
   getAttributeCategory,
+  getContacts,
   getDepartments,
   getEmployeeJob,
   getEmployeeSummary,
@@ -57,4 +58,8 @@ export type Person = NonNullable<
 
 export type Shift = NonNullable<
   Awaited<ReturnType<typeof getShifts>>["data"]
+>[number];
+
+export type Contact = NonNullable<
+  Awaited<ReturnType<typeof getContacts>>["data"]
 >[number];

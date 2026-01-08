@@ -1,4 +1,5 @@
 import {
+  LuBookUser,
   LuCalendarClock,
   LuCalendarHeart,
   LuListChecks,
@@ -14,10 +15,16 @@ const peopleRoutes: RouteGroup[] = [
     name: "Manage",
     routes: [
       {
-        name: "People",
+        name: "Employees",
         to: path.to.people,
         icon: <LuUsers />,
         table: "employee"
+      },
+      {
+        name: "Contacts",
+        to: path.to.contact,
+        icon: <LuBookUser />,
+        table: "contact"
       }
     ]
   },
