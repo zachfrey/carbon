@@ -73,7 +73,7 @@ export const userAdminTask = task({
 
         const invite = await serviceRole
           .from("invite")
-          .select("code")
+          .select("code, createdBy")
           .eq("email", user.data.email)
           .eq("companyId", companyId)
           .is("acceptedAt", null)
@@ -86,7 +86,13 @@ export const userAdminTask = task({
           };
         }
 
-        const invitationEmail = await sendEmail({
+        const inviter = await serviceRole
+          .from("user")
+          .select("email, fullName")
+          .eq("id", invite.data.createdBy)
+          .single();
+
+        await sendEmail({
           from: `Carbon <no-reply@${RESEND_DOMAIN}>`,
           to: user.data.email,
           subject: `You have been invited to join ${company.data?.name} on Carbon`,
@@ -95,9 +101,10 @@ export const userAdminTask = task({
           },
           html: await render(
             InviteEmail({
-              invitedByEmail: user.data.email,
-              invitedByName: user.data.fullName ?? "",
+              invitedByEmail: inviter.data?.email ?? user.data.email,
+              invitedByName: inviter.data?.fullName ?? "",
               email: user.data.email,
+              name: user.data.fullName ?? "",
               companyName: company.data.name,
               inviteLink: `${getAppUrl()}/invite/${invite.data.code}`,
               ip,
@@ -105,8 +112,6 @@ export const userAdminTask = task({
             })
           ),
         });
-
-        console.log(invitationEmail);
 
         result = {
           success: true,

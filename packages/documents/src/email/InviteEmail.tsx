@@ -17,6 +17,7 @@ import {
 
 interface Props {
   email?: string;
+  name?: string;
   invitedByEmail?: string;
   invitedByName?: string;
   companyName?: string;
@@ -29,6 +30,7 @@ export const InviteEmail = ({
   invitedByEmail = "tom@sawyer.com",
   invitedByName = "Tom Sawyer",
   email = "huck@sawyer.com",
+  name,
   companyName = "Tombstone",
   inviteLink = "https://carbon.ms/invite/1234567890",
   ip = "38.38.38.38",
@@ -59,6 +61,13 @@ export const InviteEmail = ({
           >
             Join <strong>{companyName}</strong> on <strong>Carbon</strong>
           </Heading>
+
+          <Text
+            className={`text-[14px] leading-[24px] ${themeClasses.text}`}
+            style={{ color: lightStyles.text.color }}
+          >
+            Hi {name ?? ""},
+          </Text>
 
           <Text
             className={`text-[14px] leading-[24px] ${themeClasses.text}`}

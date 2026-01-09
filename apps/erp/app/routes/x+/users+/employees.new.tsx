@@ -72,7 +72,13 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (!result.success) {
     console.error(result);
-    throw redirect(path.to.employeeAccounts, await flash(request, result));
+    throw redirect(
+      path.to.employeeAccounts,
+      await flash(
+        request,
+        error(result, result.message ?? "Failed to create employee account")
+      )
+    );
   }
 
   const location = request.headers.get("x-vercel-ip-city") ?? "Unknown";
@@ -86,7 +92,7 @@ export async function action({ request }: ActionFunctionArgs) {
     throw new Error("Failed to load company or user");
   }
 
-  const invitationEmail = await sendEmail({
+  await sendEmail({
     from: `Carbon <no-reply@${RESEND_DOMAIN}>`,
     to: email,
     subject: `You have been invited to join ${company.data?.name} on Carbon`,
@@ -98,6 +104,7 @@ export async function action({ request }: ActionFunctionArgs) {
         invitedByEmail: user.data.email,
         invitedByName: user.data.fullName ?? "",
         email,
+        name: `${firstName} ${lastName}`.trim(),
         companyName: company.data.name,
         inviteLink: `${getAppUrl()}/invite/${result.code}`,
         ip,
