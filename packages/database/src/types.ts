@@ -31315,63 +31315,48 @@ export type Database = {
           },
         ]
       }
-      search: {
+      searchIndexRegistry: {
         Row: {
-          companyId: string | null
-          description: string | null
-          entity: Database["public"]["Enums"]["searchEntity"] | null
-          fts: unknown
-          id: number
-          link: string
-          name: string
-          uuid: string | null
+          companyId: string
+          createdAt: string
+          lastRebuiltAt: string | null
         }
         Insert: {
-          companyId?: string | null
-          description?: string | null
-          entity?: Database["public"]["Enums"]["searchEntity"] | null
-          fts?: unknown
-          id?: number
-          link: string
-          name: string
-          uuid?: string | null
+          companyId: string
+          createdAt?: string
+          lastRebuiltAt?: string | null
         }
         Update: {
-          companyId?: string | null
-          description?: string | null
-          entity?: Database["public"]["Enums"]["searchEntity"] | null
-          fts?: unknown
-          id?: number
-          link?: string
-          name?: string
-          uuid?: string | null
+          companyId?: string
+          createdAt?: string
+          lastRebuiltAt?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "search_companyid_fkey"
+            foreignKeyName: "searchIndexRegistry_companyId_fkey"
             columns: ["companyId"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "search_companyid_fkey"
+            foreignKeyName: "searchIndexRegistry_companyId_fkey"
             columns: ["companyId"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "company"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "search_companyid_fkey"
+            foreignKeyName: "searchIndexRegistry_companyId_fkey"
             columns: ["companyId"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "customFieldTables"
             referencedColumns: ["companyId"]
           },
           {
-            foreignKeyName: "search_companyid_fkey"
+            foreignKeyName: "searchIndexRegistry_companyId_fkey"
             columns: ["companyId"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "integrations"
             referencedColumns: ["companyId"]
           },
@@ -46756,14 +46741,14 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "address_countryCode_fkey"
-            columns: ["supplierCountryCode"]
+            columns: ["customerCountryCode"]
             isOneToOne: false
             referencedRelation: "country"
             referencedColumns: ["alpha2"]
           },
           {
             foreignKeyName: "address_countryCode_fkey"
-            columns: ["customerCountryCode"]
+            columns: ["supplierCountryCode"]
             isOneToOne: false
             referencedRelation: "country"
             referencedColumns: ["alpha2"]
@@ -49447,14 +49432,14 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "address_countryCode_fkey"
-            columns: ["invoiceCountryCode"]
+            columns: ["customerCountryCode"]
             isOneToOne: false
             referencedRelation: "country"
             referencedColumns: ["alpha2"]
           },
           {
             foreignKeyName: "address_countryCode_fkey"
-            columns: ["customerCountryCode"]
+            columns: ["invoiceCountryCode"]
             isOneToOne: false
             referencedRelation: "country"
             referencedColumns: ["alpha2"]
@@ -52801,6 +52786,10 @@ export type Database = {
         Args: { operation_id: string }
         Returns: boolean
       }
+      create_company_search_index: {
+        Args: { p_company_id: string }
+        Returns: undefined
+      }
       create_rfq_from_model_v1: {
         Args: {
           company_id: string
@@ -52842,6 +52831,10 @@ export type Database = {
           rfq_line_ids: string[]
           rfq_readable_id: string
         }[]
+      }
+      drop_company_search_index: {
+        Args: { p_company_id: string }
+        Returns: undefined
       }
       employee_requires_period: {
         Args: { employee_start_date: string; period: string }
@@ -54225,6 +54218,28 @@ export type Database = {
         Args: { alphabet: string; mask: number; size: number; step: number }
         Returns: string
       }
+      populate_company_search_index: {
+        Args: { p_company_id: string }
+        Returns: undefined
+      }
+      search_company_index: {
+        Args: {
+          p_company_id: string
+          p_entity_types: string[]
+          p_limit?: number
+          p_query: string
+        }
+        Returns: {
+          description: string
+          entityId: string
+          entityType: string
+          id: number
+          link: string
+          metadata: Json
+          tags: string[]
+          title: string
+        }[]
+      }
       suppliers_search: {
         Args: {
           match_count: number
@@ -54690,28 +54705,6 @@ export type Database = {
         | "Reject"
         | "Request Approval"
       salesRfqStatus: "Draft" | "Ready for Quote" | "Closed" | "Quoted"
-      searchEntity:
-        | "Resource"
-        | "Person"
-        | "Customer"
-        | "Supplier"
-        | "Job"
-        | "Part"
-        | "Purchase Order"
-        | "Lead"
-        | "Opportunity"
-        | "Quotation"
-        | "Sales Order"
-        | "Request for Quotation"
-        | "Sales Invoice"
-        | "Purchase Invoice"
-        | "Document"
-        | "Sales RFQ"
-        | "Service"
-        | "Tool"
-        | "Consumable"
-        | "Material"
-        | "Fixture"
       serviceType: "Internal" | "External"
       shipmentSourceDocument:
         | "Sales Order"
@@ -55859,29 +55852,6 @@ export const Constants = {
         "Request Approval",
       ],
       salesRfqStatus: ["Draft", "Ready for Quote", "Closed", "Quoted"],
-      searchEntity: [
-        "Resource",
-        "Person",
-        "Customer",
-        "Supplier",
-        "Job",
-        "Part",
-        "Purchase Order",
-        "Lead",
-        "Opportunity",
-        "Quotation",
-        "Sales Order",
-        "Request for Quotation",
-        "Sales Invoice",
-        "Purchase Invoice",
-        "Document",
-        "Sales RFQ",
-        "Service",
-        "Tool",
-        "Consumable",
-        "Material",
-        "Fixture",
-      ],
       serviceType: ["Internal", "External"],
       shipmentSourceDocument: [
         "Sales Order",

@@ -232,7 +232,7 @@ const CadModelUpload = ({
               >
                 <LuCloudUpload className="mx-auto h-12 w-12 text-muted-foreground group-hover:text-primary-foreground" />
               </div>
-              <p className="text-lg text-muted-foreground group-hover:text-foreground mt-8">
+              <p className="text-base text-muted-foreground group-hover:text-foreground mt-8">
                 Choose file to upload or drag and drop
               </p>
               <p className="text-xs text-muted-foreground group-hover:text-foreground">

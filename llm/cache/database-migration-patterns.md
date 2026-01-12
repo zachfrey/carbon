@@ -16,7 +16,7 @@ Most tables follow this pattern:
 
 ```sql
 CREATE TABLE "tableName" (
-  "id" TEXT NOT NULL DEFAULT xid(),
+  "id" TEXT NOT NULL DEFAULT id('tbl'),
   -- other columns
   "companyId" TEXT NOT NULL,
   "createdBy" TEXT NOT NULL,
@@ -33,11 +33,13 @@ CREATE TABLE "tableName" (
 
 ## 2. ID Generation
 
-### XID Function
+### ID Function
 
-- Primary keys use `TEXT NOT NULL DEFAULT xid()` for globally unique IDs
-- XID generates 20-character ordered IDs using a custom domain: `CREATE DOMAIN public.xid AS CHAR(20)`
-- The xid() function combines timestamp, machine ID, process ID, and counter for uniqueness
+- Primary keys use `TEXT NOT NULL DEFAULT id()` for globally unique IDs
+- The `id()` function accepts an optional prefix parameter: `id('prefix')`
+- Without a prefix, generates 20-character ordered IDs
+- With a prefix, generates IDs in format: `prefix_<random>`
+- Common prefixes include table abbreviations like `id('usr')`, `id('cmp')`, `id('inv')`
 
 ### Composite Primary Keys
 

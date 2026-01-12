@@ -1,10 +1,7 @@
-import { useCarbon } from "@carbon/auth";
-import type { Database } from "@carbon/database";
 import type { ShortcutDefinition } from "@carbon/react";
 import {
   Button,
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -15,30 +12,29 @@ import {
   ModalContent,
   ShortcutKey,
   useDebounce,
-  useMount,
   useShortcutKeys,
   VStack
 } from "@carbon/react";
 import idb from "localforage";
 import { nanoid } from "nanoid";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import {
+  LuChevronRight,
+  LuClock,
+  LuDraftingCompass,
   LuFileCheck,
   LuHardHat,
   LuSearch,
+  LuShieldX,
   LuShoppingCart,
   LuSquareUser,
   LuUser,
-  LuWrench
+  LuX
 } from "react-icons/lu";
 import { PiShareNetworkFill } from "react-icons/pi";
-import {
-  RiProgress2Line,
-  RiProgress4Line,
-  RiProgress8Line
-} from "react-icons/ri";
+import { RiProgress8Line } from "react-icons/ri";
 import { RxMagnifyingGlass } from "react-icons/rx";
-import { useNavigate } from "react-router";
+import { useFetcher, useNavigate } from "react-router";
 import { MethodItemTypeIcon } from "~/components/Icons";
 import { useModules, useUser } from "~/hooks";
 import useAccountSubmodules from "~/modules/account/ui/useAccountSubmodules";
@@ -55,17 +51,16 @@ import useResourcesSubmodules from "~/modules/resources/ui/useResourcesSubmodule
 import useSalesSubmodules from "~/modules/sales/ui/useSalesSubmodules";
 import useSettingsSubmodules from "~/modules/settings/ui/useSettingsSubmodules";
 import useUsersSubmodules from "~/modules/users/ui/useUsersSubmodules";
+import type { SearchResponse } from "~/routes/api+/search";
 import { useUIStore } from "~/stores/ui";
 
 import type { Authenticated, Route } from "~/types";
+import { SearchEmptyState } from "./Search/SearchEmptyState";
 
-type SearchResult = {
-  id: number;
-  name: string;
-  entity: Database["public"]["Enums"]["searchEntity"] | null;
-  uuid: string | null;
-  link: string;
-  description: string | null;
+type RecentSearch = Route & {
+  entityType?: string;
+  module?: string;
+  description?: string;
 };
 
 const shortcut: ShortcutDefinition = {
@@ -74,19 +69,19 @@ const shortcut: ShortcutDefinition = {
 };
 
 const SearchModal = () => {
-  const { company } = useUser();
-  const { carbon } = useCarbon();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const fetcher = useFetcher<SearchResponse>();
   const { isSearchModalOpen, closeSearchModal } = useUIStore();
+  const { company } = useUser();
+  const storageKey = `recentSearches_${company.id}`;
 
   const [input, setInput] = useState("");
+  const [isDebouncing, setIsDebouncing] = useState(false);
   const debounceSearch = useDebounce((q: string) => {
-    if (q) {
-      getSearchResults(q);
-    } else {
-      setSearchResults([]);
+    if (q && q.length >= 2) {
+      fetcher.load(`/api/search?q=${encodeURIComponent(q)}`);
     }
+    setIsDebouncing(false);
   }, 500);
 
   useEffect(() => {
@@ -96,69 +91,89 @@ const SearchModal = () => {
   }, [isSearchModalOpen]);
 
   const staticResults = useGroupedSubmodules();
+  const modules = useModules();
 
-  const [recentResults, setRecentResults] = useState<Route[]>([]);
-  useMount(async () => {
-    const recentResultsFromStorage =
-      await idb.getItem<Route[]>("recentSearches");
-    if (recentResultsFromStorage) {
-      setRecentResults(recentResultsFromStorage);
-    }
-  });
+  const getModuleIcon = (moduleName: string) => {
+    const module = modules.find(
+      (m) => m.name.toLowerCase() === moduleName.toLowerCase()
+    );
+    return module?.icon;
+  };
 
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-
-  const getSearchResults = useCallback(
-    async (q: string) => {
-      if (!carbon || !company.id) return;
-
-      setLoading(true);
-      const tokens = q.split(" ");
-      const search =
-        tokens.length > 1
-          ? tokens.map((token) => `"${token}"`).join(" <-> ")
-          : q;
-
-      const result = await carbon
-        ?.from("search")
-        .select()
-        .textSearch("fts", `*${search}:*`)
-        .eq("companyId", company.id)
-        .limit(20);
-
-      if (result?.data) {
-        setSearchResults(result.data);
+  const [recentResults, setRecentResults] = useState<RecentSearch[]>([]);
+  useEffect(() => {
+    const loadRecentSearches = async () => {
+      const recentResultsFromStorage =
+        await idb.getItem<RecentSearch[]>(storageKey);
+      if (recentResultsFromStorage) {
+        setRecentResults(recentResultsFromStorage);
       } else {
-        setSearchResults([]);
+        setRecentResults([]);
       }
-      setLoading(false);
-    },
-    [company.id, carbon]
-  );
+    };
+    loadRecentSearches();
+  }, [storageKey]);
+
+  const recentPaths = new Set(recentResults.map((r) => r.to));
+  const searchResults = input.length >= 2 ? (fetcher.data?.results ?? []) : [];
+  const loading = fetcher.state === "loading";
+
+  // Filter static results based on input for empty state detection
+  const normalizedInput = input.toLowerCase().trim();
+  const hasMatchingStaticResults =
+    normalizedInput.length === 0 ||
+    Object.entries(staticResults).some(([module, submodules]) =>
+      submodules.some(
+        (s) =>
+          !recentPaths.has(s.to) &&
+          `${module} ${s.name}`.toLowerCase().includes(normalizedInput)
+      )
+    );
+  const hasMatchingRecentResults =
+    normalizedInput.length === 0 ||
+    recentResults.some((r) => r.name.toLowerCase().includes(normalizedInput));
+
+  const hasAnyResults =
+    searchResults.length > 0 ||
+    hasMatchingStaticResults ||
+    hasMatchingRecentResults;
 
   const onInputChange = (value: string) => {
     setInput(value);
-    if (value) {
-      setLoading(true);
-    } else {
-      setLoading(false);
+    if (value && value.length >= 2) {
+      setIsDebouncing(true);
     }
     debounceSearch(value);
   };
 
-  const onSelect = async (route: Route) => {
+  const onSelect = async (
+    route: Route,
+    entityType?: string,
+    module?: string,
+    description?: string
+  ) => {
     const { to, name } = route;
     navigate(route.to);
     closeSearchModal();
-    const newRecentSearches = [
-      { to, name },
-      ...((await idb.getItem<Route[]>("recentSearches"))?.filter(
+    const newRecentSearches: RecentSearch[] = [
+      { to, name, entityType, module, description },
+      ...((await idb.getItem<RecentSearch[]>(storageKey))?.filter(
         (item) => item.to !== to
       ) ?? [])
     ].slice(0, 5);
 
     setRecentResults(newRecentSearches);
-    idb.setItem("recentSearches", newRecentSearches);
+    idb.setItem(storageKey, newRecentSearches);
+  };
+
+  const removeRecentSearch = async (path: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const existingRecent =
+      (await idb.getItem<RecentSearch[]>(storageKey)) ?? [];
+    const updated = existingRecent.filter((item) => item.to !== path);
+
+    setRecentResults(updated);
+    await idb.setItem(storageKey, updated);
   };
 
   return (
@@ -170,125 +185,239 @@ const SearchModal = () => {
       }}
     >
       <ModalContent
-        className="rounded-lg translate-y-0 p-0 h-[343px]"
+        className="rounded-xl p-0 h-[520px] max-w-2xl overflow-hidden dark:shadow-button"
         withCloseButton={false}
       >
-        <Command>
+        <Command className="h-full flex flex-col">
+          {/* Search Input */}
+
           <CommandInput
-            placeholder="Type a command or search..."
+            placeholder="Search across your workspace..."
             value={input}
             onValueChange={onInputChange}
+            className="h-14 text-base"
           />
-          <CommandList>
-            <CommandEmpty key="empty">
-              {loading ? "Loading..." : "No results found."}
-            </CommandEmpty>
-            {recentResults.length > 0 && (
+
+          {/* Results */}
+          <CommandList className="flex-1 max-h-none overflow-y-auto px-2 py-2">
+            {loading || isDebouncing ? (
+              <SearchEmptyState type="loading" />
+            ) : !hasAnyResults ? (
+              <SearchEmptyState type="no-results" query={input} />
+            ) : (
               <>
-                <CommandGroup heading="Recent Searches" key="recent">
-                  {recentResults.map((result, index) => (
-                    <CommandItem
-                      key={`${result.to}-${nanoid()}-${index}`}
-                      onSelect={() => onSelect(result)}
-                      // append with : so we're not sharing a value with a static result
-                      value={`:${result.to}`}
+                {/* Recent Searches */}
+                {recentResults.length > 0 && (
+                  <>
+                    <CommandGroup
+                      heading={
+                        <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          <LuClock className="w-3 h-3" />
+                          Recent
+                        </span>
+                      }
+                      key="recent"
                     >
-                      <RxMagnifyingGlass className="w-4 h-4 flex-shrink-0 mr-2" />
-                      {result.name}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-                <CommandSeparator />
-              </>
-            )}
-            {Object.entries(staticResults).map(([module, submodules]) => (
-              <>
-                <CommandGroup heading={module} key={`static-${module}`}>
-                  {submodules.map((submodule, index) => (
-                    <CommandItem
-                      key={`${submodule.to}-${submodule.name}-${index}`}
-                      onSelect={() => onSelect(submodule)}
-                      value={`${module} ${submodule.name}`}
-                    >
-                      {submodule.icon && (
-                        <submodule.icon className="w-4 h-4 flex-shrink-0 mr-2" />
-                      )}
-                      <span>{submodule.name}</span>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-                <CommandSeparator />
-              </>
-            ))}
-            {searchResults.length > 0 && (
-              <CommandGroup heading="Search Results" key="search">
-                {searchResults.map((result) => (
-                  <CommandItem
-                    key={`${result.id}-${nanoid()}`}
-                    value={`${input}${result.id}`}
-                    onSelect={() =>
-                      onSelect({
-                        to: result.link,
-                        name: result.name
-                      })
+                      {recentResults.map((result, index) => {
+                        const ModuleIcon = result.module
+                          ? getModuleIcon(result.module)
+                          : undefined;
+                        return (
+                          <CommandItem
+                            key={`${result.to}-${nanoid()}-${index}`}
+                            onSelect={() =>
+                              onSelect(
+                                result,
+                                result.entityType,
+                                result.module,
+                                result.description
+                              )
+                            }
+                            value={`:${result.to}`}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg group"
+                          >
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                              {result.entityType ? (
+                                <ResultIcon entityType={result.entityType} />
+                              ) : ModuleIcon ? (
+                                <ModuleIcon className="w-4 h-4 text-muted-foreground" />
+                              ) : (
+                                <RxMagnifyingGlass className="w-4 h-4 text-muted-foreground" />
+                              )}
+                            </div>
+                            <VStack spacing={0} className="flex-1 min-w-0">
+                              <span className="font-medium truncate">
+                                {result.name}
+                              </span>
+                              {result.description && (
+                                <span className="text-sm text-muted-foreground truncate">
+                                  {result.description}
+                                </span>
+                              )}
+                            </VStack>
+                            <button
+                              type="button"
+                              onClick={(e) => removeRecentSearch(result.to, e)}
+                              className="flex-shrink-0 p-1 rounded hover:bg-muted opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <LuX className="w-4 h-4 text-muted-foreground" />
+                            </button>
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                    <CommandSeparator className="my-2" />
+                  </>
+                )}
+
+                {/* Search Results */}
+                {searchResults.length > 0 && (
+                  <CommandGroup
+                    heading={
+                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Results
+                      </span>
                     }
+                    key="search"
                   >
-                    <HStack>
-                      <ResultIcon entity={result.entity} />
-                      <VStack spacing={0}>
-                        <span>{result.name}</span>
-                        {result.description && (
-                          <span className="text-xs text-muted-foreground">
-                            {result.description}
+                    {searchResults.map((result) => (
+                      <CommandItem
+                        key={`${result.id}-${nanoid()}`}
+                        value={`${input}${result.id}`}
+                        onSelect={() =>
+                          onSelect(
+                            {
+                              to: result.link,
+                              name: result.title
+                            },
+                            result.entityType,
+                            undefined,
+                            result.description
+                          )
+                        }
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg group"
+                      >
+                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                          <ResultIcon entityType={result.entityType} />
+                        </div>
+                        <VStack spacing={0} className="flex-1 min-w-0">
+                          <span className="font-medium text-foreground truncate">
+                            {result.title}
                           </span>
-                        )}
-                      </VStack>
-                    </HStack>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+                          {result.description && (
+                            <span className="text-sm text-muted-foreground truncate">
+                              {result.description}
+                            </span>
+                          )}
+                        </VStack>
+                        <LuChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+
+                {/* Module Navigation */}
+                {Object.entries(staticResults).map(([module, submodules]) => {
+                  const filteredSubmodules = submodules.filter(
+                    (s) => !recentPaths.has(s.to)
+                  );
+                  if (filteredSubmodules.length === 0) return null;
+                  return (
+                    <div key={`static-${module}`}>
+                      <CommandGroup
+                        heading={
+                          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            {module}
+                          </span>
+                        }
+                      >
+                        {filteredSubmodules.map((submodule, index) => {
+                          const hasIconElement =
+                            "iconElement" in submodule && submodule.iconElement;
+                          return (
+                            <CommandItem
+                              key={`${submodule.to}-${submodule.name}-${index}`}
+                              onSelect={() =>
+                                onSelect(submodule, undefined, module)
+                              }
+                              value={`${module} ${submodule.name}`}
+                              className="flex items-center gap-3 px-3 py-2 rounded-lg group"
+                            >
+                              <div className="flex-shrink-0 w-7 h-7 rounded-md bg-muted/50 flex items-center justify-center text-muted-foreground [&>svg]:w-4 [&>svg]:h-4">
+                                {hasIconElement ? (
+                                  submodule.iconElement
+                                ) : submodule.icon ? (
+                                  <submodule.icon className="w-4 h-4" />
+                                ) : null}
+                              </div>
+                              <span className="flex-1 text-sm">
+                                {submodule.name}
+                              </span>
+                              <LuChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </CommandItem>
+                          );
+                        })}
+                      </CommandGroup>
+                      <CommandSeparator className="my-2" />
+                    </div>
+                  );
+                })}
+              </>
             )}
           </CommandList>
+
+          {/* Footer */}
+          <div className="border-t border-border px-4 py-2 flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">
+                  ↑↓
+                </kbd>
+                Navigate
+              </span>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">
+                  ↵
+                </kbd>
+                Select
+              </span>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">
+                  esc
+                </kbd>
+                Close
+              </span>
+            </div>
+          </div>
         </Command>
       </ModalContent>
     </Modal>
   );
 };
 
-function ResultIcon({ entity }: { entity: SearchResult["entity"] | "Module" }) {
-  switch (entity) {
-    case "Customer":
-      return <LuSquareUser className="w-4 h-4 flex-shrink-0 mr-2" />;
-    case "Document":
-      return <LuFileCheck className="w-4 h-4 flex-shrink-0 mr-2" />;
-    case "Job":
-      return <LuHardHat className="w-4 h-4 flex-shrink-0 mr-2" />;
-    case "Part":
-    case "Material":
-    case "Tool":
-    case "Consumable":
-      return (
-        <MethodItemTypeIcon
-          type={entity}
-          className="w-4 h-4 flex-shrink-0 mr-2"
-        />
-      );
-    case "Person":
-      return <LuUser className="w-4 h-4 flex-shrink-0 mr-2" />;
-    case "Resource":
-      return <LuWrench className="w-4 h-4 flex-shrink-0 mr-2" />;
-    case "Purchase Order":
-      return <LuShoppingCart className="w-4 h-4 flex-shrink-0 mr-2" />;
-    case "Opportunity":
-    case "Lead":
-    case "Sales RFQ":
-      return <RiProgress2Line className="w-4 h-4 flex-shrink-0 mr-2" />;
-    case "Quotation":
-      return <RiProgress4Line className="w-4 h-4 flex-shrink-0 mr-2" />;
-    case "Sales Order":
-      return <RiProgress8Line className="w-4 h-4 flex-shrink-0 mr-2" />;
-    case "Supplier":
-      return <PiShareNetworkFill className="w-4 h-4 flex-shrink-0 mr-2" />;
+function ResultIcon({ entityType }: { entityType: string }) {
+  const iconClass = "w-4 h-4 text-muted-foreground";
+  switch (entityType) {
+    case "customer":
+      return <LuSquareUser className={iconClass} />;
+    case "employee":
+      return <LuUser className={iconClass} />;
+    case "gauge":
+      return <LuDraftingCompass className={iconClass} />;
+    case "job":
+      return <LuHardHat className={iconClass} />;
+    case "issue":
+      return <LuShieldX className={iconClass} />;
+    case "item":
+      return <MethodItemTypeIcon type="Part" className={iconClass} />;
+    case "purchaseOrder":
+      return <LuShoppingCart className={iconClass} />;
+    case "salesInvoice":
+      return <RiProgress8Line className={iconClass} />;
+    case "purchaseInvoice":
+      return <LuFileCheck className={iconClass} />;
+    case "supplier":
+      return <PiShareNetworkFill className={iconClass} />;
     default:
       return null;
   }
@@ -328,7 +457,6 @@ function useGroupedSubmodules() {
   const sales = useSalesSubmodules();
   const purchasing = usePurchasingSubmodules();
   const documents = useDocumentsSubmodules();
-  // const messages = useMessagesSidebar();
   const accounting = useAccountingSubmodules();
   const invoicing = useInvoicingSubmodules();
   const users = useUsersSubmodules();
@@ -366,7 +494,9 @@ function useGroupedSubmodules() {
     "my account": account
   };
 
-  const shortcuts = modules.reduce<Record<string, Route[]>>((acc, module) => {
+  const shortcuts = modules.reduce<
+    Record<string, (Route & { iconElement?: React.ReactNode })[]>
+  >((acc, module) => {
     const moduleName = module.name.toLowerCase();
 
     if (moduleName in groupedSubmodules) {
@@ -377,7 +507,8 @@ function useGroupedSubmodules() {
           group.routes.map((route) => ({
             to: route.to,
             name: route.name,
-            icon: module.icon
+            icon: module.icon,
+            iconElement: route.icon
           }))
         )
       };
