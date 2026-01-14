@@ -422,7 +422,7 @@ const Notifications = () => {
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="h-[535px] w-screen md:w-[400px] p-0 overflow-hidden relative"
+        className="h-[535px] w-screen md:w-[400px] p-0 -top-px overflow-hidden relative"
         align="end"
         sideOffset={10}
       >
