@@ -276,7 +276,15 @@ const PurchasingRFQProperties = () => {
         />
       </ValidatedForm>
 
-      <div className="w-full">
+      <ValidatedForm
+        defaultValues={{
+          supplierIds: currentSupplierIds
+        }}
+        validator={z.object({
+          supplierIds: z.array(z.string()).optional()
+        })}
+        className="w-full"
+      >
         <CreatableMultiSelect
           name="supplierIds"
           label="Suppliers"
@@ -303,7 +311,7 @@ const PurchasingRFQProperties = () => {
             }}
           />
         )}
-      </div>
+      </ValidatedForm>
 
       <CustomFormInlineFields
         customFields={

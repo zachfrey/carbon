@@ -1415,7 +1415,7 @@ export const path = {
     salesSettings: `${x}/settings/sales`,
 
     // Purchasing RFQ paths
-    purchasingRfq: (id: string) => generatePath(`${x}/purchasing-rfq/${id}/d`),
+    purchasingRfq: (id: string) => generatePath(`${x}/purchasing-rfq/${id}`),
     purchasingRfqDetails: (id: string) =>
       generatePath(`${x}/purchasing-rfq/${id}/details`),
     purchasingRfqFavorite: `${x}/purchasing/rfqs/favorite`,
