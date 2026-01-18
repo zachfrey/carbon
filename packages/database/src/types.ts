@@ -53136,6 +53136,7 @@ export type Database = {
           reorderPoint: number
           reorderQuantity: number
           replenishmentSystem: Database["public"]["Enums"]["itemReplenishmentSystem"]
+          tags: string[]
           thumbnailPath: string
           type: Database["public"]["Enums"]["itemType"]
           unitOfMeasureCode: string
