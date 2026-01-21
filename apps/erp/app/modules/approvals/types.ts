@@ -5,7 +5,7 @@ import type {
   approvalRequestValidator
 } from "./approvals.models";
 import type {
-  getApprovalConfiguration,
+  getApprovalConfigurationByAmount,
   getApprovalRequestsByDocument
 } from "./approvals.service";
 
@@ -17,7 +17,7 @@ export type ApprovalHistory = NonNullable<
 >;
 
 export type ApprovalConfiguration = NonNullable<
-  Awaited<ReturnType<typeof getApprovalConfiguration>>["data"]
+  Awaited<ReturnType<typeof getApprovalConfigurationByAmount>>["data"]
 >;
 
 export type ApprovalStatus = Database["public"]["Enums"]["approvalStatus"];
