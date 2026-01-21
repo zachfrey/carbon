@@ -971,7 +971,6 @@ function getAssociationLink(
 ) {
   switch (key) {
     case "jobOperations":
-      // Check if this is an inspection step link
       if (child.type === "jobOperationsInspection") {
         return path.to.jobInspectionSteps(child.documentId);
       }
