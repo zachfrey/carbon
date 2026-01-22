@@ -847,6 +847,8 @@ export const path = {
     jobComplete: (id: string) => generatePath(`${x}/job/${id}/complete`),
     jobConfigure: (id: string) => generatePath(`${x}/job/${id}/configure`),
     jobDetails: (id: string) => generatePath(`${x}/job/${id}/details`),
+    jobInspectionSteps: (id: string) =>
+      generatePath(`${x}/job/${id}/steps?filter=type:eq:Inspection`),
     jobMaterial: (jobId: string, id: string) =>
       generatePath(`${x}/job/methods/${jobId}/material/${id}`),
     jobMaterials: (id: string) => generatePath(`${x}/job/${id}/materials`),
