@@ -26,15 +26,21 @@ export const approvalRequestValidator = z.object({
 });
 
 export const approvalDecisionValidator = z.object({
-  id: z.string().min(1, { message: "Approval request ID is required" }),
+  id: zfd.text(
+    z.string().min(1, { message: "Approval request ID is required" })
+  ),
   decision: z.enum(["Approved", "Rejected"], {
     errorMap: () => ({ message: "Decision is required" })
   }),
   decisionNotes: zfd.text(z.string().optional())
 });
 
-export const approvalConfigurationValidator = z.object({
+export const approvalRuleValidator = z.object({
   id: zfd.text(z.string().optional()),
+  name: z
+    .string()
+    .min(1, { message: "Rule name is required" })
+    .max(100, { message: "Rule name must be 100 characters or less" }),
   documentType: z.enum(approvalDocumentType, {
     errorMap: () => ({ message: "Document type is required" })
   }),

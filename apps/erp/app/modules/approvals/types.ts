@@ -1,12 +1,12 @@
 import type { Database } from "@carbon/database";
 import type { z } from "zod";
 import type {
-  approvalConfigurationValidator,
-  approvalRequestValidator
+  approvalRequestValidator,
+  approvalRuleValidator
 } from "./approvals.models";
 import type {
-  getApprovalConfigurationByAmount,
-  getApprovalRequestsByDocument
+  getApprovalRequestsByDocument,
+  getApprovalRuleByAmount
 } from "./approvals.service";
 
 export type ApprovalRequest =
@@ -16,8 +16,8 @@ export type ApprovalHistory = NonNullable<
   Awaited<ReturnType<typeof getApprovalRequestsByDocument>>["data"]
 >;
 
-export type ApprovalConfiguration = NonNullable<
-  Awaited<ReturnType<typeof getApprovalConfigurationByAmount>>["data"]
+export type ApprovalRule = NonNullable<
+  Awaited<ReturnType<typeof getApprovalRuleByAmount>>["data"]
 >;
 
 export type ApprovalStatus = Database["public"]["Enums"]["approvalStatus"];
@@ -50,12 +50,12 @@ export type CreateApprovalRequestInput = Omit<
   createdBy: string;
 };
 
-export type UpsertApprovalConfigurationInput =
-  | (Omit<z.infer<typeof approvalConfigurationValidator>, "id"> & {
+export type UpsertApprovalRuleInput =
+  | (Omit<z.infer<typeof approvalRuleValidator>, "id"> & {
       companyId: string;
       createdBy: string;
     })
-  | (Omit<z.infer<typeof approvalConfigurationValidator>, "id"> & {
+  | (Omit<z.infer<typeof approvalRuleValidator>, "id"> & {
       id: string;
       updatedBy: string;
     });
