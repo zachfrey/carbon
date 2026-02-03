@@ -487,59 +487,75 @@ export const themes = [
     name: "vercel",
     label: "Vercel",
     activeColor: {
-      light: "0 0% 93%",
-      dark: "0 0% 93%"
+      light: "0 0% 100%",
+      dark: "0 0% 100%"
     },
     cssVars: {
       light: {
-        background: "0 0% 4%",
+        // Geist Background 1: Pure black #000000
+        background: "0 0% 0%",
+        // Geist Gray 12 (primary text): #ededed
         foreground: "0 0% 93%",
-        card: "0 0% 9%",
+        // Geist Background 2: #0a0a0a - subtle elevation
+        card: "0 0% 4%",
         "card-foreground": "0 0% 93%",
-        popover: "0 0% 9%",
+        // Popovers slightly brighter than cards: #111111
+        popover: "0 0% 7%",
         "popover-foreground": "0 0% 93%",
-        primary: "0 0% 93%",
-        "primary-foreground": "0 0% 4%",
-        active: "0 0% 14%",
-        "active-foreground": "0 0% 93%",
-        secondary: "0 0% 14%",
+        // Primary: Pure white #ffffff for maximum contrast
+        primary: "0 0% 100%",
+        "primary-foreground": "0 0% 0%",
+        // Active/hover states: Geist Gray 3 #1a1a1a
+        active: "0 0% 10%",
+        "active-foreground": "0 0% 100%",
+        // Secondary: Geist Gray 2 #111111
+        secondary: "0 0% 7%",
         "secondary-foreground": "0 0% 93%",
-        muted: "0 0% 14%",
-        "muted-foreground": "0 0% 45%",
-        accent: "0 0% 14%",
+        // Muted: Geist Gray 2 with muted foreground
+        muted: "0 0% 7%",
+        // Geist Gray 9 (secondary text): #a1a1a1
+        "muted-foreground": "0 0% 63%",
+        // Accent: Geist Gray 3
+        accent: "0 0% 10%",
         "accent-foreground": "0 0% 93%",
-        destructive: "0 84% 60%",
-        "destructive-foreground": "0 0% 93%",
-        border: "0 0% 18%",
-        input: "0 0% 14%",
-        ring: "0 0% 32%",
-        success: "142 70% 45%",
-        "success-foreground": "0 0% 93%"
+        // Geist Red 9: #ff4444 - vibrant error red
+        destructive: "0 100% 64%",
+        "destructive-foreground": "0 0% 100%",
+        // Geist Gray 4: #262626 - subtle borders
+        border: "0 0% 15%",
+        // Input background: Geist Gray 2
+        input: "0 0% 7%",
+        // Focus ring: Geist Gray 6
+        ring: "0 0% 35%",
+        // Geist Green 9: #3ecf8e - Vercel's success green
+        success: "152 72% 53%",
+        "success-foreground": "0 0% 0%"
       },
       dark: {
-        background: "0 0% 4%",
+        // Identical to light - Vercel's always-dark aesthetic
+        background: "0 0% 0%",
         foreground: "0 0% 93%",
-        card: "0 0% 9%",
+        card: "0 0% 4%",
         "card-foreground": "0 0% 93%",
-        popover: "0 0% 9%",
+        popover: "0 0% 7%",
         "popover-foreground": "0 0% 93%",
-        primary: "0 0% 93%",
-        "primary-foreground": "0 0% 4%",
-        active: "0 0% 14%",
-        "active-foreground": "0 0% 93%",
-        secondary: "0 0% 14%",
+        primary: "0 0% 100%",
+        "primary-foreground": "0 0% 0%",
+        active: "0 0% 10%",
+        "active-foreground": "0 0% 100%",
+        secondary: "0 0% 7%",
         "secondary-foreground": "0 0% 93%",
-        muted: "0 0% 14%",
-        "muted-foreground": "0 0% 45%",
-        accent: "0 0% 14%",
+        muted: "0 0% 7%",
+        "muted-foreground": "0 0% 63%",
+        accent: "0 0% 10%",
         "accent-foreground": "0 0% 93%",
-        destructive: "0 62% 31%",
-        "destructive-foreground": "0 0% 93%",
-        border: "0 0% 18%",
-        input: "0 0% 14%",
-        ring: "0 0% 32%",
-        success: "142 70% 45%",
-        "success-foreground": "0 0% 93%"
+        destructive: "0 100% 64%",
+        "destructive-foreground": "0 0% 100%",
+        border: "0 0% 15%",
+        input: "0 0% 7%",
+        ring: "0 0% 35%",
+        success: "152 72% 53%",
+        "success-foreground": "0 0% 0%"
       }
     }
   }
