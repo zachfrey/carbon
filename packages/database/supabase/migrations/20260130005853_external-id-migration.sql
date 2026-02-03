@@ -57,7 +57,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- supplier
 INSERT INTO "externalIntegrationMapping" (
@@ -85,7 +85,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- contact
 INSERT INTO "externalIntegrationMapping" (
@@ -113,7 +113,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- item
 INSERT INTO "externalIntegrationMapping" (
@@ -141,7 +141,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- part
 INSERT INTO "externalIntegrationMapping" (
@@ -169,7 +169,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- material
 INSERT INTO "externalIntegrationMapping" (
@@ -197,7 +197,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- tool
 INSERT INTO "externalIntegrationMapping" (
@@ -225,7 +225,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- fixture
 INSERT INTO "externalIntegrationMapping" (
@@ -253,7 +253,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- consumable
 INSERT INTO "externalIntegrationMapping" (
@@ -281,7 +281,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- address
 INSERT INTO "externalIntegrationMapping" (
@@ -309,7 +309,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- salesOrder
 INSERT INTO "externalIntegrationMapping" (
@@ -337,7 +337,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- purchaseOrder
 INSERT INTO "externalIntegrationMapping" (
@@ -365,7 +365,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- quote
 INSERT INTO "externalIntegrationMapping" (
@@ -393,7 +393,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- salesInvoice
 INSERT INTO "externalIntegrationMapping" (
@@ -421,7 +421,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- nonConformanceActionTask (JSON type, cast to JSONB)
 INSERT INTO "externalIntegrationMapping" (
@@ -449,7 +449,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- ============================================================================
 -- STEP 2: Migrate tables requiring JOINs for companyId
@@ -482,7 +482,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- supplierLocation (join supplier for companyId)
 INSERT INTO "externalIntegrationMapping" (
@@ -511,7 +511,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- ============================================================================
 -- STEP 3: Migrate special tables
@@ -543,7 +543,7 @@ WHERE t."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- user (many-to-many via userToCompany, one mapping per company membership)
 INSERT INTO "externalIntegrationMapping" (
@@ -572,7 +572,7 @@ WHERE u."externalId" IS NOT NULL
       ELSE kv.value->>'id'
     END
   ) IS NOT NULL
-ON CONFLICT ("entityType", "entityId", "integration", "companyId") DO NOTHING;
+ON CONFLICT ("integration", "externalId", "entityType", "companyId") WHERE "allowDuplicateExternalId" = false DO NOTHING;
 
 -- ============================================================================
 -- STEP 4: Drop old indexes and columns
