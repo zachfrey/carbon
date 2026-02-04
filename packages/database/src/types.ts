@@ -7076,7 +7076,6 @@ export type Database = {
       eventSystemSubscription: {
         Row: {
           active: boolean | null
-          batchSize: number | null
           companyId: string
           config: Json
           createdAt: string | null
@@ -7089,7 +7088,6 @@ export type Database = {
         }
         Insert: {
           active?: boolean | null
-          batchSize?: number | null
           companyId: string
           config?: Json
           createdAt?: string | null
@@ -7102,7 +7100,6 @@ export type Database = {
         }
         Update: {
           active?: boolean | null
-          batchSize?: number | null
           companyId?: string
           config?: Json
           createdAt?: string | null

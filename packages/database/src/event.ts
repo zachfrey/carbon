@@ -74,8 +74,6 @@ export const CreateSubscriptionSchema = z.object({
   config: z.record(z.any()).default({}),
   // Database-level filtering (e.g. { status: "paid" })
   filter: z.record(z.any()).default({}),
-  // Optimization: specific batch size for PGMQ
-  batchSize: z.number().int().positive().default(50),
   // Defaults to true
   active: z.boolean().default(true)
 });
@@ -102,7 +100,6 @@ export async function createEventSystemSubscription(
       filter: params.filter,
       handlerType: params.type,
       config: params.config,
-      batchSize: params.batchSize,
       active: params.active
     })
     .onConflict((oc) =>
@@ -111,7 +108,6 @@ export async function createEventSystemSubscription(
         filter: params.filter,
         handlerType: params.type,
         config: params.config,
-        batchSize: params.batchSize,
         active: params.active
       })
     )

@@ -23917,9 +23917,6 @@ export default {
             $ref: "#/parameters/rowFilter.eventSystemSubscription.config",
           },
           {
-            $ref: "#/parameters/rowFilter.eventSystemSubscription.batchSize",
-          },
-          {
             $ref: "#/parameters/rowFilter.eventSystemSubscription.active",
           },
           {
@@ -24009,9 +24006,6 @@ export default {
             $ref: "#/parameters/rowFilter.eventSystemSubscription.config",
           },
           {
-            $ref: "#/parameters/rowFilter.eventSystemSubscription.batchSize",
-          },
-          {
             $ref: "#/parameters/rowFilter.eventSystemSubscription.active",
           },
           {
@@ -24053,9 +24047,6 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.eventSystemSubscription.config",
-          },
-          {
-            $ref: "#/parameters/rowFilter.eventSystemSubscription.batchSize",
           },
           {
             $ref: "#/parameters/rowFilter.eventSystemSubscription.active",
@@ -78456,11 +78447,6 @@ export default {
         config: {
           format: "jsonb",
         },
-        batchSize: {
-          default: 50,
-          format: "integer",
-          type: "integer",
-        },
         active: {
           default: true,
           format: "boolean",
@@ -109921,12 +109907,6 @@ export default {
     },
     "rowFilter.eventSystemSubscription.config": {
       name: "config",
-      required: false,
-      in: "query",
-      type: "string",
-    },
-    "rowFilter.eventSystemSubscription.batchSize": {
-      name: "batchSize",
       required: false,
       in: "query",
       type: "string",
