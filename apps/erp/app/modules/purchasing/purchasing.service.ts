@@ -938,17 +938,26 @@ export async function finalizePurchaseOrder(
   purchaseOrderId: string,
   userId: string
 ) {
-  const lines = await getPurchaseOrderLines(client, purchaseOrderId);
+  const [purchaseOrder, lines] = await Promise.all([
+    getPurchaseOrder(client, purchaseOrderId),
+    getPurchaseOrderLines(client, purchaseOrderId)
+  ]);
   const { status } = getPurchaseOrderStatus(lines.data || []);
+
+  const updateData: Database["public"]["Tables"]["purchaseOrder"]["Update"] = {
+    status,
+    updatedAt: today(getLocalTimeZone()).toString(),
+    updatedBy: userId
+  };
+
+  // Only set orderDate if it's not already set
+  if (!purchaseOrder.data?.orderDate) {
+    updateData.orderDate = today(getLocalTimeZone()).toString();
+  }
 
   return client
     .from("purchaseOrder")
-    .update({
-      status,
-      orderDate: today(getLocalTimeZone()).toString(),
-      updatedAt: today(getLocalTimeZone()).toString(),
-      updatedBy: userId
-    })
+    .update(updateData)
     .eq("id", purchaseOrderId);
 }
 

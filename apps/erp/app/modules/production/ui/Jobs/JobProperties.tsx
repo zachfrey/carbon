@@ -23,7 +23,12 @@ import { RiProgress8Line } from "react-icons/ri";
 import { Await, useFetcher, useParams } from "react-router";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { Assignee, Hyperlink, useOptimisticAssignment } from "~/components";
+import {
+  Assignee,
+  EmployeeAvatar,
+  Hyperlink,
+  useOptimisticAssignment
+} from "~/components";
 import {
   Customer,
   Item,
@@ -535,6 +540,13 @@ const JobProperties = () => {
           onChange={onUpdateTags}
         />
       </ValidatedForm>
+
+      <VStack spacing={2}>
+        <span className="text-xs font-medium text-muted-foreground">
+          Created By
+        </span>
+        <EmployeeAvatar employeeId={routeData?.job?.createdBy} />
+      </VStack>
 
       <CustomFormInlineFields
         customFields={

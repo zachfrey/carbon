@@ -24,7 +24,12 @@ import {
 import { Link, useFetcher, useParams } from "react-router";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { Assignee, Hyperlink, useOptimisticAssignment } from "~/components";
+import {
+  Assignee,
+  EmployeeAvatar,
+  Hyperlink,
+  useOptimisticAssignment
+} from "~/components";
 import {
   Currency,
   Location,
@@ -470,6 +475,14 @@ const PurchaseOrderProperties = () => {
             </HStack>
           </VStack>
         )}
+
+      <VStack spacing={2}>
+        <span className="text-xs font-medium text-muted-foreground">
+          Created By
+        </span>
+        <EmployeeAvatar employeeId={routeData?.purchaseOrder?.createdBy} />
+      </VStack>
+
       <CustomFormInlineFields
         customFields={
           (routeData?.purchaseOrder?.customFields ?? {}) as Record<string, Json>
