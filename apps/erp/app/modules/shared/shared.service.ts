@@ -129,6 +129,12 @@ export async function canApproveRequest(
       return false;
     }
 
+    // Check if user ID is directly in approverGroupIds (for individual approvers)
+    if (approverGroupIds.includes(userId)) {
+      return true;
+    }
+
+    // Check if user belongs to any of the approver groups
     return approverGroupIds.some((groupId) => userGroupIds.includes(groupId));
   });
 }
@@ -163,6 +169,12 @@ export async function canApproveRequestInWindow(
     return false;
   }
 
+  // Check if user ID is directly in approverGroupIds (for individual approvers)
+  if (approverGroupIds.includes(userId)) {
+    return true;
+  }
+
+  // Check if user belongs to any of the approver groups
   const userGroups = await client.rpc("groups_for_user", { uid: userId });
   const userGroupIds = userGroups.data || [];
   return approverGroupIds.some((groupId) => userGroupIds.includes(groupId));
