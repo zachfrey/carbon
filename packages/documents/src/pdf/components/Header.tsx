@@ -32,12 +32,14 @@ const Header = ({ company, title, documentId }: HeaderProps) => {
   return (
     <>
       <View style={tw("flex flex-row justify-between mb-1")}>
-        <View style={tw("flex flex-col flex-1")}>
+        <View style={tw("flex flex-col")}>
           {company.logoLightIcon ? (
-            <Image
-              src={company.logoLightIcon}
-              style={{ height: 50, width: "auto", marginBottom: 4 }}
-            />
+            <View style={{ alignSelf: "flex-start" }}>
+              <Image
+                src={company.logoLightIcon}
+                style={{ height: 50, width: "auto", marginBottom: 4 }}
+              />
+            </View>
           ) : (
             <View>
               <Text
