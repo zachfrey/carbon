@@ -155,7 +155,7 @@ const ItemPlanningForm = ({
             )}
             {/* <Boolean name="critical" label="Critical" /> */}
 
-            <CustomFormFields table="partPlanning" />
+            <CustomFormFields table="itemPlanning" />
           </div>
         </CardContent>
         <CardFooter>
