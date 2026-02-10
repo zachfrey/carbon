@@ -36,7 +36,7 @@ export async function loader({ request }: ActionFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
   assertIsPost(request);
-  const { client, userId } = await requirePermissions(request, {});
+  const { userId } = await requirePermissions(request, {});
 
   const validation = await validator(onboardingUserValidator).validate(
     await request.formData()
@@ -48,7 +48,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const { firstName, lastName, next } = validation.data;
 
-  const updateAccount = await updatePublicAccount(client, {
+  const updateAccount = await updatePublicAccount(getCarbonServiceRole(), {
     id: userId,
     firstName,
     lastName
