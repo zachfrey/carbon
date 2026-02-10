@@ -17970,6 +17970,57 @@ export default {
         tags: ["purchasingRfqSupplier"],
       },
     },
+    "/itemStockQuantities": {
+      get: {
+        parameters: [
+          {
+            $ref: "#/parameters/rowFilter.itemStockQuantities.itemId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.itemStockQuantities.companyId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.itemStockQuantities.quantityOnHand",
+          },
+          {
+            $ref: "#/parameters/select",
+          },
+          {
+            $ref: "#/parameters/order",
+          },
+          {
+            $ref: "#/parameters/range",
+          },
+          {
+            $ref: "#/parameters/rangeUnit",
+          },
+          {
+            $ref: "#/parameters/offset",
+          },
+          {
+            $ref: "#/parameters/limit",
+          },
+          {
+            $ref: "#/parameters/preferCount",
+          },
+        ],
+        responses: {
+          "200": {
+            description: "OK",
+            schema: {
+              items: {
+                $ref: "#/definitions/itemStockQuantities",
+              },
+              type: "array",
+            },
+          },
+          "206": {
+            description: "Partial Content",
+          },
+        },
+        tags: ["itemStockQuantities"],
+      },
+    },
     "/demandActual": {
       get: {
         parameters: [
@@ -65482,6 +65533,34 @@ export default {
         tags: ["(rpc) uuid_to_base58"],
       },
     },
+    "/rpc/refresh_item_stock_quantities": {
+      post: {
+        parameters: [
+          {
+            in: "body",
+            name: "args",
+            required: true,
+            schema: {
+              type: "object",
+            },
+          },
+          {
+            $ref: "#/parameters/preferParams",
+          },
+        ],
+        produces: [
+          "application/json",
+          "application/vnd.pgrst.object+json;nulls=stripped",
+          "application/vnd.pgrst.object+json",
+        ],
+        responses: {
+          "200": {
+            description: "OK",
+          },
+        },
+        tags: ["(rpc) refresh_item_stock_quantities"],
+      },
+    },
     "/rpc/get_assigned_job_operations": {
       post: {
         parameters: [
@@ -76133,6 +76212,27 @@ export default {
             "Note:\nThis is a Foreign Key to `user.id`.<fk table='user' column='id'/>",
           format: "text",
           type: "string",
+        },
+      },
+      type: "object",
+    },
+    itemStockQuantities: {
+      properties: {
+        itemId: {
+          description:
+            "Note:\nThis is a Foreign Key to `item.id`.<fk table='item' column='id'/>",
+          format: "text",
+          type: "string",
+        },
+        companyId: {
+          description:
+            "Note:\nThis is a Foreign Key to `company.id`.<fk table='company' column='id'/>",
+          format: "text",
+          type: "string",
+        },
+        quantityOnHand: {
+          format: "numeric",
+          type: "number",
         },
       },
       type: "object",
@@ -107212,6 +107312,33 @@ export default {
     },
     "rowFilter.purchasingRfqSupplier.createdBy": {
       name: "createdBy",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "body.itemStockQuantities": {
+      name: "itemStockQuantities",
+      description: "itemStockQuantities",
+      required: false,
+      in: "body",
+      schema: {
+        $ref: "#/definitions/itemStockQuantities",
+      },
+    },
+    "rowFilter.itemStockQuantities.itemId": {
+      name: "itemId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.itemStockQuantities.companyId": {
+      name: "companyId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.itemStockQuantities.quantityOnHand": {
+      name: "quantityOnHand",
       required: false,
       in: "query",
       type: "string",
