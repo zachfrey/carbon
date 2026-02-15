@@ -48,7 +48,6 @@ import {
   LuClipboardList,
   LuClock,
   LuEllipsisVertical,
-  LuHardHat,
   LuList,
   LuLoaderCircle,
   LuPackage,
@@ -447,7 +446,7 @@ function getExplorerMenuIcon(type: string) {
     case "quantities":
       return <LuSquareSigma />;
     default:
-      return <LuHardHat />;
+      return <LuCirclePlay />;
   }
 }
 

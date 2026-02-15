@@ -29,12 +29,12 @@ import { cva } from "class-variance-authority";
 import {
   LuCalendarDays,
   LuCircleCheck,
+  LuCirclePlay,
   LuClipboardCheck,
   LuEllipsisVertical,
   LuFlashlight,
   LuFlashlightOff,
   LuGripVertical,
-  LuHardHat,
   LuPencil,
   LuPlay,
   LuSquareUser,
@@ -280,7 +280,7 @@ export function ItemCard({ item, isOverlay, progressByItemId }: ItemCardProps) {
           </div>
         )}
         <HStack className="justify-start space-x-2">
-          <LuHardHat className="text-muted-foreground" />
+          <LuCirclePlay className="text-muted-foreground" />
           <span className="text-sm line-clamp-1">{item.title}</span>
         </HStack>
         {displaySettings.showDescription && item.description && (

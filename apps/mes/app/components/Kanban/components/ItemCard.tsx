@@ -23,9 +23,9 @@ import { cva } from "class-variance-authority";
 import {
   LuCalendarDays,
   LuCircleCheck,
+  LuCirclePlay,
   LuCircleX,
   LuClipboardCheck,
-  LuHardHat,
   LuSquareUser,
   LuTimer,
   LuTrash
@@ -198,7 +198,7 @@ export function ItemCard({
             </div>
           )}
           <HStack className="justify-start space-x-2">
-            <LuHardHat className="text-muted-foreground" />
+            <LuCirclePlay className="text-muted-foreground" />
             <span className="text-sm line-clamp-1">{item.title}</span>
           </HStack>
 

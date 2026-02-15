@@ -62,6 +62,7 @@ import {
   LuCheck,
   LuChevronLeft,
   LuChevronRight,
+  LuCirclePlay,
   LuCirclePlus,
   LuClipboardCheck,
   LuDownload,
@@ -497,7 +498,7 @@ export const JobOperation = ({
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to={path.to.jobDetail(operation.jobId)}>
-                    <DropdownMenuIcon icon={<LuHardHat />} />
+                    <DropdownMenuIcon icon={<LuCirclePlay />} />
                     Job Details
                   </Link>
                 </DropdownMenuItem>
