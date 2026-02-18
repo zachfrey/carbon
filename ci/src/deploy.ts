@@ -133,7 +133,7 @@ async function deploy(): Promise<void> {
         xero_webhook_secret,
       } = workspace;
 
-      if (slug === "app") {
+      if (["app", "staging"].includes(slug)) {
         continue;
       }
 
