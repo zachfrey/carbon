@@ -400,6 +400,8 @@ serve(async (req: Request) => {
             const partId = readableId || name;
             if (!partId) return;
 
+            const externalPartId = getReadableIdWithRevision(partId, revision);
+
             const isMade = children.length > 0;
             let itemId = id;
 
@@ -414,25 +416,26 @@ serve(async (req: Request) => {
                 .where("id", "=", itemId)
                 .execute();
 
-              // Upsert OnShape mapping
-              await trx
-                .deleteFrom("externalIntegrationMapping")
-                .where("entityType", "=", "item")
-                .where("entityId", "=", itemId)
-                .where("integration", "=", "onshapeData")
-                .execute();
-
+              // Upsert OnShape mapping — update if this entity already has a mapping
               await trx
                 .insertInto("externalIntegrationMapping")
                 .values({
                   entityType: "item",
                   entityId: itemId,
                   integration: "onshapeData",
-                  externalId: partId,
+                  externalId: externalPartId,
                   metadata: data.data,
                   companyId,
                   allowDuplicateExternalId: false,
                 })
+                .onConflict((oc) =>
+                  oc
+                    .columns(["entityType", "entityId", "integration", "companyId"])
+                    .doUpdateSet({
+                      externalId: externalPartId,
+                      metadata: data.data,
+                    })
+                )
                 .execute();
             } else {
               // Check if we've already created this part in this transaction
@@ -459,7 +462,7 @@ serve(async (req: Request) => {
 
                 itemId = item?.id;
 
-                // Create OnShape mapping for the new item
+                // Upsert OnShape mapping for the new item
                 if (itemId) {
                   await trx
                     .insertInto("externalIntegrationMapping")
@@ -467,11 +470,19 @@ serve(async (req: Request) => {
                       entityType: "item",
                       entityId: itemId,
                       integration: "onshapeData",
-                      externalId: partId,
+                      externalId: externalPartId,
                       metadata: data.data,
                       companyId,
                       allowDuplicateExternalId: false,
                     })
+                    .onConflict((oc) =>
+                      oc
+                        .columns(["integration", "externalId", "entityType", "companyId"])
+                        .doUpdateSet({
+                          entityId: itemId,
+                          metadata: data.data,
+                        })
+                    )
                     .execute();
                 }
 
