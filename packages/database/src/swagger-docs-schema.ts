@@ -10981,15 +10981,6 @@ export default {
             $ref: "#/parameters/rowFilter.supplierPart.tags",
           },
           {
-            $ref: "#/parameters/rowFilter.supplierPart.lastPurchaseDate",
-          },
-          {
-            $ref: "#/parameters/rowFilter.supplierPart.lastPOQuantity",
-          },
-          {
-            $ref: "#/parameters/rowFilter.supplierPart.lastPOId",
-          },
-          {
             $ref: "#/parameters/select",
           },
           {
@@ -11097,15 +11088,6 @@ export default {
             $ref: "#/parameters/rowFilter.supplierPart.tags",
           },
           {
-            $ref: "#/parameters/rowFilter.supplierPart.lastPurchaseDate",
-          },
-          {
-            $ref: "#/parameters/rowFilter.supplierPart.lastPOQuantity",
-          },
-          {
-            $ref: "#/parameters/rowFilter.supplierPart.lastPOId",
-          },
-          {
             $ref: "#/parameters/preferReturn",
           },
         ],
@@ -11165,15 +11147,6 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.supplierPart.tags",
-          },
-          {
-            $ref: "#/parameters/rowFilter.supplierPart.lastPurchaseDate",
-          },
-          {
-            $ref: "#/parameters/rowFilter.supplierPart.lastPOQuantity",
-          },
-          {
-            $ref: "#/parameters/rowFilter.supplierPart.lastPOId",
           },
           {
             $ref: "#/parameters/body.supplierPart",
@@ -23257,9 +23230,6 @@ export default {
             $ref: "#/parameters/rowFilter.supplierPartPrice.unitPrice",
           },
           {
-            $ref: "#/parameters/rowFilter.supplierPartPrice.leadTime",
-          },
-          {
             $ref: "#/parameters/rowFilter.supplierPartPrice.sourceType",
           },
           {
@@ -23349,9 +23319,6 @@ export default {
             $ref: "#/parameters/rowFilter.supplierPartPrice.unitPrice",
           },
           {
-            $ref: "#/parameters/rowFilter.supplierPartPrice.leadTime",
-          },
-          {
             $ref: "#/parameters/rowFilter.supplierPartPrice.sourceType",
           },
           {
@@ -23393,9 +23360,6 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.supplierPartPrice.unitPrice",
-          },
-          {
-            $ref: "#/parameters/rowFilter.supplierPartPrice.leadTime",
           },
           {
             $ref: "#/parameters/rowFilter.supplierPartPrice.sourceType",
@@ -73926,20 +73890,6 @@ export default {
           },
           type: "array",
         },
-        lastPurchaseDate: {
-          format: "timestamp with time zone",
-          type: "string",
-        },
-        lastPOQuantity: {
-          format: "numeric",
-          type: "number",
-        },
-        lastPOId: {
-          description:
-            "Note:\nThis is a Foreign Key to `purchaseOrder.id`.<fk table='purchaseOrder' column='id'/>",
-          format: "text",
-          type: "string",
-        },
       },
       type: "object",
     },
@@ -79581,14 +79531,10 @@ export default {
           format: "numeric",
           type: "number",
         },
-        leadTime: {
-          default: 0,
-          format: "numeric",
-          type: "number",
-        },
         sourceType: {
           default: "Quote",
-          format: "text",
+          enum: ["Quote", "Purchase Order", "Manual Entry"],
+          format: 'public."supplierPartPriceSourceType"',
           type: "string",
         },
         sourceDocumentId: {
@@ -104819,24 +104765,6 @@ export default {
       in: "query",
       type: "string",
     },
-    "rowFilter.supplierPart.lastPurchaseDate": {
-      name: "lastPurchaseDate",
-      required: false,
-      in: "query",
-      type: "string",
-    },
-    "rowFilter.supplierPart.lastPOQuantity": {
-      name: "lastPOQuantity",
-      required: false,
-      in: "query",
-      type: "string",
-    },
-    "rowFilter.supplierPart.lastPOId": {
-      name: "lastPOId",
-      required: false,
-      in: "query",
-      type: "string",
-    },
     "body.partner": {
       name: "partner",
       description: "partner",
@@ -111150,12 +111078,6 @@ export default {
     },
     "rowFilter.supplierPartPrice.unitPrice": {
       name: "unitPrice",
-      required: false,
-      in: "query",
-      type: "string",
-    },
-    "rowFilter.supplierPartPrice.leadTime": {
-      name: "leadTime",
       required: false,
       in: "query",
       type: "string",
