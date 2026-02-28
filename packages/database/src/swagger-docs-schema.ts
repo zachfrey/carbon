@@ -15642,6 +15642,123 @@ export default {
         tags: ["kanbans"],
       },
     },
+    "/apiKeyRateLimit": {
+      get: {
+        parameters: [
+          {
+            $ref: "#/parameters/rowFilter.apiKeyRateLimit.apiKeyId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKeyRateLimit.windowStart",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKeyRateLimit.requestCount",
+          },
+          {
+            $ref: "#/parameters/select",
+          },
+          {
+            $ref: "#/parameters/order",
+          },
+          {
+            $ref: "#/parameters/range",
+          },
+          {
+            $ref: "#/parameters/rangeUnit",
+          },
+          {
+            $ref: "#/parameters/offset",
+          },
+          {
+            $ref: "#/parameters/limit",
+          },
+          {
+            $ref: "#/parameters/preferCount",
+          },
+        ],
+        responses: {
+          "200": {
+            description: "OK",
+            schema: {
+              items: {
+                $ref: "#/definitions/apiKeyRateLimit",
+              },
+              type: "array",
+            },
+          },
+          "206": {
+            description: "Partial Content",
+          },
+        },
+        tags: ["apiKeyRateLimit"],
+      },
+      post: {
+        parameters: [
+          {
+            $ref: "#/parameters/body.apiKeyRateLimit",
+          },
+          {
+            $ref: "#/parameters/select",
+          },
+          {
+            $ref: "#/parameters/preferPost",
+          },
+        ],
+        responses: {
+          "201": {
+            description: "Created",
+          },
+        },
+        tags: ["apiKeyRateLimit"],
+      },
+      delete: {
+        parameters: [
+          {
+            $ref: "#/parameters/rowFilter.apiKeyRateLimit.apiKeyId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKeyRateLimit.windowStart",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKeyRateLimit.requestCount",
+          },
+          {
+            $ref: "#/parameters/preferReturn",
+          },
+        ],
+        responses: {
+          "204": {
+            description: "No Content",
+          },
+        },
+        tags: ["apiKeyRateLimit"],
+      },
+      patch: {
+        parameters: [
+          {
+            $ref: "#/parameters/rowFilter.apiKeyRateLimit.apiKeyId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKeyRateLimit.windowStart",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKeyRateLimit.requestCount",
+          },
+          {
+            $ref: "#/parameters/body.apiKeyRateLimit",
+          },
+          {
+            $ref: "#/parameters/preferReturn",
+          },
+        ],
+        responses: {
+          "204": {
+            description: "No Content",
+          },
+        },
+        tags: ["apiKeyRateLimit"],
+      },
+    },
     "/companies": {
       get: {
         parameters: [
@@ -54163,9 +54280,6 @@ export default {
             $ref: "#/parameters/rowFilter.apiKey.name",
           },
           {
-            $ref: "#/parameters/rowFilter.apiKey.key",
-          },
-          {
             $ref: "#/parameters/rowFilter.apiKey.companyId",
           },
           {
@@ -54173,6 +54287,27 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.apiKey.createdAt",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.keyHash",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.keyPreview",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.scopes",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.rateLimit",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.rateLimitWindow",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.expiresAt",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.lastUsedAt",
           },
           {
             $ref: "#/parameters/select",
@@ -54240,9 +54375,6 @@ export default {
             $ref: "#/parameters/rowFilter.apiKey.name",
           },
           {
-            $ref: "#/parameters/rowFilter.apiKey.key",
-          },
-          {
             $ref: "#/parameters/rowFilter.apiKey.companyId",
           },
           {
@@ -54250,6 +54382,27 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.apiKey.createdAt",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.keyHash",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.keyPreview",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.scopes",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.rateLimit",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.rateLimitWindow",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.expiresAt",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.lastUsedAt",
           },
           {
             $ref: "#/parameters/preferReturn",
@@ -54271,9 +54424,6 @@ export default {
             $ref: "#/parameters/rowFilter.apiKey.name",
           },
           {
-            $ref: "#/parameters/rowFilter.apiKey.key",
-          },
-          {
             $ref: "#/parameters/rowFilter.apiKey.companyId",
           },
           {
@@ -54281,6 +54431,27 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.apiKey.createdAt",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.keyHash",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.keyPreview",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.scopes",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.rateLimit",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.rateLimitWindow",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.expiresAt",
+          },
+          {
+            $ref: "#/parameters/rowFilter.apiKey.lastUsedAt",
           },
           {
             $ref: "#/parameters/body.apiKey",
@@ -65281,6 +65452,49 @@ export default {
         tags: ["(rpc) xid_decode"],
       },
     },
+    "/rpc/check_api_key_rate_limit": {
+      post: {
+        parameters: [
+          {
+            in: "body",
+            name: "args",
+            required: true,
+            schema: {
+              properties: {
+                p_api_key_id: {
+                  format: "text",
+                  type: "string",
+                },
+                p_limit: {
+                  format: "integer",
+                  type: "integer",
+                },
+                p_window: {
+                  format: "text",
+                  type: "string",
+                },
+              },
+              required: ["p_api_key_id", "p_limit", "p_window"],
+              type: "object",
+            },
+          },
+          {
+            $ref: "#/parameters/preferParams",
+          },
+        ],
+        produces: [
+          "application/json",
+          "application/vnd.pgrst.object+json;nulls=stripped",
+          "application/vnd.pgrst.object+json",
+        ],
+        responses: {
+          "200": {
+            description: "OK",
+          },
+        },
+        tags: ["(rpc) check_api_key_rate_limit"],
+      },
+    },
     "/rpc/nanoid_optimized": {
       post: {
         parameters: [
@@ -67005,6 +67219,34 @@ export default {
           },
         },
         tags: ["(rpc) get_material_naming_details"],
+      },
+    },
+    "/rpc/get_api_key_scopes": {
+      post: {
+        parameters: [
+          {
+            in: "body",
+            name: "args",
+            required: true,
+            schema: {
+              type: "object",
+            },
+          },
+          {
+            $ref: "#/parameters/preferParams",
+          },
+        ],
+        produces: [
+          "application/json",
+          "application/vnd.pgrst.object+json;nulls=stripped",
+          "application/vnd.pgrst.object+json",
+        ],
+        responses: {
+          "200": {
+            description: "OK",
+          },
+        },
+        tags: ["(rpc) get_api_key_scopes"],
       },
     },
     "/rpc/drop_audit_log_table": {
@@ -76106,6 +76348,28 @@ export default {
         thumbnailPath: {
           format: "text",
           type: "string",
+        },
+      },
+      type: "object",
+    },
+    apiKeyRateLimit: {
+      required: ["apiKeyId", "windowStart", "requestCount"],
+      properties: {
+        apiKeyId: {
+          description:
+            "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `apiKey.id`.<fk table='apiKey' column='id'/>",
+          format: "text",
+          type: "string",
+        },
+        windowStart: {
+          description: "Note:\nThis is a Primary Key.<pk/>",
+          format: "timestamp with time zone",
+          type: "string",
+        },
+        requestCount: {
+          default: 1,
+          format: "integer",
+          type: "integer",
         },
       },
       type: "object",
@@ -94146,7 +94410,17 @@ export default {
       type: "object",
     },
     apiKey: {
-      required: ["id", "name", "key", "companyId", "createdBy", "createdAt"],
+      required: [
+        "id",
+        "name",
+        "companyId",
+        "createdBy",
+        "createdAt",
+        "keyHash",
+        "scopes",
+        "rateLimit",
+        "rateLimitWindow",
+      ],
       properties: {
         id: {
           default: "public.id('api'::text)",
@@ -94155,10 +94429,6 @@ export default {
           type: "string",
         },
         name: {
-          format: "text",
-          type: "string",
-        },
-        key: {
           format: "text",
           type: "string",
         },
@@ -94176,6 +94446,35 @@ export default {
         },
         createdAt: {
           default: "now()",
+          format: "timestamp with time zone",
+          type: "string",
+        },
+        keyHash: {
+          format: "text",
+          type: "string",
+        },
+        keyPreview: {
+          format: "text",
+          type: "string",
+        },
+        scopes: {
+          format: "jsonb",
+        },
+        rateLimit: {
+          default: 60,
+          format: "integer",
+          type: "integer",
+        },
+        rateLimitWindow: {
+          default: "1m",
+          format: "text",
+          type: "string",
+        },
+        expiresAt: {
+          format: "timestamp with time zone",
+          type: "string",
+        },
+        lastUsedAt: {
           format: "timestamp with time zone",
           type: "string",
         },
@@ -107239,6 +107538,33 @@ export default {
     },
     "rowFilter.kanbans.thumbnailPath": {
       name: "thumbnailPath",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "body.apiKeyRateLimit": {
+      name: "apiKeyRateLimit",
+      description: "apiKeyRateLimit",
+      required: false,
+      in: "body",
+      schema: {
+        $ref: "#/definitions/apiKeyRateLimit",
+      },
+    },
+    "rowFilter.apiKeyRateLimit.apiKeyId": {
+      name: "apiKeyId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.apiKeyRateLimit.windowStart": {
+      name: "windowStart",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.apiKeyRateLimit.requestCount": {
+      name: "requestCount",
       required: false,
       in: "query",
       type: "string",
@@ -127615,12 +127941,6 @@ export default {
       in: "query",
       type: "string",
     },
-    "rowFilter.apiKey.key": {
-      name: "key",
-      required: false,
-      in: "query",
-      type: "string",
-    },
     "rowFilter.apiKey.companyId": {
       name: "companyId",
       required: false,
@@ -127635,6 +127955,48 @@ export default {
     },
     "rowFilter.apiKey.createdAt": {
       name: "createdAt",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.apiKey.keyHash": {
+      name: "keyHash",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.apiKey.keyPreview": {
+      name: "keyPreview",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.apiKey.scopes": {
+      name: "scopes",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.apiKey.rateLimit": {
+      name: "rateLimit",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.apiKey.rateLimitWindow": {
+      name: "rateLimitWindow",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.apiKey.expiresAt": {
+      name: "expiresAt",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.apiKey.lastUsedAt": {
+      name: "lastUsedAt",
       required: false,
       in: "query",
       type: "string",
