@@ -100,7 +100,8 @@ export async function deactivateCustomer(
         .from("customerAccount")
         .delete()
         .eq("id", userId)
-        .eq("companyId", companyId)
+        .eq("companyId", companyId),
+      serviceRole.from("membership").delete().eq("memberUserId", userId)
     ]);
 
   if (updatePermissions.error) {
@@ -285,7 +286,8 @@ export async function deactivateSupplier(
         .from("supplierAccount")
         .delete()
         .eq("id", userId)
-        .eq("companyId", companyId)
+        .eq("companyId", companyId),
+      serviceRole.from("membership").delete().eq("memberUserId", userId)
     ]);
 
   if (updatePermissions.error) {
