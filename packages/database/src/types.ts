@@ -9524,6 +9524,7 @@ export type Database = {
       }
       itemLedger: {
         Row: {
+          comment: string | null
           companyId: string
           createdAt: string
           createdBy: string
@@ -9544,6 +9545,7 @@ export type Database = {
           trackedEntityId: string | null
         }
         Insert: {
+          comment?: string | null
           companyId: string
           createdAt?: string
           createdBy?: string
@@ -9564,6 +9566,7 @@ export type Database = {
           trackedEntityId?: string | null
         }
         Update: {
+          comment?: string | null
           companyId?: string
           createdAt?: string
           createdBy?: string

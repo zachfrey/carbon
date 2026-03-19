@@ -13099,6 +13099,9 @@ export default {
             $ref: "#/parameters/rowFilter.itemLedger.trackedEntityId",
           },
           {
+            $ref: "#/parameters/rowFilter.itemLedger.comment",
+          },
+          {
             $ref: "#/parameters/select",
           },
           {
@@ -13206,6 +13209,9 @@ export default {
             $ref: "#/parameters/rowFilter.itemLedger.trackedEntityId",
           },
           {
+            $ref: "#/parameters/rowFilter.itemLedger.comment",
+          },
+          {
             $ref: "#/parameters/preferReturn",
           },
         ],
@@ -13265,6 +13271,9 @@ export default {
           },
           {
             $ref: "#/parameters/rowFilter.itemLedger.trackedEntityId",
+          },
+          {
+            $ref: "#/parameters/rowFilter.itemLedger.comment",
           },
           {
             $ref: "#/parameters/body.itemLedger",
@@ -75728,6 +75737,10 @@ export default {
           format: "text",
           type: "string",
         },
+        comment: {
+          format: "text",
+          type: "string",
+        },
       },
       type: "object",
     },
@@ -107062,6 +107075,12 @@ export default {
     },
     "rowFilter.itemLedger.trackedEntityId": {
       name: "trackedEntityId",
+      required: false,
+      in: "query",
+      type: "string",
+    },
+    "rowFilter.itemLedger.comment": {
+      name: "comment",
       required: false,
       in: "query",
       type: "string",
