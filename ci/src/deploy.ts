@@ -31,6 +31,7 @@ export type Workspace = {
   service_role_key: string | null;
 
   // App Configuration
+  auth_providers: string | null;
   carbon_edition: string | null;
   cloudflare_turnstile_secret_key: string | null;
   cloudflare_turnstile_site_key: string | null;
@@ -99,6 +100,7 @@ async function deploy(): Promise<void> {
         aws,
         aws_account_id,
         aws_region,
+        auth_providers,
         domain_name,
         cert_arn_erp,
         cert_arn_mes,
@@ -258,6 +260,7 @@ async function deploy(): Promise<void> {
           AWS_ACCOUNT_ID: aws_account_id,
           AWS_REGION: aws_region,
           IMAGE_TAG: imageTag,
+          AUTH_PROVIDERS: auth_providers ?? undefined,
           CARBON_EDITION: carbon_edition ?? "enterprise",
           CERT_ARN_ERP: cert_arn_erp,
           CERT_ARN_MES: cert_arn_mes,

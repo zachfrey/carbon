@@ -42,6 +42,7 @@ export default $config({
         memoryUtilization: 80,
       },
       environment: {
+        AUTH_PROVIDERS: process.env.AUTH_PROVIDERS,
         CARBON_EDITION: process.env.CARBON_EDITION,
         CLOUDFLARE_TURNSTILE_SECRET_KEY:
           process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY,
@@ -133,6 +134,7 @@ export default $config({
         memoryUtilization: 80,
       },
       environment: {
+        AUTH_PROVIDERS: process.env.AUTH_PROVIDERS,
         CARBON_EDITION: process.env.CARBON_EDITION,
         CLOUDFLARE_TURNSTILE_SECRET_KEY:
           process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY,
