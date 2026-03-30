@@ -34,7 +34,7 @@ import {
 } from "@carbon/react";
 import { ItarDisclosure, useMode } from "@carbon/remix";
 import type { ComponentProps } from "react";
-import { useRef } from "react";
+import { Suspense, useRef } from "react";
 import { BsFillHexagonFill } from "react-icons/bs";
 import {
   LuActivity,
@@ -51,7 +51,7 @@ import {
   LuUser,
   LuWrench
 } from "react-icons/lu";
-import { Form, Link, useFetcher, useLocation } from "react-router";
+import { Await, Form, Link, useFetcher, useLocation } from "react-router";
 import { useUser } from "~/hooks";
 import type { action } from "~/root";
 import type { Location } from "~/services/types";
@@ -79,7 +79,9 @@ export function AppSidebar({
   location: string;
   locations: Location[];
   timeCardEnabled?: boolean;
-  openClockEntry?: { id: string; clockIn: string } | null;
+  openClockEntry?: Promise<{
+    data: { id: string; clockIn: string; [key: string]: unknown } | null;
+  }> | null;
 }) {
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -96,7 +98,22 @@ export function AppSidebar({
       <SidebarFooter>
         {timeCardEnabled && (
           <SidebarMenu>
-            <TimeCardButton openClockEntry={openClockEntry ?? null} />
+            <Suspense fallback={<TimeCardButton openClockEntry={null} />}>
+              <Await resolve={openClockEntry}>
+                {(resolved) => (
+                  <TimeCardButton
+                    openClockEntry={
+                      resolved?.data
+                        ? {
+                            id: resolved.data.id,
+                            clockIn: resolved.data.clockIn
+                          }
+                        : null
+                    }
+                  />
+                )}
+              </Await>
+            </Suspense>
           </SidebarMenu>
         )}
         <UserNav

@@ -16,12 +16,14 @@ import { ItarPopup, useKeyboardWedge, useNProgress } from "@carbon/remix";
 import { getStripeCustomerByCompanyId } from "@carbon/stripe/stripe.server";
 import { Edition } from "@carbon/utils";
 import posthog from "posthog-js";
+import { Suspense } from "react";
 import type {
   LoaderFunctionArgs,
   MiddlewareFunction,
   ShouldRevalidateFunction
 } from "react-router";
 import {
+  Await,
   data,
   Outlet,
   redirect,
@@ -82,7 +84,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   // Get the location from middleware context
   const locationId = context.get(userContext)?.locationId;
 
-  let [companyPlan, locations, activeEvents, companySettings, openClockEntry] =
+  let [companyPlan, locations, activeEvents, companySettings] =
     await Promise.all([
       getStripeCustomerByCompanyId(companyId, userId),
       getLocationsByCompany(client, companyId),
@@ -94,8 +96,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
         .from("companySettings")
         .select("timeCardEnabled")
         .eq("id", companyId)
-        .single(),
-      getOpenClockEntry(client, userId, companyId)
+        .single()
     ]);
 
   // Get active maintenance count after we have the location
@@ -127,8 +128,8 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     plan: companyPlan?.planId,
     user: user.data,
     timeCardEnabled: companySettings.data?.timeCardEnabled ?? false,
-    openClockEntry: openClockEntry.data
-      ? { id: openClockEntry.data.id, clockIn: openClockEntry.data.clockIn }
+    openClockEntry: companySettings.data?.timeCardEnabled
+      ? getOpenClockEntry(client, userId, companyId)
       : null
   });
 }
@@ -195,7 +196,22 @@ export default function AuthenticatedRoute() {
                 />
                 <Outlet />
                 {timeCardEnabled && (
-                  <TimeCardWarning openClockEntry={openClockEntry} />
+                  <Suspense fallback={null}>
+                    <Await resolve={openClockEntry}>
+                      {(resolved) => (
+                        <TimeCardWarning
+                          openClockEntry={
+                            resolved?.data
+                              ? {
+                                  id: resolved.data.id,
+                                  clockIn: resolved.data.clockIn
+                                }
+                              : null
+                          }
+                        />
+                      )}
+                    </Await>
+                  </Suspense>
                 )}
               </TooltipProvider>
             </SidebarProvider>
